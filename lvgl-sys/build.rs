@@ -1,5 +1,6 @@
 use std::{env, path::PathBuf};
 use cc::Build;
+use bindgen;
 
 fn main() {
     let project_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
@@ -9,6 +10,9 @@ fn main() {
     let vendor = root_dir.join("vendor");
     let src = vendor.join("lvgl").join("src");
 
+    // TODO: Make it configurable! Needs to be linked to final proj defs, define as an env var.
+    let lvgl_config_path = vendor.join("lv_sim_eclipse_sdl");
+
     let mut cfg = Build::new();
 
     cfg.file(src.parent().unwrap().join("lvgl.h"))
@@ -16,8 +20,13 @@ fn main() {
         .include(&src)
         .warnings(false);
 
-    // TODO: Make it configurable! Needs to be linked to final proj defs, define as an env var.
-    cfg.include(vendor.join("lv_sim_eclipse_sdl"));
+    cfg.include(&lvgl_config_path);
 
     cfg.compile("lvgl");
+
+    let cc_args = ["-DLV_CONF_INCLUDE_SIMPLE=1", "-I", lvgl_config_path.to_str().unwrap()];
+    let _bindings = bindgen::Builder::default()
+        .header(src.parent().unwrap().join("lvgl.h").to_str().unwrap())
+        .clang_args(&cc_args)
+        .generate().expect("Unable to generate bindings");
 }
