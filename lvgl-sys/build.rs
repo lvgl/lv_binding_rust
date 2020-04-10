@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf};
+use std::{env, path::PathBuf, path::Path};
 use cc::Build;
 use bindgen;
 
@@ -15,8 +15,15 @@ fn main() {
 
     let mut cfg = Build::new();
 
-    cfg.file(src.parent().unwrap().join("lvgl.h"))
-        .define("LV_CONF_INCLUDE_SIMPLE", Some("1"))
+    add_c_files(&mut cfg, src.join("lv_core"));
+    add_c_files(&mut cfg, src.join("lv_draw"));
+    add_c_files(&mut cfg, src.join("lv_font"));
+    add_c_files(&mut cfg, src.join("lv_hal"));
+    add_c_files(&mut cfg, src.join("lv_misc"));
+    add_c_files(&mut cfg, src.join("lv_objx"));
+    add_c_files(&mut cfg, src.join("lv_themes"));
+
+    cfg.define("LV_CONF_INCLUDE_SIMPLE", Some("1"))
         .include(&src)
         .warnings(false)
         .include(&lvgl_config_path)
@@ -31,4 +38,17 @@ fn main() {
         .expect("Unable to generate bindings")
         .write_to_file(root_dir.join("lvgl-sys").join("src").join("lib.rs"))
         .expect("Can't write bindings!");
+}
+
+
+fn add_c_files(build: &mut cc::Build, path: impl AsRef<Path>) {
+    for e in path.as_ref().read_dir().unwrap() {
+        let e = e.unwrap();
+        let path = e.path();
+        if e.file_type().unwrap().is_dir() {
+            // skip dirs for now
+        } else if path.extension().and_then(|s| s.to_str()) == Some("c") {
+            build.file(&path);
+        }
+    }
 }
