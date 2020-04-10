@@ -29,14 +29,14 @@ fn main() {
         .include(&lvgl_config_path)
         .compile("lvgl");
 
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     let cc_args = ["-DLV_CONF_INCLUDE_SIMPLE=1", "-I", lvgl_config_path.to_str().unwrap()];
     bindgen::Builder::default()
         .header(src.parent().unwrap().join("lvgl.h").to_str().unwrap())
-        .raw_line("#![allow(non_snake_case, non_camel_case_types, non_upper_case_globals)]")
         .clang_args(&cc_args)
         .generate()
         .expect("Unable to generate bindings")
-        .write_to_file(root_dir.join("lvgl-sys").join("src").join("lib.rs"))
+        .write_to_file(out_path.join("bindings.rs"))
         .expect("Can't write bindings!");
 }
 
