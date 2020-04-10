@@ -1,0 +1,10 @@
+[package]
+name = "lvgl"
+version = "0.1.0"
+authors = ["Rafael Caricio <crates.lvgl@caric.io>"]
+edition = "2018"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
