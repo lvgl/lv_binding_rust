@@ -1,6 +1,6 @@
-use std::{env, path::PathBuf, path::Path};
-use cc::Build;
 use bindgen;
+use cc::Build;
+use std::{env, path::Path, path::PathBuf};
 
 fn main() {
     let project_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
@@ -30,7 +30,11 @@ fn main() {
         .include(&lvgl_config_path)
         .compile("lvgl");
 
-    let cc_args = ["-DLV_CONF_INCLUDE_SIMPLE=1", "-I", lvgl_config_path.to_str().unwrap()];
+    let cc_args = [
+        "-DLV_CONF_INCLUDE_SIMPLE=1",
+        "-I",
+        lvgl_config_path.to_str().unwrap(),
+    ];
     bindgen::Builder::default()
         .header(src.parent().unwrap().join("lvgl.h").to_str().unwrap())
         .clang_args(&cc_args)
@@ -39,7 +43,6 @@ fn main() {
         .write_to_file(lvgl_sys_src.join("bindings.rs"))
         .expect("Can't write bindings!");
 }
-
 
 fn add_c_files(build: &mut cc::Build, path: impl AsRef<Path>) {
     for e in path.as_ref().read_dir().unwrap() {
