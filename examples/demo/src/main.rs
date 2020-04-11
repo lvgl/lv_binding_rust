@@ -1,37 +1,30 @@
-use lazy_static;
 use lvgl_sys;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use sdl2::rect::{Point, Rect};
-use sdl2::render::{WindowCanvas, CanvasBuilder, Canvas};
-use sdl2::video::Window;
+use sdl2::rect::Point;
 use std::ffi::CString;
-use std::mem::{MaybeUninit, ManuallyDrop};
+use std::mem::MaybeUninit;
 use std::os::raw::c_void;
-use std::time::Duration;
-use std::ptr::NonNull;
 use std::panic;
-use std::sync::mpsc::channel;
-
+use std::time::Duration;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
 
-    let hr: u32 = unsafe { lvgl_sys::lv_disp_get_hor_res(std::ptr::null_mut()) as u32 };
-    let vr: u32 = unsafe { lvgl_sys::lv_disp_get_ver_res(std::ptr::null_mut()) as u32 };
-
     let window = video_subsystem
-        .window("TFT Display: Demo", hr, vr)
+        .window(
+            "TFT Display: Demo",
+            lvgl_sys::LV_HOR_RES_MAX,
+            lvgl_sys::LV_VER_RES_MAX,
+        )
         .position_centered()
         .opengl()
         .build()
         .map_err(|e| e.to_string())?;
 
-    let mut canvas = window
-        .into_canvas()
-        .build().map_err(|e| e.to_string())?;
+    let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
 
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     canvas.clear();
@@ -50,7 +43,7 @@ fn main() -> Result<(), String> {
             disp_buf.as_mut_ptr(),
             buf.as_mut_ptr() as *mut c_void,
             std::ptr::null_mut(),
-            (hr * 10) as u32,
+            (lvgl_sys::LV_HOR_RES_MAX * 10) as u32,
         );
     }
 
@@ -58,7 +51,7 @@ fn main() -> Result<(), String> {
     let mut display_driver = DisplayDriver::new(move |points, colors| {
         for (i, point) in points.into_iter().enumerate() {
             canvas.set_draw_color(colors[i]);
-            canvas.draw_point(point);
+            canvas.draw_point(point).unwrap();
         }
         canvas.present();
     });
@@ -69,14 +62,14 @@ fn main() -> Result<(), String> {
     }
 
     // Create screen and widgets
-    let mut screen = unsafe { lvgl_sys::lv_disp_get_scr_act(std::ptr::null_mut()) };
-    let mut btn = unsafe { lvgl_sys::lv_btn_create(screen, std::ptr::null_mut()) };
+    let screen = unsafe { lvgl_sys::lv_disp_get_scr_act(std::ptr::null_mut()) };
+    let btn = unsafe { lvgl_sys::lv_btn_create(screen, std::ptr::null_mut()) };
     unsafe {
         lvgl_sys::lv_obj_set_pos(btn, 10, 10);
         lvgl_sys::lv_obj_set_size(btn, 200, 50)
     }
-    let mut label = unsafe { lvgl_sys::lv_label_create(btn, std::ptr::null_mut()) };
-    let text = CString::new("Ewa, eu te amo!").unwrap();
+    let label = unsafe { lvgl_sys::lv_label_create(btn, std::ptr::null_mut()) };
+    let text = CString::new("Click me!").unwrap();
     unsafe {
         lvgl_sys::lv_label_set_text(label, text.as_ptr());
     }
@@ -108,14 +101,16 @@ fn main() -> Result<(), String> {
 }
 
 struct DisplayDriver<F>
-    where F: FnMut(Vec<Point>, Vec<Color>)
+where
+    F: FnMut(Vec<Point>, Vec<Color>),
 {
     pub raw: lvgl_sys::lv_disp_drv_t,
     callback: F,
 }
 
 impl<F> DisplayDriver<F>
-    where F: FnMut(Vec<Point>, Vec<Color>)
+where
+    F: FnMut(Vec<Point>, Vec<Color>),
 {
     fn new(mut callback: F) -> Self {
         let disp_drv = unsafe {
@@ -125,21 +120,24 @@ impl<F> DisplayDriver<F>
             disp_drv.user_data = &mut callback as *mut _ as *mut c_void;
             disp_drv
         };
-        Self{ raw: disp_drv, callback }
+        Self {
+            raw: disp_drv,
+            callback,
+        }
     }
 }
 
 unsafe extern "C" fn display_callback_wrapper<F>(
     disp_drv: *mut lvgl_sys::lv_disp_drv_t,
     area: *const lvgl_sys::lv_area_t,
-    color_p: *mut lvgl_sys::lv_color_t
-)
-    where F: FnMut(Vec<Point>, Vec<Color>)
+    color_p: *mut lvgl_sys::lv_color_t,
+) where
+    F: FnMut(Vec<Point>, Vec<Color>),
 {
     // we need to make sure panics can't escape across the FFI boundary.
     let _ = panic::catch_unwind(|| {
         let mut i = 0;
-        let mut disp = *disp_drv;
+        let disp = *disp_drv;
         let closure = &mut *(disp.user_data as *mut F);
         let mut points = vec![];
         let mut colors = vec![];
