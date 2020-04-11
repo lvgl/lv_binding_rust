@@ -2,7 +2,8 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+pub mod bindings;
+pub use bindings::*;
 
 #[cfg(test)]
 mod tests {
@@ -13,11 +14,11 @@ mod tests {
         unsafe {
             lv_init();
 
-            let hres = lv_disp_get_hor_res(std::ptr::null_mut());
-            assert_eq!(hres, 480);
+            let horizontal_resolution = lv_disp_get_hor_res(std::ptr::null_mut());
+            assert_eq!(horizontal_resolution, 480);
 
-            let vres = lv_disp_get_ver_res(std::ptr::null_mut());
-            assert_eq!(vres, 320);
+            let vertical_resolution = lv_disp_get_ver_res(std::ptr::null_mut());
+            assert_eq!(vertical_resolution, 320);
         }
     }
 }

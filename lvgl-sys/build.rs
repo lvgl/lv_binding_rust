@@ -8,6 +8,7 @@ fn main() {
         .unwrap();
     let root_dir = project_dir.parent().unwrap();
     let vendor = root_dir.join("vendor");
+    let lvgl_sys_src = root_dir.join("lvgl-sys").join("src");
     let src = vendor.join("lvgl").join("src");
 
     // TODO: Make it configurable! Needs to be linked to final proj defs, define as an env var.
@@ -29,14 +30,13 @@ fn main() {
         .include(&lvgl_config_path)
         .compile("lvgl");
 
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     let cc_args = ["-DLV_CONF_INCLUDE_SIMPLE=1", "-I", lvgl_config_path.to_str().unwrap()];
     bindgen::Builder::default()
         .header(src.parent().unwrap().join("lvgl.h").to_str().unwrap())
         .clang_args(&cc_args)
         .generate()
         .expect("Unable to generate bindings")
-        .write_to_file(out_path.join("bindings.rs"))
+        .write_to_file(lvgl_sys_src.join("bindings.rs"))
         .expect("Can't write bindings!");
 }
 

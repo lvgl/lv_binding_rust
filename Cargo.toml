@@ -1,3 +1,7 @@
 [workspace]
-members = ["lvgl-sys", "lvgl"]
+members = [
+    "lvgl-sys",
+    "lvgl",
+    "examples/demo",
+]
 
