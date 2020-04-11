@@ -37,6 +37,10 @@ fn main() {
     ];
     bindgen::Builder::default()
         .header(src.parent().unwrap().join("lvgl.h").to_str().unwrap())
+        .layout_tests(false)
+        .use_core()
+        .ctypes_prefix("cty")
+        .raw_line("use cty;")
         .clang_args(&cc_args)
         .generate()
         .expect("Unable to generate bindings")
