@@ -69,7 +69,7 @@ fn main() -> Result<(), String> {
     button.set_size(250, 50);
 
     let mut label = lvgl::Label::new(&mut button);
-    label.set_text("Hello Mundo!");
+    label.set_text("Hello Mundo!\0");
 
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
