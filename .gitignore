@@ -10,4 +10,5 @@ Cargo.lock
 **/*.rs.bk
 .idea/
 examples/demo/target/
+lvgl-sys/target/
 lvgl/target/
