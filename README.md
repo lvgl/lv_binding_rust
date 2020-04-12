@@ -19,6 +19,4 @@ LittlevGL is compatible with <samp>#![no_std]</samp> environments by default.
 
 ---
 
-<p align="center">
-<img src="https://raw.githubusercontent.com/rafaelcaricio/lvgl-rs/master/demo.png">
-</p>
+![Rust bindings usage demo code.](demo.png)
