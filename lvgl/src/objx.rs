@@ -1,7 +1,6 @@
-use lvgl_sys;
-use core::ffi;
 use core::ptr;
 use cty;
+use lvgl_sys;
 
 pub trait Container {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t>;
@@ -19,9 +18,7 @@ impl Object {
 
 impl Container for Object {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
-        unsafe {
-            ptr::NonNull::new_unchecked(self.raw.as_ptr())
-        }
+        unsafe { ptr::NonNull::new_unchecked(self.raw.as_ptr()) }
     }
 }
 
@@ -41,7 +38,11 @@ impl Button {
 
     pub fn set_pos(&mut self, x: u16, y: u16) {
         unsafe {
-            lvgl_sys::lv_obj_set_pos(self.raw().as_mut(), x as lvgl_sys::lv_coord_t, y as lvgl_sys::lv_coord_t);
+            lvgl_sys::lv_obj_set_pos(
+                self.raw().as_mut(),
+                x as lvgl_sys::lv_coord_t,
+                y as lvgl_sys::lv_coord_t,
+            );
         }
     }
 }
@@ -68,7 +69,10 @@ impl Label {
 
     pub fn set_text(&mut self, text: &str) {
         unsafe {
-            lvgl_sys::lv_label_set_text(self.core.raw().as_mut(), text.as_ptr() as *const cty::c_char);
+            lvgl_sys::lv_label_set_text(
+                self.core.raw().as_mut(),
+                text.as_ptr() as *const cty::c_char,
+            );
         }
     }
 }

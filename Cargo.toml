@@ -1,7 +1,0 @@
-[workspace]
-members = [
-    "lvgl-sys",
-    "lvgl",
-    "examples/demo",
-]
-
