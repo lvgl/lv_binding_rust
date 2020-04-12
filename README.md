@@ -10,7 +10,6 @@ LittlevGL is compatible with `#![no_std]` environments by default.
 
 <h4 align="center">
 <a href="https://littlevgl.com">Official LittlevGL Website </a> &middot; 
-<a href="https://littlevgl.com/live-demo">Live WASM demo</a>
 </h4>
 
 ---
