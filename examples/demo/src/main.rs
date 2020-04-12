@@ -1,4 +1,5 @@
 use lvgl_sys;
+use lvgl;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -62,17 +63,25 @@ fn main() -> Result<(), String> {
     }
 
     // Create screen and widgets
-    let screen = unsafe { lvgl_sys::lv_disp_get_scr_act(std::ptr::null_mut()) };
-    let btn = unsafe { lvgl_sys::lv_btn_create(screen, std::ptr::null_mut()) };
-    unsafe {
-        lvgl_sys::lv_obj_set_pos(btn, 10, 10);
-        lvgl_sys::lv_obj_set_size(btn, 200, 50)
-    }
-    let label = unsafe { lvgl_sys::lv_label_create(btn, std::ptr::null_mut()) };
-    let text = CString::new("Click me!").unwrap();
-    unsafe {
-        lvgl_sys::lv_label_set_text(label, text.as_ptr());
-    }
+    // let screen = unsafe { lvgl_sys::lv_disp_get_scr_act(std::ptr::null_mut()) };
+    // let btn = unsafe { lvgl_sys::lv_btn_create(screen, std::ptr::null_mut()) };
+    // unsafe {
+    //     lvgl_sys::lv_obj_set_pos(btn, 10, 10);
+    //     lvgl_sys::lv_obj_set_size(btn, 200, 50)
+    // }
+    // let label = unsafe { lvgl_sys::lv_label_create(btn, std::ptr::null_mut()) };
+    // let text = CString::new("Click me!").unwrap();
+    // unsafe {
+    //     lvgl_sys::lv_label_set_text(label, text.as_ptr());
+    // }
+
+    let mut screen = lvgl::display::get_active_screen();
+
+    let mut button = lvgl::Button::new(&mut screen);
+    button.set_pos(100, 10);
+
+    let mut label = lvgl::Label::new(&mut button);
+    label.set_text("Hello Beauty!");
 
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
