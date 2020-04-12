@@ -5,6 +5,7 @@ version = "0.1.0"
 authors = ["Rafael Caricio <crates.lvgl-sys@caric.io>"]
 edition = "2018"
 license = "MIT"
+homepage = "https://github.com/rafaelcaricio/lvgl-rs"
 repository = "https://github.com/rafaelcaricio/lvgl-rs"
 readme = "README.md"
 categories = ["external-ffi-bindings", "embedded", "gui", "no-std"]
