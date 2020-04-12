@@ -5,7 +5,7 @@
 LittlevGL provides everything you need to create a Graphical User Interface (GUI) on embedded systems with easy-to-use graphical elements, beautiful visual effects and low memory footprint. 
 </p>
 <p align="center">
-LittlevGL is compatible with `#![no_std]` environments by default.
+LittlevGL is compatible with <samp>#![no_std]</samp> environments by default.
 </p>
 
 <h4 align="center">
