@@ -1,6 +1,3 @@
-[submodule "lvgl-sys/vendor/lv_sim_eclipse_sdl"]
-	path = lvgl-sys/vendor/lv_sim_eclipse_sdl
-	url = https://github.com/rafaelcaricio/lv_sim_eclipse_sdl.git
 [submodule "lvgl-sys/vendor/lvgl"]
 	path = lvgl-sys/vendor/lvgl
 	url = https://github.com/littlevgl/lvgl.git

@@ -1,7 +1,7 @@
 [package]
 name = "lvgl"
 description = "LittlevGL bindings for Rust. A powerful and easy-to-use embedded GUI with many widgets, advanced visual effects (opacity, antialiasing, animations) and low memory requirements (16K RAM, 64K Flash)."
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Rafael Caricio <crates.lvgl@caric.io>"]
 edition = "2018"
 repository = "https://github.com/rafaelcaricio/lvgl-rs"
@@ -13,5 +13,5 @@ keywords = ["littlevgl", "lvgl", "graphical_interfaces"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-lvgl-sys = "0.1.0"
+lvgl-sys = "0.1.1"
 cty = "0.2.1"

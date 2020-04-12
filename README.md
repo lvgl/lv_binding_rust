@@ -20,3 +20,20 @@ LittlevGL is compatible with <samp>#![no_std]</samp> environments by default.
 ---
 
 ![Rust bindings usage demo code.](demo.png)
+
+## Usage
+
+Edit your `Cargo.toml` file dependencies with:
+```
+$ cargo add lvgl
+```
+
+The build requires the environment variable bellow to be set:
+
+- `DEP_LV_CONFIG_PATH`: Path to the directory containing the `lv_conf.h` header file used for configuration of LittlevGL library.
+
+We recommend the `lv_conf.h` file to be in your project's root directory. If so, the command to build your project would be:
+```shell script
+$ DEP_LV_CONFIG_PATH=`pwd` cargo build
+```
+

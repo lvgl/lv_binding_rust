@@ -45,6 +45,16 @@ impl Button {
             );
         }
     }
+
+    pub fn set_size(&mut self, w: u16, h: u16) {
+        unsafe {
+            lvgl_sys::lv_obj_set_size(
+                self.raw().as_mut(),
+                w as lvgl_sys::lv_coord_t,
+                h as lvgl_sys::lv_coord_t,
+            );
+        }
+    }
 }
 
 impl Container for Button {

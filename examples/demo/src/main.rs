@@ -4,7 +4,6 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
-use std::ffi::CString;
 use std::mem::MaybeUninit;
 use std::os::raw::c_void;
 use std::panic;
@@ -66,10 +65,11 @@ fn main() -> Result<(), String> {
     let mut screen = lvgl::display::get_active_screen();
 
     let mut button = lvgl::Button::new(&mut screen);
-    button.set_pos(100, 10);
+    button.set_pos(50, 50);
+    button.set_size(250, 50);
 
     let mut label = lvgl::Label::new(&mut button);
-    label.set_text("Hello Beauty!");
+    label.set_text("Hello Mundo!");
 
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
