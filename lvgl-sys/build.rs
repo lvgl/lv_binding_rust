@@ -52,6 +52,7 @@ fn main() {
     add_c_files(&mut cfg, vendor_src.join("lv_misc"));
     add_c_files(&mut cfg, vendor_src.join("lv_objx"));
     add_c_files(&mut cfg, vendor_src.join("lv_themes"));
+    add_c_files(&mut cfg, &lv_config_dir);
 
     cfg.define("LV_CONF_INCLUDE_SIMPLE", Some("1"))
         .include(&vendor_src)

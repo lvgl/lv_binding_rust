@@ -1,5 +1,6 @@
 use lvgl_sys;
 use lvgl;
+use lvgl::{Object, Style};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -13,7 +14,7 @@ fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     let mut framebuffer = [
-        [Color::from((255, 255, 255)); lvgl_sys::LV_VER_RES_MAX as usize];
+        [Color::from((0, 0, 0)); lvgl_sys::LV_VER_RES_MAX as usize];
         lvgl_sys::LV_HOR_RES_MAX as usize
     ];
 
@@ -30,7 +31,7 @@ fn main() -> Result<(), String> {
 
     let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
 
-    canvas.set_draw_color(Color::RGB(255, 255, 255));
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
     canvas.present();
 
@@ -57,12 +58,34 @@ fn main() -> Result<(), String> {
     // Create screen and widgets
     let mut screen = display_driver.get_active_screen();
 
-    let mut button = lvgl::Button::new(&mut screen);
-    button.set_pos(50, 50);
-    button.set_size(250, 50);
+    // let mut button = lvgl::Button::new(&mut screen);
+    // button.set_pos(50, 50);
+    // button.set_size(100, 50);
+    //
+    // let mut label = lvgl::Label::new(&mut button);
+    // label.set_text("Hello Mundo!\0");
 
-    let mut label = lvgl::Label::new(&mut button);
-    label.set_text("Hello Mundo!\0");
+    let mut time = lvgl::Label::new(&mut screen);
+    time.set_text("20:46\0");
+    time.set_width(240);
+    time.set_height(200);
+
+    // let mut style_time = Style::default();
+    // style_time.text.font = unsafe {
+    //     Some(&noto_sans_numeric_80)
+    // };
+    //time.set_style(style_time);
+
+    let mut native_style: lvgl_sys::lv_style_t;
+    unsafe {
+        native_style = MaybeUninit::<lvgl_sys::lv_style_t>::uninit().assume_init();
+        lvgl_sys::lv_style_copy(&mut native_style, &lvgl_sys::lv_style_pretty);
+        native_style.text.font = &noto_sans_numeric_80;
+    }
+
+    time.set_style(&mut native_style);
+    time.set_label_align(lvgl::LabelAlign::Center);
+    time.set_align(&mut screen, lvgl::Align::Center, 0, -30);
 
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
@@ -89,6 +112,11 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
+extern "C" {
+    pub static mut noto_sans_numeric_80: lvgl_sys::lv_font_t;
+}
+
+#[allow(dead_code)]
 struct DisplayDriver<F>
 where
     F: FnMut(Vec<Point>, Vec<Color>),
@@ -136,7 +164,7 @@ where
         }
     }
 
-    fn get_active_screen(&mut self) -> lvgl::Object {
+    fn get_active_screen(&mut self) -> lvgl::ObjectX {
         lvgl::display::get_active_screen()
     }
 }
