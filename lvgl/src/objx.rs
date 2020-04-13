@@ -55,13 +55,13 @@ pub trait Object: Container {
         }
     }
 
-    fn set_object_align(
+    fn set_object_align<C>(
         &mut self,
-        base: &mut dyn Container,
+        base: &mut C,
         align: ObjectAlign,
         x_mod: i32,
         y_mod: i32,
-    ) {
+    ) where C: Container {
         let align = match align {
             ObjectAlign::Center => lvgl_sys::LV_ALIGN_CENTER,
             ObjectAlign::InTopLeft => lvgl_sys::LV_ALIGN_IN_TOP_LEFT,
@@ -126,7 +126,7 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn new(parent: &mut dyn Container) -> Self {
+    pub fn new<C>(parent: &mut C) -> Self where C: Container {
         let raw = unsafe {
             let ptr = lvgl_sys::lv_btn_create(parent.raw().as_mut(), ptr::null_mut());
             ptr::NonNull::new_unchecked(ptr)
@@ -156,7 +156,7 @@ pub struct Label {
 }
 
 impl Label {
-    pub fn new(parent: &mut dyn Container) -> Self {
+    pub fn new<C>(parent: &mut C) -> Self where C: Container {
         let raw = unsafe {
             let ptr = lvgl_sys::lv_label_create(parent.raw().as_mut(), ptr::null_mut());
             ptr::NonNull::new_unchecked(ptr)
