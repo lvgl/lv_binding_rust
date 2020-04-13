@@ -97,6 +97,22 @@ pub trait Object: Container {
     }
 }
 
+macro_rules! define_object {
+    ($item:ident) => {
+        pub struct $item {
+            core: ObjectX,
+        }
+
+        impl Container for $item {
+            fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
+                self.core.raw()
+            }
+        }
+
+        impl Object for $item {}
+    }
+}
+
 pub enum ObjectAlign {
     Center,
     InTopLeft,
@@ -121,9 +137,7 @@ pub enum ObjectAlign {
     OutRightBottom,
 }
 
-pub struct Button {
-    core: ObjectX,
-}
+define_object!(Button);
 
 impl Button {
     pub fn new<C>(parent: &mut C) -> Self where C: Container {
@@ -136,14 +150,6 @@ impl Button {
     }
 }
 
-impl Container for Button {
-    fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
-        self.core.raw()
-    }
-}
-
-impl Object for Button {}
-
 pub enum LabelAlign {
     Left,
     Center,
@@ -151,9 +157,7 @@ pub enum LabelAlign {
     Auto,
 }
 
-pub struct Label {
-    core: ObjectX,
-}
+define_object!(Label);
 
 impl Label {
     pub fn new<C>(parent: &mut C) -> Self where C: Container {
@@ -186,11 +190,3 @@ impl Label {
         }
     }
 }
-
-impl Container for Label {
-    fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
-        self.core.raw()
-    }
-}
-
-impl Object for Label {}
