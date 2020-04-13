@@ -1,8 +1,8 @@
-use crate::objx::Object;
+use crate::objx::ObjectX;
 use core::ptr;
 
-pub fn get_active_screen() -> Object {
+pub fn get_active_screen() -> ObjectX {
     let raw =
         unsafe { ptr::NonNull::new_unchecked(lvgl_sys::lv_disp_get_scr_act(ptr::null_mut())) };
-    Object::new(raw)
+    ObjectX::new(raw)
 }
