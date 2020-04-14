@@ -66,26 +66,31 @@ fn main() -> Result<(), String> {
     // label.set_text("Hello Mundo!\0");
 
     let mut time = lvgl::Label::new(&mut screen);
+    let mut style_time = Style::default();
+    style_time.text.font = unsafe {
+        Some(&noto_sans_numeric_80)
+    };
+    time.set_style(&mut style_time);
+    time.set_align(&mut screen, lvgl::Align::InLeftMid, 20, 0);
     time.set_text("20:46\0");
     time.set_width(240);
-    time.set_height(200);
+    time.set_height(240);
 
-    // let mut style_time = Style::default();
-    // style_time.text.font = unsafe {
-    //     Some(&noto_sans_numeric_80)
-    // };
-    //time.set_style(style_time);
+    let mut bt = lvgl::Label::new(&mut screen);
+    bt.set_width(50);
+    bt.set_height(80);
+    bt.set_recolor(true);
+    bt.set_text("#5794f2 \u{F293}#\0");
+    bt.set_label_align(lvgl::LabelAlign::Left);
+    bt.set_align(&mut screen, lvgl::Align::InTopLeft, 0, 0);
 
-    let mut native_style: lvgl_sys::lv_style_t;
-    unsafe {
-        native_style = MaybeUninit::<lvgl_sys::lv_style_t>::uninit().assume_init();
-        lvgl_sys::lv_style_copy(&mut native_style, &lvgl_sys::lv_style_pretty);
-        native_style.text.font = &noto_sans_numeric_80;
-    }
-
-    time.set_style(&mut native_style);
-    time.set_label_align(lvgl::LabelAlign::Center);
-    time.set_align(&mut screen, lvgl::Align::Center, 0, -30);
+    let mut power = lvgl::Label::new(&mut screen);
+    power.set_recolor(true);
+    power.set_width(80);
+    power.set_height(20);
+    power.set_text("#fade2a 20%#\0");
+    power.set_label_align(lvgl::LabelAlign::Right);
+    power.set_align(&mut screen, lvgl::Align::InTopRight, 0, 0);
 
     let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
@@ -164,7 +169,7 @@ where
         }
     }
 
-    fn get_active_screen(&mut self) -> lvgl::ObjectX {
+    fn get_active_screen(&mut self) -> lvgl::ObjectX<'static> {
         lvgl::display::get_active_screen()
     }
 }

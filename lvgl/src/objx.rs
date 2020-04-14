@@ -9,7 +9,7 @@ pub trait NativeObject {
 
 pub struct ObjectX<'a> {
     raw: ptr::NonNull<lvgl_sys::lv_obj_t>,
-    style: Option<Style<'a>>,
+    style: Option<&'a mut Style<'a>>,
 }
 
 impl<'a> ObjectX<'a> {
@@ -24,7 +24,7 @@ impl<'a> NativeObject for ObjectX<'a> {
     }
 }
 
-pub trait Object: NativeObject {
+pub trait Object<'a>: NativeObject {
     fn set_pos(&mut self, x: i16, y: i16) {
         unsafe {
             lvgl_sys::lv_obj_set_pos(
@@ -98,8 +98,7 @@ pub trait Object: NativeObject {
         }
     }
 
-    //fn set_style(&mut self, style: Style<'static>);
-    fn set_style(&mut self, style: &mut lvgl_sys::lv_style_t);
+    fn set_style(&mut self, style: &'a mut Style<'a>);
 }
 
 macro_rules! define_object {
@@ -114,39 +113,15 @@ macro_rules! define_object {
             }
         }
 
-        impl<'a> Object for $item<'a> {
-            fn set_style(&mut self, style: &mut lvgl_sys::lv_style_t) {
-                unsafe {
-                    lvgl_sys::lv_obj_set_style(self.raw().as_mut(), style);
-                };
+        impl<'a> Object<'a> for $item<'a> {
+            fn set_style(&mut self, style: &'a mut Style<'a>) {
                 //self.core.style = Some(style);
+                unsafe {
+                    lvgl_sys::lv_obj_set_style(self.raw().as_mut(), style.raw());
+                };
             }
         }
     }
-}
-
-pub enum Align {
-    Center,
-    InTopLeft,
-    InTopMid,
-    InTopRight,
-    InBottomLeft,
-    InBottomMid,
-    InBottomRight,
-    InLeftMid,
-    InRightMid,
-    OutTopLeft,
-    OutTopMid,
-    OutTopRight,
-    OutBottomLeft,
-    OutBottomMid,
-    OutBottomRight,
-    OutLeftTop,
-    OutLeftMid,
-    OutLeftBottom,
-    OutRightTop,
-    OutRightMid,
-    OutRightBottom,
 }
 
 define_object!(Button);
@@ -201,6 +176,12 @@ impl<'a> Label<'a> {
             lvgl_sys::lv_label_set_align(self.core.raw().as_mut(), align);
         }
     }
+
+    pub fn set_recolor(&mut self, recolor: bool) {
+        unsafe {
+            lvgl_sys::lv_label_set_recolor(self.core.raw().as_mut(), recolor);
+        }
+    }
 }
 
 pub enum Themes {
@@ -221,20 +202,42 @@ pub struct TextStyle<'a> {
 impl<'a> Style<'a> {
     fn raw(&mut self) -> *const lvgl_sys::lv_style_t {
         match self.raw {
-            Some(mut native_pointer) => unsafe {
+            Some(mut native_pointer) => {
                 &mut native_pointer
-            }
+            },
             None => unsafe {
-                // TODO: Create the native struct and save to self
-                let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit().assume_init();
-                lvgl_sys::lv_style_copy(&mut native_style, &lvgl_sys::lv_style_pretty);
+                let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
+                lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), &lvgl_sys::lv_style_pretty);
+                self.raw = Some(native_style.assume_init());
                 if let Some(text_font) = self.text.font {
-                    native_style.text.font = text_font;
+                    self.raw.as_mut().unwrap().text.font = text_font as *const lvgl_sys::lv_font_t;
                 }
-                self.raw = Some(native_style);
-                &mut self.raw.unwrap()
+                self.raw.as_mut().unwrap()
             }
         }
     }
 }
 
+pub enum Align {
+    Center,
+    InTopLeft,
+    InTopMid,
+    InTopRight,
+    InBottomLeft,
+    InBottomMid,
+    InBottomRight,
+    InLeftMid,
+    InRightMid,
+    OutTopLeft,
+    OutTopMid,
+    OutTopRight,
+    OutBottomLeft,
+    OutBottomMid,
+    OutBottomRight,
+    OutLeftTop,
+    OutLeftMid,
+    OutLeftBottom,
+    OutRightTop,
+    OutRightMid,
+    OutRightBottom,
+}
