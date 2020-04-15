@@ -194,11 +194,6 @@ pub struct Style<'a> {
     pub text: TextStyle<'a>,
 }
 
-#[derive(Default)]
-pub struct TextStyle<'a> {
-    pub font: Option<&'a lvgl_sys::lv_font_t>,
-}
-
 impl<'a> Style<'a> {
     fn raw(&mut self) -> *const lvgl_sys::lv_style_t {
         match self.raw {
@@ -214,6 +209,42 @@ impl<'a> Style<'a> {
                 }
                 self.raw.as_mut().unwrap()
             }
+        }
+    }
+}
+
+impl<'a> Clone for Style<'a> {
+    fn clone(&self) -> Self {
+        match self.raw {
+            Some(_) => {
+                let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
+                unsafe {
+                    lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), self.raw.as_ref().unwrap());
+                    Self{
+                        raw: Some(native_style.assume_init()),
+                        text: self.text.clone()
+                    }
+                }
+            },
+            None => {
+                Self{
+                    raw: None,
+                    text: self.text.clone()
+                }
+            }
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct TextStyle<'a> {
+    pub font: Option<&'a lvgl_sys::lv_font_t>,
+}
+
+impl<'a> Clone for TextStyle<'a> {
+    fn clone(&self) -> Self {
+        Self {
+            font: self.font.clone()
         }
     }
 }
