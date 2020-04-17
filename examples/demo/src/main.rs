@@ -77,6 +77,12 @@ fn main() -> Result<(), String> {
     time.set_height(240);
 
     let mut bt = lvgl::Label::new(&mut screen);
+    let mut style_bt = Style::default();
+    style_bt.text.font = unsafe {
+        Some(&lvgl_sys::lv_font_roboto_28)
+    };
+    let mut style_power = style_bt.clone();
+    bt.set_style(&mut style_bt);
     bt.set_width(50);
     bt.set_height(80);
     bt.set_recolor(true);
@@ -85,6 +91,7 @@ fn main() -> Result<(), String> {
     bt.set_align(&mut screen, lvgl::Align::InTopLeft, 0, 0);
 
     let mut power = lvgl::Label::new(&mut screen);
+    power.set_style(&mut style_power);
     power.set_recolor(true);
     power.set_width(80);
     power.set_height(20);

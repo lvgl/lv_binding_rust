@@ -115,10 +115,10 @@ macro_rules! define_object {
 
         impl<'a> Object<'a> for $item<'a> {
             fn set_style(&mut self, style: &'a mut Style<'a>) {
-                //self.core.style = Some(style);
                 unsafe {
                     lvgl_sys::lv_obj_set_style(self.raw().as_mut(), style.raw());
                 };
+                self.core.style = Some(style);
             }
         }
     }
