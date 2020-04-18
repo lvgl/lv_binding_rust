@@ -1,7 +1,7 @@
+use core::mem;
 use core::ptr;
 use cty;
 use lvgl_sys;
-use core::mem;
 
 pub trait NativeObject {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t>;
@@ -9,7 +9,7 @@ pub trait NativeObject {
 
 pub struct ObjectX<'a> {
     raw: ptr::NonNull<lvgl_sys::lv_obj_t>,
-    style: Option<&'a mut Style<'a>>,
+    style: Option<&'a mut Style>,
 }
 
 impl<'a> ObjectX<'a> {
@@ -57,13 +57,10 @@ pub trait Object<'a>: NativeObject {
         }
     }
 
-    fn set_align<C>(
-        &mut self,
-        base: &mut C,
-        align: Align,
-        x_mod: i32,
-        y_mod: i32,
-    ) where C: NativeObject {
+    fn set_align<C>(&mut self, base: &mut C, align: Align, x_mod: i32, y_mod: i32)
+    where
+        C: NativeObject,
+    {
         let align = match align {
             Align::Center => lvgl_sys::LV_ALIGN_CENTER,
             Align::InTopLeft => lvgl_sys::LV_ALIGN_IN_TOP_LEFT,
@@ -98,7 +95,16 @@ pub trait Object<'a>: NativeObject {
         }
     }
 
-    fn set_style(&mut self, style: &'a mut Style<'a>);
+    fn set_style(&mut self, style: &'a mut Style);
+}
+
+impl<'a> Object<'a> for ObjectX<'a> {
+    fn set_style(&mut self, style: &'a mut Style) {
+        unsafe {
+            lvgl_sys::lv_obj_set_style(self.raw().as_mut(), style.raw());
+        };
+        self.style = Some(style);
+    }
 }
 
 macro_rules! define_object {
@@ -114,20 +120,23 @@ macro_rules! define_object {
         }
 
         impl<'a> Object<'a> for $item<'a> {
-            fn set_style(&mut self, style: &'a mut Style<'a>) {
+            fn set_style(&mut self, style: &'a mut Style) {
                 unsafe {
                     lvgl_sys::lv_obj_set_style(self.raw().as_mut(), style.raw());
                 };
                 self.core.style = Some(style);
             }
         }
-    }
+    };
 }
 
 define_object!(Button);
 
 impl<'a> Button<'a> {
-    pub fn new<C>(parent: &mut C) -> Self where C: NativeObject {
+    pub fn new<C>(parent: &mut C) -> Self
+    where
+        C: NativeObject,
+    {
         let raw = unsafe {
             let ptr = lvgl_sys::lv_btn_create(parent.raw().as_mut(), ptr::null_mut());
             ptr::NonNull::new_unchecked(ptr)
@@ -147,7 +156,10 @@ pub enum LabelAlign {
 define_object!(Label);
 
 impl<'a> Label<'a> {
-    pub fn new<C>(parent: &mut C) -> Self where C: NativeObject {
+    pub fn new<C>(parent: &mut C) -> Self
+    where
+        C: NativeObject,
+    {
         let raw = unsafe {
             let ptr = lvgl_sys::lv_label_create(parent.raw().as_mut(), ptr::null_mut());
             ptr::NonNull::new_unchecked(ptr)
@@ -188,64 +200,69 @@ pub enum Themes {
     Pretty,
 }
 
-#[derive(Default)]
-pub struct Style<'a> {
-    raw: Option<lvgl_sys::lv_style_t>,
-    pub text: TextStyle<'a>,
+pub struct Style {
+    raw: lvgl_sys::lv_style_t,
 }
 
-impl<'a> Style<'a> {
+impl Style {
+    pub fn new() -> Self {
+        let raw = unsafe {
+            let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
+            lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), &lvgl_sys::lv_style_pretty);
+            native_style.assume_init()
+        };
+        Self { raw }
+    }
+
+    /// Object's main background color.
+    pub fn set_body_main_color(&mut self, color: Color) {
+        self.raw.body.main_color = color.raw;
+    }
+
+    /// Second color. If not equal to `set_body_main_color` a gradient will be drawn for the background.
+    pub fn set_body_grad_color(&mut self, color: Color) {
+        self.raw.body.grad_color = color.raw;
+    }
+
+    /// Text color.
+    pub fn set_text_color(&mut self, color: Color) {
+        self.raw.text.color = color.raw;
+    }
+
+    /// Font used for displaying the text.
+    pub fn set_text_font(&mut self, font: &lvgl_sys::lv_font_t) {
+        self.raw.text.font = font;
+    }
+
     fn raw(&mut self) -> *const lvgl_sys::lv_style_t {
-        match self.raw {
-            Some(mut native_pointer) => {
-                &mut native_pointer
-            },
-            None => unsafe {
-                let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
-                lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), &lvgl_sys::lv_style_pretty);
-                self.raw = Some(native_style.assume_init());
-                if let Some(text_font) = self.text.font {
-                    self.raw.as_mut().unwrap().text.font = text_font as *const lvgl_sys::lv_font_t;
-                }
-                self.raw.as_mut().unwrap()
+        &mut self.raw
+    }
+}
+
+impl Clone for Style {
+    fn clone(&self) -> Self {
+        let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
+        unsafe {
+            lvgl_sys::lv_style_copy(
+                native_style.as_mut_ptr(),
+                &self.raw as *const lvgl_sys::lv_style_t,
+            );
+            Self {
+                raw: native_style.assume_init(),
             }
         }
     }
 }
 
-impl<'a> Clone for Style<'a> {
-    fn clone(&self) -> Self {
-        match self.raw {
-            Some(_) => {
-                let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
-                unsafe {
-                    lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), self.raw.as_ref().unwrap());
-                    Self{
-                        raw: Some(native_style.assume_init()),
-                        text: self.text.clone()
-                    }
-                }
-            },
-            None => {
-                Self{
-                    raw: None,
-                    text: self.text.clone()
-                }
-            }
-        }
-    }
+#[derive(Clone)]
+pub struct Color {
+    raw: lvgl_sys::lv_color_t,
 }
 
-#[derive(Default)]
-pub struct TextStyle<'a> {
-    pub font: Option<&'a lvgl_sys::lv_font_t>,
-}
-
-impl<'a> Clone for TextStyle<'a> {
-    fn clone(&self) -> Self {
-        Self {
-            font: self.font.clone()
-        }
+impl Color {
+    pub fn from_rgb((r, g, b): (u8, u8, u8)) -> Self {
+        let raw = unsafe { lvgl_sys::lvsys_color_make(r, g, b) };
+        Self { raw }
     }
 }
 

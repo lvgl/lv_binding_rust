@@ -1,6 +1,6 @@
-use lvgl_sys;
 use lvgl;
-use lvgl::{Object, Style};
+use lvgl::Object;
+use lvgl_sys;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -13,10 +13,8 @@ use std::time::Duration;
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
-    let mut framebuffer = [
-        [Color::from((0, 0, 0)); lvgl_sys::LV_VER_RES_MAX as usize];
-        lvgl_sys::LV_HOR_RES_MAX as usize
-    ];
+    let mut framebuffer = [[Color::from((0, 0, 0)); lvgl_sys::LV_VER_RES_MAX as usize];
+        lvgl_sys::LV_HOR_RES_MAX as usize];
 
     let window = video_subsystem
         .window(
@@ -65,11 +63,18 @@ fn main() -> Result<(), String> {
     // let mut label = lvgl::Label::new(&mut button);
     // label.set_text("Hello Mundo!\0");
 
+    let font_roboto_28 = unsafe { &lvgl_sys::lv_font_roboto_28 };
+    let font_noto_sans_numeric_28 = unsafe { &noto_sans_numeric_80 };
+
+    let mut screen_style = lvgl::Style::new();
+    screen_style.set_body_main_color(lvgl::Color::from_rgb((0, 0, 0)));
+    screen_style.set_body_grad_color(lvgl::Color::from_rgb((0, 0, 0)));
+    screen.set_style(&mut screen_style);
+
     let mut time = lvgl::Label::new(&mut screen);
-    let mut style_time = Style::default();
-    style_time.text.font = unsafe {
-        Some(&noto_sans_numeric_80)
-    };
+    let mut style_time = lvgl::Style::new();
+    style_time.set_text_font(font_noto_sans_numeric_28);
+    style_time.set_text_color(lvgl::Color::from_rgb((255, 255, 255)));
     time.set_style(&mut style_time);
     time.set_align(&mut screen, lvgl::Align::InLeftMid, 20, 0);
     time.set_text("20:46\0");
@@ -77,10 +82,8 @@ fn main() -> Result<(), String> {
     time.set_height(240);
 
     let mut bt = lvgl::Label::new(&mut screen);
-    let mut style_bt = Style::default();
-    style_bt.text.font = unsafe {
-        Some(&lvgl_sys::lv_font_roboto_28)
-    };
+    let mut style_bt = lvgl::Style::new();
+    style_bt.set_text_font(font_roboto_28);
     let mut style_power = style_bt.clone();
     bt.set_style(&mut style_bt);
     bt.set_width(50);
@@ -114,7 +117,9 @@ fn main() -> Result<(), String> {
             }
         }
 
-        ::std::thread::sleep(Duration::from_millis(lvgl_sys::LV_DISP_DEF_REFR_PERIOD as u64));
+        ::std::thread::sleep(Duration::from_millis(
+            lvgl_sys::LV_DISP_DEF_REFR_PERIOD as u64,
+        ));
 
         unsafe {
             lvgl_sys::lv_task_handler();
@@ -124,6 +129,7 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
+// Reference to native font for LittlevGL, defined in the file: "fonts_noto_sans_numeric_80.c"
 extern "C" {
     pub static mut noto_sans_numeric_80: lvgl_sys::lv_font_t;
 }
@@ -146,7 +152,8 @@ where
     fn new(mut callback: F) -> Self {
         // Create a display buffer for LittlevGL
         let mut display_buffer = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
-        let mut refresh_buffer: [MaybeUninit<lvgl_sys::lv_color_t>; lvgl_sys::LV_HOR_RES_MAX as usize * 10] =
+        let mut refresh_buffer: [MaybeUninit<lvgl_sys::lv_color_t>;
+            lvgl_sys::LV_HOR_RES_MAX as usize * 10] =
             unsafe { MaybeUninit::uninit().assume_init() }; /*Declare a buffer for 10 lines*/
         unsafe {
             // Initialize the display buffer
@@ -188,17 +195,23 @@ unsafe extern "C" fn display_callback_wrapper<F>(
 ) where
     F: FnMut(Vec<Point>, Vec<Color>),
 {
-    // we need to make sure panics can't escape across the FFI boundary.
+    // We need to make sure panics can't escape across the FFI boundary.
     let _ = panic::catch_unwind(|| {
         let mut i = 0;
         let disp = *disp_drv;
+
+        // Rust code closure reference
         let closure = &mut *(disp.user_data as *mut F);
+
         let mut points = vec![];
         let mut colors = vec![];
 
         for y in (*area).y1..=(*area).y2 {
             for x in (*area).x1..=(*area).x2 {
+                // Convert point to paint to a high-level Rust repr
                 points.push(Point::new(x as i32, y as i32));
+
+                // Convert C color representation to high-level Rust
                 let raw_color = *color_p.add(i);
                 let color = Color::from((
                     raw_color.ch.red,
@@ -207,10 +220,15 @@ unsafe extern "C" fn display_callback_wrapper<F>(
                     raw_color.ch.alpha,
                 ));
                 colors.push(color);
+
                 i = i + 1;
             }
         }
+
+        // Callback the Rust closure to flush the new points to the screen
         closure(points, colors);
-        lvgl_sys::lv_disp_flush_ready(disp_drv); // Indicate you are ready with the flushing
+
+        // Indicate to LittlevGL that you are ready with the flushing
+        lvgl_sys::lv_disp_flush_ready(disp_drv);
     });
 }

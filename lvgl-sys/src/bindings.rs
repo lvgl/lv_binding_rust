@@ -178,7 +178,7 @@ pub const LV_COLOR_16_SWAP: u32 = 0;
 pub const LV_COLOR_SCREEN_TRANSP: u32 = 0;
 pub const LV_INDEXED_CHROMA: u32 = 1;
 pub const LV_ANTIALIAS: u32 = 1;
-pub const LV_DISP_DEF_REFR_PERIOD: u32 = 100;
+pub const LV_DISP_DEF_REFR_PERIOD: u32 = 30;
 pub const LV_DPI: u32 = 100;
 pub const LV_MEM_CUSTOM: u32 = 0;
 pub const LV_MEM_SIZE: u32 = 131072;
@@ -11787,6 +11787,9 @@ extern "C" {
     #[doc = " Useful if the image source is updated therefore it needs to be cached again."]
     #[doc = " @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable."]
     pub fn lv_img_cache_invalidate_src(src: *const cty::c_void);
+}
+extern "C" {
+    pub fn lvsys_color_make(r: u8, g: u8, b: u8) -> lv_color_t;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

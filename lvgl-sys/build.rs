@@ -8,6 +8,7 @@ fn main() {
     let project_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
         .canonicalize()
         .unwrap();
+    let include_dir = project_dir.join("include");
     let vendor = project_dir.join("vendor");
     let vendor_src = vendor.join("lvgl").join("src");
 
@@ -52,7 +53,9 @@ fn main() {
     add_c_files(&mut cfg, vendor_src.join("lv_misc"));
     add_c_files(&mut cfg, vendor_src.join("lv_objx"));
     add_c_files(&mut cfg, vendor_src.join("lv_themes"));
+    add_c_files(&mut cfg, vendor_src.join("lv_themes"));
     add_c_files(&mut cfg, &lv_config_dir);
+    add_c_files(&mut cfg, &include_dir);
 
     cfg.define("LV_CONF_INCLUDE_SIMPLE", Some("1"))
         .include(&vendor_src)
@@ -69,14 +72,7 @@ fn main() {
         vendor.to_str().unwrap(),
     ];
     bindgen::Builder::default()
-        .header(
-            vendor_src
-                .parent()
-                .unwrap()
-                .join("lvgl.h")
-                .to_str()
-                .unwrap(),
-        )
+        .header(include_dir.join("lvgl_sys.h").to_str().unwrap())
         .layout_tests(false)
         .use_core()
         .ctypes_prefix("cty")
