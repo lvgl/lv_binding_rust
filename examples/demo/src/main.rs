@@ -103,8 +103,9 @@ fn main() -> Result<(), String> {
     power.set_align(&mut screen, lvgl::Align::InTopRight, 0, 0);
 
     let mut event_pump = sdl_context.event_pump()?;
+    let mut i = 0;
     'running: loop {
-        for event in event_pump.poll_iter() {
+        if let Some(event) = event_pump.poll_event() {
             match event {
                 Event::Quit { .. }
                 | Event::KeyDown {
@@ -117,12 +118,17 @@ fn main() -> Result<(), String> {
             }
         }
 
-        ::std::thread::sleep(Duration::from_millis(
-            lvgl_sys::LV_DISP_DEF_REFR_PERIOD as u64,
-        ));
+        if i > 59 {
+            i = 0;
+        }
+        time.set_text(format!("21:{:02}\0", i).as_str());
+        i = 1 + i;
+
+        ::std::thread::sleep(Duration::from_millis(10));
 
         unsafe {
             lvgl_sys::lv_task_handler();
+            lvgl_sys::lv_tick_inc(10);
         }
     }
 
