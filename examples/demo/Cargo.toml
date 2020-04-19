@@ -10,4 +10,5 @@ publish = false
 [dependencies]
 lvgl = { path = "../../lvgl" }
 lvgl-sys = { path = "../../lvgl-sys" }
-sdl2 = "0.33.0"
+embedded-graphics = "0.6"
+embedded-graphics-simulator = "0.2.0"

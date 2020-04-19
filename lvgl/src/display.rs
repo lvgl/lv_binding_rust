@@ -8,11 +8,11 @@ use embedded_graphics::pixelcolor::Rgb888;
 use core::marker::PhantomData;
 
 
-struct DisplayDriver<'a, T>
+pub struct DisplayDriver<'a, T>
     where
         T: DrawTarget<Rgb888>,
 {
-    pub raw: lvgl_sys::lv_disp_drv_t,
+    raw: lvgl_sys::lv_disp_drv_t,
     display_buffer: MaybeUninit<lvgl_sys::lv_disp_buf_t>,
     refresh_buffer: [MaybeUninit<lvgl_sys::lv_color_t>; lvgl_sys::LV_HOR_RES_MAX as usize * 10],
     phantom: &'a PhantomData<T>,
@@ -61,7 +61,7 @@ impl<'a, T> DisplayDriver<'a, T> where
         }
     }
 
-    fn get_active_screen(&mut self) -> ObjectX<'static> {
+    pub fn get_active_screen(&mut self) -> ObjectX<'static> {
         get_active_screen()
     }
 }
