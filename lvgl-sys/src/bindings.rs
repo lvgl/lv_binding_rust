@@ -179,9 +179,9 @@ pub const LV_COLOR_SCREEN_TRANSP: u32 = 0;
 pub const LV_INDEXED_CHROMA: u32 = 1;
 pub const LV_ANTIALIAS: u32 = 1;
 pub const LV_DISP_DEF_REFR_PERIOD: u32 = 30;
-pub const LV_DPI: u32 = 100;
+pub const LV_DPI: u32 = 298;
 pub const LV_MEM_CUSTOM: u32 = 0;
-pub const LV_MEM_SIZE: u32 = 131072;
+pub const LV_MEM_SIZE: u32 = 4096;
 pub const LV_MEM_ADR: u32 = 0;
 pub const LV_MEM_AUTO_DEFRAG: u32 = 1;
 pub const LV_ENABLE_GC: u32 = 0;
@@ -193,37 +193,31 @@ pub const LV_INDEV_DEF_LONG_PRESS_REP_TIME: u32 = 100;
 pub const LV_USE_ANIMATION: u32 = 1;
 pub const LV_USE_SHADOW: u32 = 1;
 pub const LV_USE_GROUP: u32 = 1;
-pub const LV_USE_GPU: u32 = 1;
-pub const LV_USE_FILESYSTEM: u32 = 1;
+pub const LV_USE_GPU: u32 = 0;
+pub const LV_USE_FILESYSTEM: u32 = 0;
 pub const LV_USE_USER_DATA: u32 = 1;
 pub const LV_IMG_CF_INDEXED: u32 = 1;
 pub const LV_IMG_CF_ALPHA: u32 = 1;
 pub const LV_IMG_CACHE_DEF_SIZE: u32 = 1;
 pub const LV_TICK_CUSTOM: u32 = 0;
-pub const LV_USE_LOG: u32 = 1;
-pub const LV_LOG_PRINTF: u32 = 1;
-pub const LV_USE_DEBUG: u32 = 1;
-pub const LV_USE_ASSERT_NULL: u32 = 1;
-pub const LV_USE_ASSERT_MEM: u32 = 1;
-pub const LV_USE_ASSERT_STR: u32 = 1;
-pub const LV_USE_ASSERT_OBJ: u32 = 1;
-pub const LV_USE_ASSERT_STYLE: u32 = 1;
+pub const LV_USE_LOG: u32 = 0;
+pub const LV_USE_DEBUG: u32 = 0;
 pub const LV_THEME_LIVE_UPDATE: u32 = 0;
 pub const LV_USE_THEME_TEMPL: u32 = 0;
-pub const LV_USE_THEME_DEFAULT: u32 = 1;
-pub const LV_USE_THEME_ALIEN: u32 = 1;
-pub const LV_USE_THEME_NIGHT: u32 = 1;
-pub const LV_USE_THEME_MONO: u32 = 1;
-pub const LV_USE_THEME_MATERIAL: u32 = 1;
-pub const LV_USE_THEME_ZEN: u32 = 1;
-pub const LV_USE_THEME_NEMO: u32 = 1;
-pub const LV_FONT_ROBOTO_12: u32 = 1;
-pub const LV_FONT_ROBOTO_16: u32 = 1;
-pub const LV_FONT_ROBOTO_22: u32 = 1;
+pub const LV_USE_THEME_DEFAULT: u32 = 0;
+pub const LV_USE_THEME_ALIEN: u32 = 0;
+pub const LV_USE_THEME_NIGHT: u32 = 0;
+pub const LV_USE_THEME_MONO: u32 = 0;
+pub const LV_USE_THEME_MATERIAL: u32 = 0;
+pub const LV_USE_THEME_ZEN: u32 = 0;
+pub const LV_USE_THEME_NEMO: u32 = 0;
+pub const LV_FONT_ROBOTO_12: u32 = 0;
+pub const LV_FONT_ROBOTO_16: u32 = 0;
+pub const LV_FONT_ROBOTO_22: u32 = 0;
 pub const LV_FONT_ROBOTO_28: u32 = 1;
 pub const LV_FONT_ROBOTO_12_SUBPX: u32 = 1;
 pub const LV_FONT_ROBOTO_28_COMPRESSED: u32 = 1;
-pub const LV_FONT_UNSCII_8: u32 = 1;
+pub const LV_FONT_UNSCII_8: u32 = 0;
 pub const LV_FONT_FMT_TXT_LARGE: u32 = 0;
 pub const LV_FONT_SUBPX_BGR: u32 = 0;
 pub const LV_TXT_BREAK_CHARS: &'static [u8; 8usize] = b" ,.;:-_\0";
@@ -231,7 +225,7 @@ pub const LV_TXT_LINE_BREAK_LONG_LEN: u32 = 12;
 pub const LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN: u32 = 3;
 pub const LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN: u32 = 3;
 pub const LV_TXT_COLOR_CMD: &'static [u8; 2usize] = b"#\0";
-pub const LV_USE_BIDI: u32 = 1;
+pub const LV_USE_BIDI: u32 = 0;
 pub const LV_SPRINTF_CUSTOM: u32 = 0;
 pub const LV_USE_OBJ_REALIGN: u32 = 1;
 pub const LV_USE_ARC: u32 = 1;
@@ -377,8 +371,6 @@ pub const LV_EXT_CLICK_AREA_FULL: u32 = 2;
 pub const __GNUC_VA_LIST: u32 = 1;
 pub const LV_TXT_ENC_UTF8: u32 = 1;
 pub const LV_TXT_ENC_ASCII: u32 = 2;
-pub const LV_FS_MAX_FN_LENGTH: u32 = 64;
-pub const LV_FS_MAX_PATH_LENGTH: u32 = 256;
 pub const LV_IMG_PX_SIZE_ALPHA_BYTE: u32 = 4;
 pub const LV_DRAW_LABEL_NO_TXT_SEL: u32 = 65535;
 pub const LV_LABEL_DOT_NUM: u32 = 3;
@@ -474,7 +466,6 @@ pub type uintmax_t = __uintmax_t;
 pub type lv_coord_t = i16;
 pub type lv_anim_user_data_t = *mut cty::c_void;
 pub type lv_group_user_data_t = *mut cty::c_void;
-pub type lv_fs_drv_user_data_t = *mut cty::c_void;
 pub type lv_img_decoder_user_data_t = *mut cty::c_void;
 pub type lv_disp_drv_user_data_t = *mut cty::c_void;
 pub type lv_indev_drv_user_data_t = *mut cty::c_void;
@@ -486,35 +477,6 @@ pub struct _silence_gcc_warning {
     _unused: [u8; 0],
 }
 pub type lv_log_level_t = i8;
-#[doc = " Log print function. Receives \"Log Level\", \"File path\", \"Line number\" and \"Description\"."]
-pub type lv_log_print_g_cb_t = ::core::option::Option<
-    unsafe extern "C" fn(
-        level: lv_log_level_t,
-        arg1: *const cty::c_char,
-        arg2: u32,
-        arg3: *const cty::c_char,
-    ),
->;
-extern "C" {
-    #[doc = " Register custom print/write function to call when a log is added."]
-    #[doc = " It can format its \"File path\", \"Line number\" and \"Description\" as required"]
-    #[doc = " and send the formatted log message to a consol or serial port."]
-    #[doc = " @param print_cb a function pointer to print a log"]
-    pub fn lv_log_register_print_cb(print_cb: lv_log_print_g_cb_t);
-}
-extern "C" {
-    #[doc = " Add a log"]
-    #[doc = " @param level the level of log. (From `lv_log_level_t` enum)"]
-    #[doc = " @param file name of the file when the log added"]
-    #[doc = " @param line line number in the source code where the log added"]
-    #[doc = " @param dsc description of the log"]
-    pub fn lv_log_add(
-        level: lv_log_level_t,
-        file: *const cty::c_char,
-        line: cty::c_int,
-        dsc: *const cty::c_char,
-    );
-}
 pub type size_t = cty::c_ulong;
 pub type wchar_t = cty::c_int;
 #[repr(C)]
@@ -1588,26 +1550,6 @@ pub struct _disp_drv_t {
     pub monitor_cb: ::core::option::Option<
         unsafe extern "C" fn(disp_drv: *mut _disp_drv_t, time: u32, px: u32),
     >,
-    #[doc = " OPTIONAL: Blend two memories using opacity (GPU only)"]
-    pub gpu_blend_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            disp_drv: *mut _disp_drv_t,
-            dest: *mut lv_color_t,
-            src: *const lv_color_t,
-            length: u32,
-            opa: lv_opa_t,
-        ),
-    >,
-    #[doc = " OPTIONAL: Fill a memory with a color (GPU only)"]
-    pub gpu_fill_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            disp_drv: *mut _disp_drv_t,
-            dest_buf: *mut lv_color_t,
-            dest_width: lv_coord_t,
-            fill_area: *const lv_area_t,
-            color: lv_color_t,
-        ),
-    >,
     #[doc = " On CHROMA_KEYED images this color will be transparent."]
     #[doc = " `LV_COLOR_TRANSP` by default. (lv_conf.h)"]
     pub color_chroma_key: lv_color_t,
@@ -2259,19 +2201,7 @@ extern "C" {
     pub fn lv_font_get_glyph_width(font: *const lv_font_t, letter: u32, letter_next: u32) -> u16;
 }
 extern "C" {
-    pub static mut lv_font_roboto_12: lv_font_t;
-}
-extern "C" {
-    pub static mut lv_font_roboto_16: lv_font_t;
-}
-extern "C" {
-    pub static mut lv_font_roboto_22: lv_font_t;
-}
-extern "C" {
     pub static mut lv_font_roboto_28: lv_font_t;
-}
-extern "C" {
-    pub static mut lv_font_unscii_8: lv_font_t;
 }
 pub const LV_ANIM_OFF: _bindgen_ty_8 = 0;
 pub const LV_ANIM_ON: _bindgen_ty_8 = 1;
@@ -2513,8 +2443,6 @@ pub struct lv_style_t {
     pub text: lv_style_t__bindgen_ty_2,
     pub image: lv_style_t__bindgen_ty_3,
     pub line: lv_style_t__bindgen_ty_4,
-    #[doc = "<Should `LV_STYLE_DEGUG_SENTINEL_VALUE` to indicate that the style is valid"]
-    pub debug_sentinel: u32,
 }
 #[doc = " Object background."]
 #[repr(C)]
@@ -2743,61 +2671,6 @@ pub const LV_BIDI_DIR_WEAK: _bindgen_ty_11 = 33;
 #[doc = "      TYPEDEFS"]
 pub type _bindgen_ty_11 = u32;
 pub type lv_bidi_dir_t = u8;
-extern "C" {
-    pub fn lv_bidi_process(
-        str_in: *const cty::c_char,
-        str_out: *mut cty::c_char,
-        base_dir: lv_bidi_dir_t,
-    );
-}
-extern "C" {
-    pub fn lv_bidi_process_paragraph(
-        str_in: *const cty::c_char,
-        str_out: *mut cty::c_char,
-        len: u32,
-        base_dir: lv_bidi_dir_t,
-        pos_conv_out: *mut u16,
-        pos_conv_len: u16,
-    );
-}
-extern "C" {
-    pub fn lv_bidi_get_next_paragraph(txt: *const cty::c_char) -> u32;
-}
-extern "C" {
-    pub fn lv_bidi_detect_base_dir(txt: *const cty::c_char) -> lv_bidi_dir_t;
-}
-extern "C" {
-    pub fn lv_bidi_get_letter_dir(letter: u32) -> lv_bidi_dir_t;
-}
-extern "C" {
-    pub fn lv_bidi_letter_is_weak(letter: u32) -> bool;
-}
-extern "C" {
-    pub fn lv_bidi_letter_is_rtl(letter: u32) -> bool;
-}
-extern "C" {
-    pub fn lv_bidi_letter_is_neutral(letter: u32) -> bool;
-}
-extern "C" {
-    pub fn lv_bidi_get_logical_pos(
-        str_in: *const cty::c_char,
-        bidi_txt: *mut *mut cty::c_char,
-        len: u32,
-        base_dir: lv_bidi_dir_t,
-        visual_pos: u32,
-        is_rtl: *mut bool,
-    ) -> u16;
-}
-extern "C" {
-    pub fn lv_bidi_get_visual_pos(
-        str_in: *const cty::c_char,
-        bidi_txt: *mut *mut cty::c_char,
-        len: u16,
-        base_dir: lv_bidi_dir_t,
-        logical_pos: u32,
-        is_rtl: *mut bool,
-    ) -> u16;
-}
 #[doc = "< Draw the main portion of the object"]
 pub const LV_DESIGN_DRAW_MAIN: _bindgen_ty_12 = 0;
 #[doc = "< Draw extras on the object"]
@@ -4323,25 +4196,6 @@ extern "C" {
     #[doc = " @param disp pointer to an display (NULL to use the default display)"]
     pub fn lv_disp_trig_activity(disp: *mut lv_disp_t);
 }
-extern "C" {
-    #[doc = " GLOBAL PROTOTYPES"]
-    pub fn lv_debug_check_null(p: *const cty::c_void) -> bool;
-}
-extern "C" {
-    pub fn lv_debug_check_obj_type(obj: *const lv_obj_t, obj_type: *const cty::c_char) -> bool;
-}
-extern "C" {
-    pub fn lv_debug_check_obj_valid(obj: *const lv_obj_t) -> bool;
-}
-extern "C" {
-    pub fn lv_debug_check_style(style: *const lv_style_t) -> bool;
-}
-extern "C" {
-    pub fn lv_debug_check_str(str: *const cty::c_void) -> bool;
-}
-extern "C" {
-    pub fn lv_debug_log_error(msg: *const cty::c_char, value: u64);
-}
 #[doc = " A theme in LittlevGL consists of many styles bound together."]
 #[doc = ""]
 #[doc = " There is a style for each object type, as well as a generic style for"]
@@ -4628,90 +4482,6 @@ extern "C" {
     #[doc = " Get the current system theme."]
     #[doc = " @return pointer to the current system theme. NULL if not set."]
     pub fn lv_theme_get_current() -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Initialize the default theme"]
-    #[doc = " @param hue [0..360] hue value from HSV color space to define the theme's base color"]
-    #[doc = " @param font pointer to a font (NULL to use the default)"]
-    #[doc = " @return pointer to the initialized theme"]
-    pub fn lv_theme_default_init(hue: u16, font: *mut lv_font_t) -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Get a pointer to the theme"]
-    #[doc = " @return pointer to the theme"]
-    pub fn lv_theme_get_default() -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Initialize the alien theme"]
-    #[doc = " @param hue [0..360] hue value from HSV color space to define the theme's base color"]
-    #[doc = " @param font pointer to a font (NULL to use the default)"]
-    #[doc = " @return pointer to the initialized theme"]
-    pub fn lv_theme_alien_init(hue: u16, font: *mut lv_font_t) -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Get a pointer to the theme"]
-    #[doc = " @return pointer to the theme"]
-    pub fn lv_theme_get_alien() -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Initialize the night theme"]
-    #[doc = " @param hue [0..360] hue value from HSV color space to define the theme's base color"]
-    #[doc = " @param font pointer to a font (NULL to use the default)"]
-    #[doc = " @return pointer to the initialized theme"]
-    pub fn lv_theme_night_init(hue: u16, font: *mut lv_font_t) -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Get a pointer to the theme"]
-    #[doc = " @return pointer to the theme"]
-    pub fn lv_theme_get_night() -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Initialize the zen theme"]
-    #[doc = " @param hue [0..360] hue value from HSV color space to define the theme's base color"]
-    #[doc = " @param font pointer to a font (NULL to use the default)"]
-    #[doc = " @return pointer to the initialized theme"]
-    pub fn lv_theme_zen_init(hue: u16, font: *mut lv_font_t) -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Get a pointer to the theme"]
-    #[doc = " @return pointer to the theme"]
-    pub fn lv_theme_get_zen() -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Initialize the mono theme"]
-    #[doc = " @param hue [0..360] hue value from HSV color space to define the theme's base color"]
-    #[doc = " @param font pointer to a font (NULL to use the default)"]
-    #[doc = " @return pointer to the initialized theme"]
-    pub fn lv_theme_mono_init(hue: u16, font: *mut lv_font_t) -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Get a pointer to the theme"]
-    #[doc = " @return pointer to the theme"]
-    pub fn lv_theme_get_mono() -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Initialize the material theme"]
-    #[doc = " @param hue [0..360] hue value from HSV color space to define the theme's base color"]
-    #[doc = " @param font pointer to a font (NULL to use the default)"]
-    #[doc = " @return pointer to the initialized theme"]
-    pub fn lv_theme_nemo_init(hue: u16, font: *mut lv_font_t) -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Get a pointer to the theme"]
-    #[doc = " @return pointer to the theme"]
-    pub fn lv_theme_get_nemo() -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Initialize the material theme"]
-    #[doc = " @param hue [0..360] hue value from HSV color space to define the theme's base color"]
-    #[doc = " @param font pointer to a font (NULL to use the default)"]
-    #[doc = " @return pointer to the initialized theme"]
-    pub fn lv_theme_material_init(hue: u16, font: *mut lv_font_t) -> *mut lv_theme_t;
-}
-extern "C" {
-    #[doc = " Get a pointer to the theme"]
-    #[doc = " @return pointer to the theme"]
-    pub fn lv_theme_get_material() -> *mut lv_theme_t;
 }
 #[doc = " This describes a glyph."]
 #[repr(C)]
@@ -5488,321 +5258,15 @@ extern "C" {
     pub static mut lv_txt_get_encoded_length:
         ::core::option::Option<unsafe extern "C" fn(arg1: *const cty::c_char) -> u32>;
 }
-pub const LV_FS_RES_OK: _bindgen_ty_28 = 0;
-pub const LV_FS_RES_HW_ERR: _bindgen_ty_28 = 1;
-pub const LV_FS_RES_FS_ERR: _bindgen_ty_28 = 2;
-pub const LV_FS_RES_NOT_EX: _bindgen_ty_28 = 3;
-pub const LV_FS_RES_FULL: _bindgen_ty_28 = 4;
-pub const LV_FS_RES_LOCKED: _bindgen_ty_28 = 5;
-pub const LV_FS_RES_DENIED: _bindgen_ty_28 = 6;
-pub const LV_FS_RES_BUSY: _bindgen_ty_28 = 7;
-pub const LV_FS_RES_TOUT: _bindgen_ty_28 = 8;
-pub const LV_FS_RES_NOT_IMP: _bindgen_ty_28 = 9;
-pub const LV_FS_RES_OUT_OF_MEM: _bindgen_ty_28 = 10;
-pub const LV_FS_RES_INV_PARAM: _bindgen_ty_28 = 11;
-pub const LV_FS_RES_UNKNOWN: _bindgen_ty_28 = 12;
-#[doc = "      TYPEDEFS"]
-#[doc = " Errors in the filesystem module."]
-pub type _bindgen_ty_28 = u32;
-pub type lv_fs_res_t = u8;
-pub const LV_FS_MODE_WR: _bindgen_ty_29 = 1;
-pub const LV_FS_MODE_RD: _bindgen_ty_29 = 2;
-#[doc = " Filesystem mode."]
-pub type _bindgen_ty_29 = u32;
-pub type lv_fs_mode_t = u8;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _lv_fs_drv_t {
-    pub letter: cty::c_char,
-    pub file_size: u16,
-    pub rddir_size: u16,
-    pub ready_cb: ::core::option::Option<unsafe extern "C" fn(drv: *mut _lv_fs_drv_t) -> bool>,
-    pub open_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            file_p: *mut cty::c_void,
-            path: *const cty::c_char,
-            mode: lv_fs_mode_t,
-        ) -> lv_fs_res_t,
-    >,
-    pub close_cb: ::core::option::Option<
-        unsafe extern "C" fn(drv: *mut _lv_fs_drv_t, file_p: *mut cty::c_void) -> lv_fs_res_t,
-    >,
-    pub remove_cb: ::core::option::Option<
-        unsafe extern "C" fn(drv: *mut _lv_fs_drv_t, fn_: *const cty::c_char) -> lv_fs_res_t,
-    >,
-    pub read_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            file_p: *mut cty::c_void,
-            buf: *mut cty::c_void,
-            btr: u32,
-            br: *mut u32,
-        ) -> lv_fs_res_t,
-    >,
-    pub write_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            file_p: *mut cty::c_void,
-            buf: *const cty::c_void,
-            btw: u32,
-            bw: *mut u32,
-        ) -> lv_fs_res_t,
-    >,
-    pub seek_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            file_p: *mut cty::c_void,
-            pos: u32,
-        ) -> lv_fs_res_t,
-    >,
-    pub tell_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            file_p: *mut cty::c_void,
-            pos_p: *mut u32,
-        ) -> lv_fs_res_t,
-    >,
-    pub trunc_cb: ::core::option::Option<
-        unsafe extern "C" fn(drv: *mut _lv_fs_drv_t, file_p: *mut cty::c_void) -> lv_fs_res_t,
-    >,
-    pub size_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            file_p: *mut cty::c_void,
-            size_p: *mut u32,
-        ) -> lv_fs_res_t,
-    >,
-    pub rename_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            oldname: *const cty::c_char,
-            newname: *const cty::c_char,
-        ) -> lv_fs_res_t,
-    >,
-    pub free_space_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            total_p: *mut u32,
-            free_p: *mut u32,
-        ) -> lv_fs_res_t,
-    >,
-    pub dir_open_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            rddir_p: *mut cty::c_void,
-            path: *const cty::c_char,
-        ) -> lv_fs_res_t,
-    >,
-    pub dir_read_cb: ::core::option::Option<
-        unsafe extern "C" fn(
-            drv: *mut _lv_fs_drv_t,
-            rddir_p: *mut cty::c_void,
-            fn_: *mut cty::c_char,
-        ) -> lv_fs_res_t,
-    >,
-    pub dir_close_cb: ::core::option::Option<
-        unsafe extern "C" fn(drv: *mut _lv_fs_drv_t, rddir_p: *mut cty::c_void) -> lv_fs_res_t,
-    >,
-    #[doc = "< Custom file user data"]
-    pub user_data: lv_fs_drv_user_data_t,
-}
-pub type lv_fs_drv_t = _lv_fs_drv_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct lv_fs_file_t {
-    pub file_d: *mut cty::c_void,
-    pub drv: *mut lv_fs_drv_t,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct lv_fs_dir_t {
-    pub dir_d: *mut cty::c_void,
-    pub drv: *mut lv_fs_drv_t,
-}
-extern "C" {
-    #[doc = " Initialize the File system interface"]
-    pub fn lv_fs_init();
-}
-extern "C" {
-    #[doc = " Initialize a file system driver with default values."]
-    #[doc = " It is used to surly have known values in the fields ant not memory junk."]
-    #[doc = " After it you can set the fields."]
-    #[doc = " @param drv pointer to driver variable to initialize"]
-    pub fn lv_fs_drv_init(drv: *mut lv_fs_drv_t);
-}
-extern "C" {
-    #[doc = " Add a new drive"]
-    #[doc = " @param drv_p pointer to an lv_fs_drv_t structure which is inited with the"]
-    #[doc = " corresponding function pointers. The data will be copied so the variable can be local."]
-    pub fn lv_fs_drv_register(drv_p: *mut lv_fs_drv_t);
-}
-extern "C" {
-    #[doc = " Give a pointer to a driver from its letter"]
-    #[doc = " @param letter the driver letter"]
-    #[doc = " @return pointer to a driver or NULL if not found"]
-    pub fn lv_fs_get_drv(letter: cty::c_char) -> *mut lv_fs_drv_t;
-}
-extern "C" {
-    #[doc = " Test if a drive is rady or not. If the `ready` function was not initialized `true` will be"]
-    #[doc = " returned."]
-    #[doc = " @param letter letter of the drive"]
-    #[doc = " @return true: drive is ready; false: drive is not ready"]
-    pub fn lv_fs_is_ready(letter: cty::c_char) -> bool;
-}
-extern "C" {
-    #[doc = " Open a file"]
-    #[doc = " @param file_p pointer to a lv_fs_file_t variable"]
-    #[doc = " @param path path to the file beginning with the driver letter (e.g. S:/folder/file.txt)"]
-    #[doc = " @param mode read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR"]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_open(
-        file_p: *mut lv_fs_file_t,
-        path: *const cty::c_char,
-        mode: lv_fs_mode_t,
-    ) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Close an already opened file"]
-    #[doc = " @param file_p pointer to a lv_fs_file_t variable"]
-    #[doc = " @return  LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_close(file_p: *mut lv_fs_file_t) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Delete a file"]
-    #[doc = " @param path path of the file to delete"]
-    #[doc = " @return  LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_remove(path: *const cty::c_char) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Read from a file"]
-    #[doc = " @param file_p pointer to a lv_fs_file_t variable"]
-    #[doc = " @param buf pointer to a buffer where the read bytes are stored"]
-    #[doc = " @param btr Bytes To Read"]
-    #[doc = " @param br the number of real read bytes (Bytes Read). NULL if unused."]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_read(
-        file_p: *mut lv_fs_file_t,
-        buf: *mut cty::c_void,
-        btr: u32,
-        br: *mut u32,
-    ) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Write into a file"]
-    #[doc = " @param file_p pointer to a lv_fs_file_t variable"]
-    #[doc = " @param buf pointer to a buffer with the bytes to write"]
-    #[doc = " @param btr Bytes To Write"]
-    #[doc = " @param br the number of real written bytes (Bytes Written). NULL if unused."]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_write(
-        file_p: *mut lv_fs_file_t,
-        buf: *const cty::c_void,
-        btw: u32,
-        bw: *mut u32,
-    ) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Set the position of the 'cursor' (read write pointer) in a file"]
-    #[doc = " @param file_p pointer to a lv_fs_file_t variable"]
-    #[doc = " @param pos the new position expressed in bytes index (0: start of file)"]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_seek(file_p: *mut lv_fs_file_t, pos: u32) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Give the position of the read write pointer"]
-    #[doc = " @param file_p pointer to a lv_fs_file_t variable"]
-    #[doc = " @param pos_p pointer to store the position of the read write pointer"]
-    #[doc = " @return LV_FS_RES_OK or any error from 'fs_res_t'"]
-    pub fn lv_fs_tell(file_p: *mut lv_fs_file_t, pos: *mut u32) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Truncate the file size to the current position of the read write pointer"]
-    #[doc = " @param file_p pointer to an 'ufs_file_t' variable. (opened with lv_fs_open )"]
-    #[doc = " @return LV_FS_RES_OK: no error, the file is read"]
-    #[doc = "         any error from lv_fs_res_t enum"]
-    pub fn lv_fs_trunc(file_p: *mut lv_fs_file_t) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Give the size of a file bytes"]
-    #[doc = " @param file_p pointer to a lv_fs_file_t variable"]
-    #[doc = " @param size pointer to a variable to store the size"]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_size(file_p: *mut lv_fs_file_t, size: *mut u32) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Rename a file"]
-    #[doc = " @param oldname path to the file"]
-    #[doc = " @param newname path with the new name"]
-    #[doc = " @return LV_FS_RES_OK or any error from 'fs_res_t'"]
-    pub fn lv_fs_rename(oldname: *const cty::c_char, newname: *const cty::c_char) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Initialize a 'fs_dir_t' variable for directory reading"]
-    #[doc = " @param rddir_p pointer to a 'fs_read_dir_t' variable"]
-    #[doc = " @param path path to a directory"]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_dir_open(rddir_p: *mut lv_fs_dir_t, path: *const cty::c_char) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Read the next filename form a directory."]
-    #[doc = " The name of the directories will begin with '/'"]
-    #[doc = " @param rddir_p pointer to an initialized 'fs_rdir_t' variable"]
-    #[doc = " @param fn pointer to a buffer to store the filename"]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_dir_read(rddir_p: *mut lv_fs_dir_t, fn_: *mut cty::c_char) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Close the directory reading"]
-    #[doc = " @param rddir_p pointer to an initialized 'fs_dir_t' variable"]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_dir_close(rddir_p: *mut lv_fs_dir_t) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Get the free and total size of a driver in kB"]
-    #[doc = " @param letter the driver letter"]
-    #[doc = " @param total_p pointer to store the total size [kB]"]
-    #[doc = " @param free_p pointer to store the free size [kB]"]
-    #[doc = " @return LV_FS_RES_OK or any error from lv_fs_res_t enum"]
-    pub fn lv_fs_free_space(
-        letter: cty::c_char,
-        total_p: *mut u32,
-        free_p: *mut u32,
-    ) -> lv_fs_res_t;
-}
-extern "C" {
-    #[doc = " Fill a buffer with the letters of existing drivers"]
-    #[doc = " @param buf buffer to store the letters ('\\0' added after the last letter)"]
-    #[doc = " @return the buffer"]
-    pub fn lv_fs_get_letters(buf: *mut cty::c_char) -> *mut cty::c_char;
-}
-extern "C" {
-    #[doc = " Return with the extension of the filename"]
-    #[doc = " @param fn string with a filename"]
-    #[doc = " @return pointer to the beginning extension or empty string if no extension"]
-    pub fn lv_fs_get_ext(fn_: *const cty::c_char) -> *const cty::c_char;
-}
-extern "C" {
-    #[doc = " Step up one level"]
-    #[doc = " @param path pointer to a file name"]
-    #[doc = " @return the truncated file name"]
-    pub fn lv_fs_up(path: *mut cty::c_char) -> *mut cty::c_char;
-}
-extern "C" {
-    #[doc = " Get the last element of a path (e.g. U:/folder/file -> file)"]
-    #[doc = " @param buf buffer to store the letters ('\\0' added after the last letter)"]
-    #[doc = " @return pointer to the beginning of the last element in the path"]
-    pub fn lv_fs_get_last(path: *const cty::c_char) -> *const cty::c_char;
-}
-pub const LV_IMG_SRC_VARIABLE: _bindgen_ty_30 = 0;
+pub const LV_IMG_SRC_VARIABLE: _bindgen_ty_28 = 0;
 #[doc = " Binary/C variable"]
-pub const LV_IMG_SRC_FILE: _bindgen_ty_30 = 1;
+pub const LV_IMG_SRC_FILE: _bindgen_ty_28 = 1;
 #[doc = " File in filesystem"]
-pub const LV_IMG_SRC_SYMBOL: _bindgen_ty_30 = 2;
+pub const LV_IMG_SRC_SYMBOL: _bindgen_ty_28 = 2;
 #[doc = " Symbol (@ref lv_symbol_def.h)"]
-pub const LV_IMG_SRC_UNKNOWN: _bindgen_ty_30 = 3;
+pub const LV_IMG_SRC_UNKNOWN: _bindgen_ty_28 = 3;
 #[doc = " Source of image."]
-pub type _bindgen_ty_30 = u32;
+pub type _bindgen_ty_28 = u32;
 pub type lv_img_src_t = u8;
 #[doc = " LittlevGL image header"]
 #[repr(C)]
@@ -5900,73 +5364,73 @@ impl lv_img_header_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_IMG_CF_UNKNOWN: _bindgen_ty_31 = 0;
+pub const LV_IMG_CF_UNKNOWN: _bindgen_ty_29 = 0;
 #[doc = "< Contains the file as it is. Needs custom decoder function"]
-pub const LV_IMG_CF_RAW: _bindgen_ty_31 = 1;
+pub const LV_IMG_CF_RAW: _bindgen_ty_29 = 1;
 #[doc = "< Contains the file as it is. The image has alpha. Needs custom decoder"]
 #[doc = "function"]
-pub const LV_IMG_CF_RAW_ALPHA: _bindgen_ty_31 = 2;
+pub const LV_IMG_CF_RAW_ALPHA: _bindgen_ty_29 = 2;
 #[doc = "< Contains the file as it is. The image is chroma keyed. Needs"]
 #[doc = "custom decoder function"]
-pub const LV_IMG_CF_RAW_CHROMA_KEYED: _bindgen_ty_31 = 3;
+pub const LV_IMG_CF_RAW_CHROMA_KEYED: _bindgen_ty_29 = 3;
 #[doc = "< Color format and depth should match with LV_COLOR settings"]
-pub const LV_IMG_CF_TRUE_COLOR: _bindgen_ty_31 = 4;
+pub const LV_IMG_CF_TRUE_COLOR: _bindgen_ty_29 = 4;
 #[doc = "< Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte"]
-pub const LV_IMG_CF_TRUE_COLOR_ALPHA: _bindgen_ty_31 = 5;
+pub const LV_IMG_CF_TRUE_COLOR_ALPHA: _bindgen_ty_29 = 5;
 #[doc = "< Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels"]
 #[doc = "will be transparent"]
-pub const LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED: _bindgen_ty_31 = 6;
+pub const LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED: _bindgen_ty_29 = 6;
 #[doc = "< Can have 2 different colors in a palette (always chroma keyed)"]
-pub const LV_IMG_CF_INDEXED_1BIT: _bindgen_ty_31 = 7;
+pub const LV_IMG_CF_INDEXED_1BIT: _bindgen_ty_29 = 7;
 #[doc = "< Can have 4 different colors in a palette (always chroma keyed)"]
-pub const LV_IMG_CF_INDEXED_2BIT: _bindgen_ty_31 = 8;
+pub const LV_IMG_CF_INDEXED_2BIT: _bindgen_ty_29 = 8;
 #[doc = "< Can have 16 different colors in a palette (always chroma keyed)"]
-pub const LV_IMG_CF_INDEXED_4BIT: _bindgen_ty_31 = 9;
+pub const LV_IMG_CF_INDEXED_4BIT: _bindgen_ty_29 = 9;
 #[doc = "< Can have 256 different colors in a palette (always chroma keyed)"]
-pub const LV_IMG_CF_INDEXED_8BIT: _bindgen_ty_31 = 10;
+pub const LV_IMG_CF_INDEXED_8BIT: _bindgen_ty_29 = 10;
 #[doc = "< Can have one color and it can be drawn or not"]
-pub const LV_IMG_CF_ALPHA_1BIT: _bindgen_ty_31 = 11;
+pub const LV_IMG_CF_ALPHA_1BIT: _bindgen_ty_29 = 11;
 #[doc = "< Can have one color but 4 different alpha value"]
-pub const LV_IMG_CF_ALPHA_2BIT: _bindgen_ty_31 = 12;
+pub const LV_IMG_CF_ALPHA_2BIT: _bindgen_ty_29 = 12;
 #[doc = "< Can have one color but 16 different alpha value"]
-pub const LV_IMG_CF_ALPHA_4BIT: _bindgen_ty_31 = 13;
+pub const LV_IMG_CF_ALPHA_4BIT: _bindgen_ty_29 = 13;
 #[doc = "< Can have one color but 256 different alpha value"]
-pub const LV_IMG_CF_ALPHA_8BIT: _bindgen_ty_31 = 14;
+pub const LV_IMG_CF_ALPHA_8BIT: _bindgen_ty_29 = 14;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_15: _bindgen_ty_31 = 15;
+pub const LV_IMG_CF_RESERVED_15: _bindgen_ty_29 = 15;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_16: _bindgen_ty_31 = 16;
+pub const LV_IMG_CF_RESERVED_16: _bindgen_ty_29 = 16;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_17: _bindgen_ty_31 = 17;
+pub const LV_IMG_CF_RESERVED_17: _bindgen_ty_29 = 17;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_18: _bindgen_ty_31 = 18;
+pub const LV_IMG_CF_RESERVED_18: _bindgen_ty_29 = 18;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_19: _bindgen_ty_31 = 19;
+pub const LV_IMG_CF_RESERVED_19: _bindgen_ty_29 = 19;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_20: _bindgen_ty_31 = 20;
+pub const LV_IMG_CF_RESERVED_20: _bindgen_ty_29 = 20;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_21: _bindgen_ty_31 = 21;
+pub const LV_IMG_CF_RESERVED_21: _bindgen_ty_29 = 21;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_22: _bindgen_ty_31 = 22;
+pub const LV_IMG_CF_RESERVED_22: _bindgen_ty_29 = 22;
 #[doc = "< Reserved for further use."]
-pub const LV_IMG_CF_RESERVED_23: _bindgen_ty_31 = 23;
+pub const LV_IMG_CF_RESERVED_23: _bindgen_ty_29 = 23;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_0: _bindgen_ty_31 = 24;
+pub const LV_IMG_CF_USER_ENCODED_0: _bindgen_ty_29 = 24;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_1: _bindgen_ty_31 = 25;
+pub const LV_IMG_CF_USER_ENCODED_1: _bindgen_ty_29 = 25;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_2: _bindgen_ty_31 = 26;
+pub const LV_IMG_CF_USER_ENCODED_2: _bindgen_ty_29 = 26;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_3: _bindgen_ty_31 = 27;
+pub const LV_IMG_CF_USER_ENCODED_3: _bindgen_ty_29 = 27;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_4: _bindgen_ty_31 = 28;
+pub const LV_IMG_CF_USER_ENCODED_4: _bindgen_ty_29 = 28;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_5: _bindgen_ty_31 = 29;
+pub const LV_IMG_CF_USER_ENCODED_5: _bindgen_ty_29 = 29;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_6: _bindgen_ty_31 = 30;
+pub const LV_IMG_CF_USER_ENCODED_6: _bindgen_ty_29 = 30;
 #[doc = "< User holder encoding format."]
-pub const LV_IMG_CF_USER_ENCODED_7: _bindgen_ty_31 = 31;
-pub type _bindgen_ty_31 = u32;
+pub const LV_IMG_CF_USER_ENCODED_7: _bindgen_ty_29 = 31;
+pub type _bindgen_ty_29 = u32;
 pub type lv_img_cf_t = u8;
 #[doc = " Image header it is compatible with"]
 #[doc = " the result from image converter utility"]
@@ -6582,12 +6046,12 @@ pub struct lv_imgbtn_ext_t {
     pub act_cf: lv_img_cf_t,
 }
 #[doc = "< Same meaning as ordinary button styles."]
-pub const LV_IMGBTN_STYLE_REL: _bindgen_ty_32 = 0;
-pub const LV_IMGBTN_STYLE_PR: _bindgen_ty_32 = 1;
-pub const LV_IMGBTN_STYLE_TGL_REL: _bindgen_ty_32 = 2;
-pub const LV_IMGBTN_STYLE_TGL_PR: _bindgen_ty_32 = 3;
-pub const LV_IMGBTN_STYLE_INA: _bindgen_ty_32 = 4;
-pub type _bindgen_ty_32 = u32;
+pub const LV_IMGBTN_STYLE_REL: _bindgen_ty_30 = 0;
+pub const LV_IMGBTN_STYLE_PR: _bindgen_ty_30 = 1;
+pub const LV_IMGBTN_STYLE_TGL_REL: _bindgen_ty_30 = 2;
+pub const LV_IMGBTN_STYLE_TGL_PR: _bindgen_ty_30 = 3;
+pub const LV_IMGBTN_STYLE_INA: _bindgen_ty_30 = 4;
+pub type _bindgen_ty_30 = u32;
 pub type lv_imgbtn_style_t = u8;
 extern "C" {
     #[doc = " Create a image button objects"]
@@ -6633,31 +6097,31 @@ extern "C" {
     ) -> *const lv_style_t;
 }
 #[doc = "< Expand the object size to the text size"]
-pub const LV_LABEL_LONG_EXPAND: _bindgen_ty_33 = 0;
+pub const LV_LABEL_LONG_EXPAND: _bindgen_ty_31 = 0;
 #[doc = "< Keep the object width, break the too long lines and expand the object"]
 #[doc = "height"]
-pub const LV_LABEL_LONG_BREAK: _bindgen_ty_33 = 1;
+pub const LV_LABEL_LONG_BREAK: _bindgen_ty_31 = 1;
 #[doc = "< Keep the size and write dots at the end if the text is too long"]
-pub const LV_LABEL_LONG_DOT: _bindgen_ty_33 = 2;
+pub const LV_LABEL_LONG_DOT: _bindgen_ty_31 = 2;
 #[doc = "< Keep the size and roll the text back and forth"]
-pub const LV_LABEL_LONG_SROLL: _bindgen_ty_33 = 3;
+pub const LV_LABEL_LONG_SROLL: _bindgen_ty_31 = 3;
 #[doc = "< Keep the size and roll the text circularly"]
-pub const LV_LABEL_LONG_SROLL_CIRC: _bindgen_ty_33 = 4;
+pub const LV_LABEL_LONG_SROLL_CIRC: _bindgen_ty_31 = 4;
 #[doc = "< Keep the size and crop the text out of it"]
-pub const LV_LABEL_LONG_CROP: _bindgen_ty_33 = 5;
+pub const LV_LABEL_LONG_CROP: _bindgen_ty_31 = 5;
 #[doc = " Long mode behaviors. Used in 'lv_label_ext_t'"]
-pub type _bindgen_ty_33 = u32;
+pub type _bindgen_ty_31 = u32;
 pub type lv_label_long_mode_t = u8;
 #[doc = "< Align text to left"]
-pub const LV_LABEL_ALIGN_LEFT: _bindgen_ty_34 = 0;
+pub const LV_LABEL_ALIGN_LEFT: _bindgen_ty_32 = 0;
 #[doc = "< Align text to center"]
-pub const LV_LABEL_ALIGN_CENTER: _bindgen_ty_34 = 1;
+pub const LV_LABEL_ALIGN_CENTER: _bindgen_ty_32 = 1;
 #[doc = "< Align text to right"]
-pub const LV_LABEL_ALIGN_RIGHT: _bindgen_ty_34 = 2;
+pub const LV_LABEL_ALIGN_RIGHT: _bindgen_ty_32 = 2;
 #[doc = "< Use LEFT or RIGHT depending on the direction of the text (LTR/RTL)"]
-pub const LV_LABEL_ALIGN_AUTO: _bindgen_ty_34 = 3;
+pub const LV_LABEL_ALIGN_AUTO: _bindgen_ty_32 = 3;
 #[doc = " Label align policy"]
-pub type _bindgen_ty_34 = u32;
+pub type _bindgen_ty_32 = u32;
 pub type lv_label_align_t = u8;
 #[doc = " Data of label"]
 #[repr(C)]
@@ -6799,9 +6263,9 @@ impl lv_label_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_LABEL_STYLE_MAIN: _bindgen_ty_35 = 0;
+pub const LV_LABEL_STYLE_MAIN: _bindgen_ty_33 = 0;
 #[doc = " Label styles"]
-pub type _bindgen_ty_35 = u32;
+pub type _bindgen_ty_33 = u32;
 pub type lv_label_style_t = u8;
 extern "C" {
     #[doc = " Create a label objects"]
@@ -7036,8 +6500,8 @@ impl lv_img_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_IMG_STYLE_MAIN: _bindgen_ty_36 = 0;
-pub type _bindgen_ty_36 = u32;
+pub const LV_IMG_STYLE_MAIN: _bindgen_ty_34 = 0;
+pub type _bindgen_ty_34 = u32;
 pub type lv_img_style_t = u8;
 extern "C" {
     #[doc = " Create an image objects"]
@@ -7150,8 +6614,8 @@ impl lv_line_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_LINE_STYLE_MAIN: _bindgen_ty_37 = 0;
-pub type _bindgen_ty_37 = u32;
+pub const LV_LINE_STYLE_MAIN: _bindgen_ty_35 = 0;
+pub type _bindgen_ty_35 = u32;
 pub type lv_line_style_t = u8;
 extern "C" {
     #[doc = " Create a line objects"]
@@ -7195,26 +6659,26 @@ extern "C" {
     pub fn lv_line_get_y_invert(line: *const lv_obj_t) -> bool;
 }
 #[doc = "< Never show scrollbars"]
-pub const LV_SB_MODE_OFF: _bindgen_ty_38 = 0;
+pub const LV_SB_MODE_OFF: _bindgen_ty_36 = 0;
 #[doc = "< Always show scrollbars"]
-pub const LV_SB_MODE_ON: _bindgen_ty_38 = 1;
+pub const LV_SB_MODE_ON: _bindgen_ty_36 = 1;
 #[doc = "< Show scrollbars when page is being dragged"]
-pub const LV_SB_MODE_DRAG: _bindgen_ty_38 = 2;
+pub const LV_SB_MODE_DRAG: _bindgen_ty_36 = 2;
 #[doc = "< Show scrollbars when the scrollable container is large enough to be scrolled"]
-pub const LV_SB_MODE_AUTO: _bindgen_ty_38 = 3;
+pub const LV_SB_MODE_AUTO: _bindgen_ty_36 = 3;
 #[doc = "< Hide the scroll bar temporally"]
-pub const LV_SB_MODE_HIDE: _bindgen_ty_38 = 4;
+pub const LV_SB_MODE_HIDE: _bindgen_ty_36 = 4;
 #[doc = "< Unhide the previously hidden scrollbar. Recover it's type too"]
-pub const LV_SB_MODE_UNHIDE: _bindgen_ty_38 = 5;
+pub const LV_SB_MODE_UNHIDE: _bindgen_ty_36 = 5;
 #[doc = " Scrollbar modes: shows when should the scrollbars be visible"]
-pub type _bindgen_ty_38 = u32;
+pub type _bindgen_ty_36 = u32;
 pub type lv_sb_mode_t = u8;
-pub const LV_PAGE_EDGE_LEFT: _bindgen_ty_39 = 1;
-pub const LV_PAGE_EDGE_TOP: _bindgen_ty_39 = 2;
-pub const LV_PAGE_EDGE_RIGHT: _bindgen_ty_39 = 4;
-pub const LV_PAGE_EDGE_BOTTOM: _bindgen_ty_39 = 8;
+pub const LV_PAGE_EDGE_LEFT: _bindgen_ty_37 = 1;
+pub const LV_PAGE_EDGE_TOP: _bindgen_ty_37 = 2;
+pub const LV_PAGE_EDGE_RIGHT: _bindgen_ty_37 = 4;
+pub const LV_PAGE_EDGE_BOTTOM: _bindgen_ty_37 = 8;
 #[doc = " Edges: describes the four edges of the page"]
-pub type _bindgen_ty_39 = u32;
+pub type _bindgen_ty_37 = u32;
 pub type lv_page_edge_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -7431,11 +6895,11 @@ impl lv_page_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_PAGE_STYLE_BG: _bindgen_ty_40 = 0;
-pub const LV_PAGE_STYLE_SCRL: _bindgen_ty_40 = 1;
-pub const LV_PAGE_STYLE_SB: _bindgen_ty_40 = 2;
-pub const LV_PAGE_STYLE_EDGE_FLASH: _bindgen_ty_40 = 3;
-pub type _bindgen_ty_40 = u32;
+pub const LV_PAGE_STYLE_BG: _bindgen_ty_38 = 0;
+pub const LV_PAGE_STYLE_SCRL: _bindgen_ty_38 = 1;
+pub const LV_PAGE_STYLE_SB: _bindgen_ty_38 = 2;
+pub const LV_PAGE_STYLE_EDGE_FLASH: _bindgen_ty_38 = 3;
+pub type _bindgen_ty_38 = u32;
 pub type lv_page_style_t = u8;
 extern "C" {
     #[doc = " Create a page objects"]
@@ -7605,21 +7069,21 @@ impl lv_list_ext_t {
     }
 }
 #[doc = "< List background style"]
-pub const LV_LIST_STYLE_BG: _bindgen_ty_41 = 0;
+pub const LV_LIST_STYLE_BG: _bindgen_ty_39 = 0;
 #[doc = "< List scrollable area style."]
-pub const LV_LIST_STYLE_SCRL: _bindgen_ty_41 = 1;
+pub const LV_LIST_STYLE_SCRL: _bindgen_ty_39 = 1;
 #[doc = "< List scrollbar style."]
-pub const LV_LIST_STYLE_SB: _bindgen_ty_41 = 2;
+pub const LV_LIST_STYLE_SB: _bindgen_ty_39 = 2;
 #[doc = "< List edge flash style."]
-pub const LV_LIST_STYLE_EDGE_FLASH: _bindgen_ty_41 = 3;
+pub const LV_LIST_STYLE_EDGE_FLASH: _bindgen_ty_39 = 3;
 #[doc = "< Same meaning as the ordinary button styles."]
-pub const LV_LIST_STYLE_BTN_REL: _bindgen_ty_41 = 4;
-pub const LV_LIST_STYLE_BTN_PR: _bindgen_ty_41 = 5;
-pub const LV_LIST_STYLE_BTN_TGL_REL: _bindgen_ty_41 = 6;
-pub const LV_LIST_STYLE_BTN_TGL_PR: _bindgen_ty_41 = 7;
-pub const LV_LIST_STYLE_BTN_INA: _bindgen_ty_41 = 8;
+pub const LV_LIST_STYLE_BTN_REL: _bindgen_ty_39 = 4;
+pub const LV_LIST_STYLE_BTN_PR: _bindgen_ty_39 = 5;
+pub const LV_LIST_STYLE_BTN_TGL_REL: _bindgen_ty_39 = 6;
+pub const LV_LIST_STYLE_BTN_TGL_PR: _bindgen_ty_39 = 7;
+pub const LV_LIST_STYLE_BTN_INA: _bindgen_ty_39 = 8;
 #[doc = " List styles."]
-pub type _bindgen_ty_41 = u32;
+pub type _bindgen_ty_39 = u32;
 pub type lv_list_style_t = u8;
 extern "C" {
     #[doc = " Create a list objects"]
@@ -7765,26 +7229,26 @@ extern "C" {
     pub fn lv_list_focus(btn: *const lv_obj_t, anim: lv_anim_enable_t);
 }
 #[doc = "< Don't draw the series"]
-pub const LV_CHART_TYPE_NONE: _bindgen_ty_42 = 0;
+pub const LV_CHART_TYPE_NONE: _bindgen_ty_40 = 0;
 #[doc = "< Connect the points with lines"]
-pub const LV_CHART_TYPE_LINE: _bindgen_ty_42 = 1;
+pub const LV_CHART_TYPE_LINE: _bindgen_ty_40 = 1;
 #[doc = "< Draw columns"]
-pub const LV_CHART_TYPE_COLUMN: _bindgen_ty_42 = 2;
+pub const LV_CHART_TYPE_COLUMN: _bindgen_ty_40 = 2;
 #[doc = "< Draw circles on the points"]
-pub const LV_CHART_TYPE_POINT: _bindgen_ty_42 = 4;
+pub const LV_CHART_TYPE_POINT: _bindgen_ty_40 = 4;
 #[doc = "< Draw vertical lines on points (useful when chart width == point count)"]
-pub const LV_CHART_TYPE_VERTICAL_LINE: _bindgen_ty_42 = 8;
+pub const LV_CHART_TYPE_VERTICAL_LINE: _bindgen_ty_40 = 8;
 #[doc = "< Draw area chart"]
-pub const LV_CHART_TYPE_AREA: _bindgen_ty_42 = 16;
+pub const LV_CHART_TYPE_AREA: _bindgen_ty_40 = 16;
 #[doc = " Chart types"]
-pub type _bindgen_ty_42 = u32;
+pub type _bindgen_ty_40 = u32;
 pub type lv_chart_type_t = u8;
 #[doc = "< Shift old data to the left and add the new one o the right"]
-pub const LV_CHART_UPDATE_MODE_SHIFT: _bindgen_ty_43 = 0;
+pub const LV_CHART_UPDATE_MODE_SHIFT: _bindgen_ty_41 = 0;
 #[doc = "< Add the new data in a circular way"]
-pub const LV_CHART_UPDATE_MODE_CIRCULAR: _bindgen_ty_43 = 1;
+pub const LV_CHART_UPDATE_MODE_CIRCULAR: _bindgen_ty_41 = 1;
 #[doc = " Chart update mode for `lv_chart_set_next`"]
-pub type _bindgen_ty_43 = u32;
+pub type _bindgen_ty_41 = u32;
 pub type lv_chart_update_mode_t = u8;
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -7794,13 +7258,13 @@ pub struct lv_chart_series_t {
     pub start_point: u16,
 }
 #[doc = "< don't draw the last tick"]
-pub const LV_CHART_AXIS_SKIP_LAST_TICK: _bindgen_ty_44 = 0;
+pub const LV_CHART_AXIS_SKIP_LAST_TICK: _bindgen_ty_42 = 0;
 #[doc = "< draw the last tick"]
-pub const LV_CHART_AXIS_DRAW_LAST_TICK: _bindgen_ty_44 = 1;
+pub const LV_CHART_AXIS_DRAW_LAST_TICK: _bindgen_ty_42 = 1;
 #[doc = "< draw tick labels in an inversed order"]
-pub const LV_CHART_AXIS_INVERSE_LABELS_ORDER: _bindgen_ty_44 = 2;
+pub const LV_CHART_AXIS_INVERSE_LABELS_ORDER: _bindgen_ty_42 = 2;
 #[doc = " Data of axis"]
-pub type _bindgen_ty_44 = u32;
+pub type _bindgen_ty_42 = u32;
 pub type lv_chart_axis_options_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -7859,8 +7323,8 @@ impl lv_chart_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_CHART_STYLE_MAIN: _bindgen_ty_45 = 0;
-pub type _bindgen_ty_45 = u32;
+pub const LV_CHART_STYLE_MAIN: _bindgen_ty_43 = 0;
+pub type _bindgen_ty_43 = u32;
 pub type lv_chart_style_t = u8;
 extern "C" {
     #[doc = " Create a chart background objects"]
@@ -8175,12 +7639,12 @@ pub struct lv_table_ext_t {
     pub cell_style: [*const lv_style_t; 4usize],
     pub col_w: [lv_coord_t; 12usize],
 }
-pub const LV_TABLE_STYLE_BG: _bindgen_ty_46 = 0;
-pub const LV_TABLE_STYLE_CELL1: _bindgen_ty_46 = 1;
-pub const LV_TABLE_STYLE_CELL2: _bindgen_ty_46 = 2;
-pub const LV_TABLE_STYLE_CELL3: _bindgen_ty_46 = 3;
-pub const LV_TABLE_STYLE_CELL4: _bindgen_ty_46 = 4;
-pub type _bindgen_ty_46 = u32;
+pub const LV_TABLE_STYLE_BG: _bindgen_ty_44 = 0;
+pub const LV_TABLE_STYLE_CELL1: _bindgen_ty_44 = 1;
+pub const LV_TABLE_STYLE_CELL2: _bindgen_ty_44 = 2;
+pub const LV_TABLE_STYLE_CELL3: _bindgen_ty_44 = 3;
+pub const LV_TABLE_STYLE_CELL4: _bindgen_ty_44 = 4;
+pub type _bindgen_ty_44 = u32;
 pub type lv_table_style_t = u8;
 extern "C" {
     #[doc = " Create a table object"]
@@ -8347,19 +7811,19 @@ pub struct lv_cb_ext_t {
     pub label: *mut lv_obj_t,
 }
 #[doc = "< Style of object background."]
-pub const LV_CB_STYLE_BG: _bindgen_ty_47 = 0;
+pub const LV_CB_STYLE_BG: _bindgen_ty_45 = 0;
 #[doc = "< Style of box (released)."]
-pub const LV_CB_STYLE_BOX_REL: _bindgen_ty_47 = 1;
+pub const LV_CB_STYLE_BOX_REL: _bindgen_ty_45 = 1;
 #[doc = "< Style of box (pressed)."]
-pub const LV_CB_STYLE_BOX_PR: _bindgen_ty_47 = 2;
+pub const LV_CB_STYLE_BOX_PR: _bindgen_ty_45 = 2;
 #[doc = "< Style of box (released but checked)."]
-pub const LV_CB_STYLE_BOX_TGL_REL: _bindgen_ty_47 = 3;
+pub const LV_CB_STYLE_BOX_TGL_REL: _bindgen_ty_45 = 3;
 #[doc = "< Style of box (pressed and checked)."]
-pub const LV_CB_STYLE_BOX_TGL_PR: _bindgen_ty_47 = 4;
+pub const LV_CB_STYLE_BOX_TGL_PR: _bindgen_ty_45 = 4;
 #[doc = "< Style of disabled box"]
-pub const LV_CB_STYLE_BOX_INA: _bindgen_ty_47 = 5;
+pub const LV_CB_STYLE_BOX_INA: _bindgen_ty_45 = 5;
 #[doc = " Checkbox styles."]
-pub type _bindgen_ty_47 = u32;
+pub type _bindgen_ty_45 = u32;
 pub type lv_cb_style_t = u8;
 extern "C" {
     #[doc = " Create a check box objects"]
@@ -8402,15 +7866,15 @@ extern "C" {
     #[doc = " @return style pointer to the style"]
     pub fn lv_cb_get_style(cb: *const lv_obj_t, type_: lv_cb_style_t) -> *const lv_style_t;
 }
-pub const LV_CPICKER_TYPE_RECT: _bindgen_ty_48 = 0;
-pub const LV_CPICKER_TYPE_DISC: _bindgen_ty_48 = 1;
+pub const LV_CPICKER_TYPE_RECT: _bindgen_ty_46 = 0;
+pub const LV_CPICKER_TYPE_DISC: _bindgen_ty_46 = 1;
 #[doc = "      TYPEDEFS"]
-pub type _bindgen_ty_48 = u32;
+pub type _bindgen_ty_46 = u32;
 pub type lv_cpicker_type_t = u8;
-pub const LV_CPICKER_COLOR_MODE_HUE: _bindgen_ty_49 = 0;
-pub const LV_CPICKER_COLOR_MODE_SATURATION: _bindgen_ty_49 = 1;
-pub const LV_CPICKER_COLOR_MODE_VALUE: _bindgen_ty_49 = 2;
-pub type _bindgen_ty_49 = u32;
+pub const LV_CPICKER_COLOR_MODE_HUE: _bindgen_ty_47 = 0;
+pub const LV_CPICKER_COLOR_MODE_SATURATION: _bindgen_ty_47 = 1;
+pub const LV_CPICKER_COLOR_MODE_VALUE: _bindgen_ty_47 = 2;
+pub type _bindgen_ty_47 = u32;
 pub type lv_cpicker_color_mode_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -8527,9 +7991,9 @@ impl lv_cpicker_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_CPICKER_STYLE_MAIN: _bindgen_ty_50 = 0;
-pub const LV_CPICKER_STYLE_INDICATOR: _bindgen_ty_50 = 1;
-pub type _bindgen_ty_50 = u32;
+pub const LV_CPICKER_STYLE_MAIN: _bindgen_ty_48 = 0;
+pub const LV_CPICKER_STYLE_INDICATOR: _bindgen_ty_48 = 1;
+pub type _bindgen_ty_48 = u32;
 pub type lv_cpicker_style_t = u8;
 extern "C" {
     #[doc = " Create a colorpicker objects"]
@@ -8715,11 +8179,11 @@ impl lv_bar_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_BAR_STYLE_BG: _bindgen_ty_51 = 0;
+pub const LV_BAR_STYLE_BG: _bindgen_ty_49 = 0;
 #[doc = " Bar background style."]
-pub const LV_BAR_STYLE_INDIC: _bindgen_ty_51 = 1;
+pub const LV_BAR_STYLE_INDIC: _bindgen_ty_49 = 1;
 #[doc = " Bar styles."]
-pub type _bindgen_ty_51 = u32;
+pub type _bindgen_ty_49 = u32;
 pub type lv_bar_style_t = u8;
 extern "C" {
     #[doc = " Create a bar objects"]
@@ -8832,13 +8296,13 @@ impl lv_slider_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_SLIDER_STYLE_BG: _bindgen_ty_52 = 0;
+pub const LV_SLIDER_STYLE_BG: _bindgen_ty_50 = 0;
 #[doc = " Slider background style."]
-pub const LV_SLIDER_STYLE_INDIC: _bindgen_ty_52 = 1;
+pub const LV_SLIDER_STYLE_INDIC: _bindgen_ty_50 = 1;
 #[doc = " Slider indicator (filled area) style."]
-pub const LV_SLIDER_STYLE_KNOB: _bindgen_ty_52 = 2;
+pub const LV_SLIDER_STYLE_KNOB: _bindgen_ty_50 = 2;
 #[doc = " Built-in styles of slider"]
-pub type _bindgen_ty_52 = u32;
+pub type _bindgen_ty_50 = u32;
 pub type lv_slider_style_t = u8;
 extern "C" {
     #[doc = " Create a slider objects"]
@@ -8900,8 +8364,8 @@ extern "C" {
 pub struct lv_led_ext_t {
     pub bright: u8,
 }
-pub const LV_LED_STYLE_MAIN: _bindgen_ty_53 = 0;
-pub type _bindgen_ty_53 = u32;
+pub const LV_LED_STYLE_MAIN: _bindgen_ty_51 = 0;
+pub type _bindgen_ty_51 = u32;
 pub type lv_led_style_t = u8;
 extern "C" {
     #[doc = " Create a led objects"]
@@ -8938,19 +8402,19 @@ extern "C" {
     pub fn lv_led_get_bright(led: *const lv_obj_t) -> u8;
 }
 #[doc = "< Button hidden"]
-pub const LV_BTNM_CTRL_HIDDEN: _bindgen_ty_54 = 8;
+pub const LV_BTNM_CTRL_HIDDEN: _bindgen_ty_52 = 8;
 #[doc = "< Do not repeat press this button."]
-pub const LV_BTNM_CTRL_NO_REPEAT: _bindgen_ty_54 = 16;
+pub const LV_BTNM_CTRL_NO_REPEAT: _bindgen_ty_52 = 16;
 #[doc = "< Disable this button."]
-pub const LV_BTNM_CTRL_INACTIVE: _bindgen_ty_54 = 32;
+pub const LV_BTNM_CTRL_INACTIVE: _bindgen_ty_52 = 32;
 #[doc = "< Button *can* be toggled."]
-pub const LV_BTNM_CTRL_TGL_ENABLE: _bindgen_ty_54 = 64;
+pub const LV_BTNM_CTRL_TGL_ENABLE: _bindgen_ty_52 = 64;
 #[doc = "< Button is currently toggled (e.g. checked)."]
-pub const LV_BTNM_CTRL_TGL_STATE: _bindgen_ty_54 = 128;
+pub const LV_BTNM_CTRL_TGL_STATE: _bindgen_ty_52 = 128;
 #[doc = "< 1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS"]
-pub const LV_BTNM_CTRL_CLICK_TRIG: _bindgen_ty_54 = 256;
+pub const LV_BTNM_CTRL_CLICK_TRIG: _bindgen_ty_52 = 256;
 #[doc = " Type to store button control bits (disabled, hidden etc.)"]
-pub type _bindgen_ty_54 = u32;
+pub type _bindgen_ty_52 = u32;
 pub type lv_btnm_ctrl_t = u16;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9003,13 +8467,13 @@ impl lv_btnm_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_BTNM_STYLE_BG: _bindgen_ty_55 = 0;
-pub const LV_BTNM_STYLE_BTN_REL: _bindgen_ty_55 = 1;
-pub const LV_BTNM_STYLE_BTN_PR: _bindgen_ty_55 = 2;
-pub const LV_BTNM_STYLE_BTN_TGL_REL: _bindgen_ty_55 = 3;
-pub const LV_BTNM_STYLE_BTN_TGL_PR: _bindgen_ty_55 = 4;
-pub const LV_BTNM_STYLE_BTN_INA: _bindgen_ty_55 = 5;
-pub type _bindgen_ty_55 = u32;
+pub const LV_BTNM_STYLE_BG: _bindgen_ty_53 = 0;
+pub const LV_BTNM_STYLE_BTN_REL: _bindgen_ty_53 = 1;
+pub const LV_BTNM_STYLE_BTN_PR: _bindgen_ty_53 = 2;
+pub const LV_BTNM_STYLE_BTN_TGL_REL: _bindgen_ty_53 = 3;
+pub const LV_BTNM_STYLE_BTN_TGL_PR: _bindgen_ty_53 = 4;
+pub const LV_BTNM_STYLE_BTN_INA: _bindgen_ty_53 = 5;
+pub type _bindgen_ty_53 = u32;
 pub type lv_btnm_style_t = u8;
 extern "C" {
     #[doc = " Create a button matrix objects"]
@@ -9168,11 +8632,11 @@ extern "C" {
     #[doc = " @return whether \"one toggle\" mode is enabled"]
     pub fn lv_btnm_get_one_toggle(btnm: *const lv_obj_t) -> bool;
 }
-pub const LV_KB_MODE_TEXT: _bindgen_ty_56 = 0;
-pub const LV_KB_MODE_NUM: _bindgen_ty_56 = 1;
-pub const LV_KB_MODE_TEXT_UPPER: _bindgen_ty_56 = 2;
+pub const LV_KB_MODE_TEXT: _bindgen_ty_54 = 0;
+pub const LV_KB_MODE_NUM: _bindgen_ty_54 = 1;
+pub const LV_KB_MODE_TEXT_UPPER: _bindgen_ty_54 = 2;
 #[doc = " Current keyboard mode."]
-pub type _bindgen_ty_56 = u32;
+pub type _bindgen_ty_54 = u32;
 pub type lv_kb_mode_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9206,13 +8670,13 @@ impl lv_kb_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_KB_STYLE_BG: _bindgen_ty_57 = 0;
-pub const LV_KB_STYLE_BTN_REL: _bindgen_ty_57 = 1;
-pub const LV_KB_STYLE_BTN_PR: _bindgen_ty_57 = 2;
-pub const LV_KB_STYLE_BTN_TGL_REL: _bindgen_ty_57 = 3;
-pub const LV_KB_STYLE_BTN_TGL_PR: _bindgen_ty_57 = 4;
-pub const LV_KB_STYLE_BTN_INA: _bindgen_ty_57 = 5;
-pub type _bindgen_ty_57 = u32;
+pub const LV_KB_STYLE_BG: _bindgen_ty_55 = 0;
+pub const LV_KB_STYLE_BTN_REL: _bindgen_ty_55 = 1;
+pub const LV_KB_STYLE_BTN_PR: _bindgen_ty_55 = 2;
+pub const LV_KB_STYLE_BTN_TGL_REL: _bindgen_ty_55 = 3;
+pub const LV_KB_STYLE_BTN_TGL_PR: _bindgen_ty_55 = 4;
+pub const LV_KB_STYLE_BTN_INA: _bindgen_ty_55 = 5;
+pub type _bindgen_ty_55 = u32;
 pub type lv_kb_style_t = u8;
 extern "C" {
     #[doc = " Create a keyboard objects"]
@@ -9365,10 +8829,10 @@ impl lv_ddlist_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_DDLIST_STYLE_BG: _bindgen_ty_58 = 0;
-pub const LV_DDLIST_STYLE_SEL: _bindgen_ty_58 = 1;
-pub const LV_DDLIST_STYLE_SB: _bindgen_ty_58 = 2;
-pub type _bindgen_ty_58 = u32;
+pub const LV_DDLIST_STYLE_BG: _bindgen_ty_56 = 0;
+pub const LV_DDLIST_STYLE_SEL: _bindgen_ty_56 = 1;
+pub const LV_DDLIST_STYLE_SB: _bindgen_ty_56 = 2;
+pub type _bindgen_ty_56 = u32;
 pub type lv_ddlist_style_t = u8;
 extern "C" {
     #[doc = " GLOBAL PROTOTYPES"]
@@ -9501,11 +8965,11 @@ extern "C" {
     pub fn lv_ddlist_close(ddlist: *mut lv_obj_t, anim: lv_anim_enable_t);
 }
 #[doc = "< Normal mode (roller ends at the end of the options)."]
-pub const LV_ROLLER_MODE_NORMAL: _bindgen_ty_59 = 0;
+pub const LV_ROLLER_MODE_NORMAL: _bindgen_ty_57 = 0;
 #[doc = "< Infinite mode (roller can be scrolled forever)."]
-pub const LV_ROLLER_MODE_INIFINITE: _bindgen_ty_59 = 1;
+pub const LV_ROLLER_MODE_INIFINITE: _bindgen_ty_57 = 1;
 #[doc = " Roller mode."]
-pub type _bindgen_ty_59 = u32;
+pub type _bindgen_ty_57 = u32;
 pub type lv_roller_mode_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9537,9 +9001,9 @@ impl lv_roller_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_ROLLER_STYLE_BG: _bindgen_ty_60 = 0;
-pub const LV_ROLLER_STYLE_SEL: _bindgen_ty_60 = 1;
-pub type _bindgen_ty_60 = u32;
+pub const LV_ROLLER_STYLE_BG: _bindgen_ty_58 = 0;
+pub const LV_ROLLER_STYLE_SEL: _bindgen_ty_58 = 1;
+pub type _bindgen_ty_58 = u32;
 pub type lv_roller_style_t = u8;
 extern "C" {
     #[doc = " Create a roller object"]
@@ -9618,19 +9082,19 @@ extern "C" {
     ) -> *const lv_style_t;
 }
 #[doc = "< No cursor"]
-pub const LV_CURSOR_NONE: _bindgen_ty_61 = 0;
+pub const LV_CURSOR_NONE: _bindgen_ty_59 = 0;
 #[doc = "< Vertical line"]
-pub const LV_CURSOR_LINE: _bindgen_ty_61 = 1;
+pub const LV_CURSOR_LINE: _bindgen_ty_59 = 1;
 #[doc = "< Rectangle"]
-pub const LV_CURSOR_BLOCK: _bindgen_ty_61 = 2;
+pub const LV_CURSOR_BLOCK: _bindgen_ty_59 = 2;
 #[doc = "< Outline around character"]
-pub const LV_CURSOR_OUTLINE: _bindgen_ty_61 = 3;
+pub const LV_CURSOR_OUTLINE: _bindgen_ty_59 = 3;
 #[doc = "< Horizontal line under character"]
-pub const LV_CURSOR_UNDERLINE: _bindgen_ty_61 = 4;
+pub const LV_CURSOR_UNDERLINE: _bindgen_ty_59 = 4;
 #[doc = "< This flag can be ORed to any of the other values to temporarily hide the cursor"]
-pub const LV_CURSOR_HIDDEN: _bindgen_ty_61 = 8;
+pub const LV_CURSOR_HIDDEN: _bindgen_ty_59 = 8;
 #[doc = " Style of text area's cursor."]
-pub type _bindgen_ty_61 = u32;
+pub type _bindgen_ty_59 = u32;
 pub type lv_cursor_type_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9754,17 +9218,17 @@ impl lv_ta_ext_t {
     }
 }
 #[doc = "< Text area background style"]
-pub const LV_TA_STYLE_BG: _bindgen_ty_62 = 0;
+pub const LV_TA_STYLE_BG: _bindgen_ty_60 = 0;
 #[doc = "< Scrollbar style"]
-pub const LV_TA_STYLE_SB: _bindgen_ty_62 = 1;
+pub const LV_TA_STYLE_SB: _bindgen_ty_60 = 1;
 #[doc = "< Cursor style"]
-pub const LV_TA_STYLE_CURSOR: _bindgen_ty_62 = 2;
+pub const LV_TA_STYLE_CURSOR: _bindgen_ty_60 = 2;
 #[doc = "< Edge flash style"]
-pub const LV_TA_STYLE_EDGE_FLASH: _bindgen_ty_62 = 3;
+pub const LV_TA_STYLE_EDGE_FLASH: _bindgen_ty_60 = 3;
 #[doc = "< Placeholder style"]
-pub const LV_TA_STYLE_PLACEHOLDER: _bindgen_ty_62 = 4;
+pub const LV_TA_STYLE_PLACEHOLDER: _bindgen_ty_60 = 4;
 #[doc = " Possible text areas tyles."]
-pub type _bindgen_ty_62 = u32;
+pub type _bindgen_ty_60 = u32;
 pub type lv_ta_style_t = u8;
 extern "C" {
     #[doc = " Create a text area objects"]
@@ -10017,8 +9481,8 @@ pub struct lv_canvas_ext_t {
     pub img: lv_img_ext_t,
     pub dsc: lv_img_dsc_t,
 }
-pub const LV_CANVAS_STYLE_MAIN: _bindgen_ty_63 = 0;
-pub type _bindgen_ty_63 = u32;
+pub const LV_CANVAS_STYLE_MAIN: _bindgen_ty_61 = 0;
+pub type _bindgen_ty_61 = u32;
 pub type lv_canvas_style_t = u8;
 extern "C" {
     #[doc = " Create a canvas object"]
@@ -10252,18 +9716,18 @@ pub struct lv_win_ext_t {
     pub btn_size: lv_coord_t,
 }
 #[doc = "< Window object background style."]
-pub const LV_WIN_STYLE_BG: _bindgen_ty_64 = 0;
+pub const LV_WIN_STYLE_BG: _bindgen_ty_62 = 0;
 #[doc = "< Window content style."]
-pub const LV_WIN_STYLE_CONTENT: _bindgen_ty_64 = 1;
+pub const LV_WIN_STYLE_CONTENT: _bindgen_ty_62 = 1;
 #[doc = "< Window scrollbar style."]
-pub const LV_WIN_STYLE_SB: _bindgen_ty_64 = 2;
+pub const LV_WIN_STYLE_SB: _bindgen_ty_62 = 2;
 #[doc = "< Window titlebar background style."]
-pub const LV_WIN_STYLE_HEADER: _bindgen_ty_64 = 3;
+pub const LV_WIN_STYLE_HEADER: _bindgen_ty_62 = 3;
 #[doc = "< Same meaning as ordinary button styles."]
-pub const LV_WIN_STYLE_BTN_REL: _bindgen_ty_64 = 4;
-pub const LV_WIN_STYLE_BTN_PR: _bindgen_ty_64 = 5;
+pub const LV_WIN_STYLE_BTN_REL: _bindgen_ty_62 = 4;
+pub const LV_WIN_STYLE_BTN_PR: _bindgen_ty_62 = 5;
 #[doc = " Window styles."]
-pub type _bindgen_ty_64 = u32;
+pub type _bindgen_ty_62 = u32;
 pub type lv_win_style_t = u8;
 extern "C" {
     #[doc = " Create a window objects"]
@@ -10403,12 +9867,12 @@ extern "C" {
     #[doc = " @param anim_en LV_ANIM_ON focus with an animation; LV_ANIM_OFF focus without animation"]
     pub fn lv_win_focus(win: *mut lv_obj_t, obj: *mut lv_obj_t, anim_en: lv_anim_enable_t);
 }
-pub const LV_TABVIEW_BTNS_POS_TOP: _bindgen_ty_65 = 0;
-pub const LV_TABVIEW_BTNS_POS_BOTTOM: _bindgen_ty_65 = 1;
-pub const LV_TABVIEW_BTNS_POS_LEFT: _bindgen_ty_65 = 2;
-pub const LV_TABVIEW_BTNS_POS_RIGHT: _bindgen_ty_65 = 3;
+pub const LV_TABVIEW_BTNS_POS_TOP: _bindgen_ty_63 = 0;
+pub const LV_TABVIEW_BTNS_POS_BOTTOM: _bindgen_ty_63 = 1;
+pub const LV_TABVIEW_BTNS_POS_LEFT: _bindgen_ty_63 = 2;
+pub const LV_TABVIEW_BTNS_POS_RIGHT: _bindgen_ty_63 = 3;
 #[doc = " Position of tabview buttons."]
-pub type _bindgen_ty_65 = u32;
+pub type _bindgen_ty_63 = u32;
 pub type lv_tabview_btns_pos_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -10529,14 +9993,14 @@ impl lv_tabview_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_TABVIEW_STYLE_BG: _bindgen_ty_66 = 0;
-pub const LV_TABVIEW_STYLE_INDIC: _bindgen_ty_66 = 1;
-pub const LV_TABVIEW_STYLE_BTN_BG: _bindgen_ty_66 = 2;
-pub const LV_TABVIEW_STYLE_BTN_REL: _bindgen_ty_66 = 3;
-pub const LV_TABVIEW_STYLE_BTN_PR: _bindgen_ty_66 = 4;
-pub const LV_TABVIEW_STYLE_BTN_TGL_REL: _bindgen_ty_66 = 5;
-pub const LV_TABVIEW_STYLE_BTN_TGL_PR: _bindgen_ty_66 = 6;
-pub type _bindgen_ty_66 = u32;
+pub const LV_TABVIEW_STYLE_BG: _bindgen_ty_64 = 0;
+pub const LV_TABVIEW_STYLE_INDIC: _bindgen_ty_64 = 1;
+pub const LV_TABVIEW_STYLE_BTN_BG: _bindgen_ty_64 = 2;
+pub const LV_TABVIEW_STYLE_BTN_REL: _bindgen_ty_64 = 3;
+pub const LV_TABVIEW_STYLE_BTN_PR: _bindgen_ty_64 = 4;
+pub const LV_TABVIEW_STYLE_BTN_TGL_REL: _bindgen_ty_64 = 5;
+pub const LV_TABVIEW_STYLE_BTN_TGL_PR: _bindgen_ty_64 = 6;
+pub type _bindgen_ty_64 = u32;
 pub type lv_tabview_style_t = u8;
 extern "C" {
     #[doc = " Create a Tab view object"]
@@ -10768,8 +10232,8 @@ impl lv_tileview_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_TILEVIEW_STYLE_MAIN: _bindgen_ty_67 = 0;
-pub type _bindgen_ty_67 = u32;
+pub const LV_TILEVIEW_STYLE_MAIN: _bindgen_ty_65 = 0;
+pub type _bindgen_ty_65 = u32;
 pub type lv_tileview_style_t = u8;
 extern "C" {
     #[doc = " Create a tileview objects"]
@@ -10839,16 +10303,16 @@ pub struct lv_mbox_ext_t {
     pub btnm: *mut lv_obj_t,
     pub anim_time: u16,
 }
-pub const LV_MBOX_STYLE_BG: _bindgen_ty_68 = 0;
+pub const LV_MBOX_STYLE_BG: _bindgen_ty_66 = 0;
 #[doc = "< Same meaning as ordinary button styles."]
-pub const LV_MBOX_STYLE_BTN_BG: _bindgen_ty_68 = 1;
-pub const LV_MBOX_STYLE_BTN_REL: _bindgen_ty_68 = 2;
-pub const LV_MBOX_STYLE_BTN_PR: _bindgen_ty_68 = 3;
-pub const LV_MBOX_STYLE_BTN_TGL_REL: _bindgen_ty_68 = 4;
-pub const LV_MBOX_STYLE_BTN_TGL_PR: _bindgen_ty_68 = 5;
-pub const LV_MBOX_STYLE_BTN_INA: _bindgen_ty_68 = 6;
+pub const LV_MBOX_STYLE_BTN_BG: _bindgen_ty_66 = 1;
+pub const LV_MBOX_STYLE_BTN_REL: _bindgen_ty_66 = 2;
+pub const LV_MBOX_STYLE_BTN_PR: _bindgen_ty_66 = 3;
+pub const LV_MBOX_STYLE_BTN_TGL_REL: _bindgen_ty_66 = 4;
+pub const LV_MBOX_STYLE_BTN_TGL_PR: _bindgen_ty_66 = 5;
+pub const LV_MBOX_STYLE_BTN_INA: _bindgen_ty_66 = 6;
 #[doc = " Message box styles."]
-pub type _bindgen_ty_68 = u32;
+pub type _bindgen_ty_66 = u32;
 pub type lv_mbox_style_t = u8;
 extern "C" {
     #[doc = " Create a message box objects"]
@@ -10983,8 +10447,8 @@ impl lv_lmeter_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_LMETER_STYLE_MAIN: _bindgen_ty_69 = 0;
-pub type _bindgen_ty_69 = u32;
+pub const LV_LMETER_STYLE_MAIN: _bindgen_ty_67 = 0;
+pub type _bindgen_ty_67 = u32;
 pub type lv_lmeter_style_t = u8;
 extern "C" {
     #[doc = " Create a line meter objects"]
@@ -11078,8 +10542,8 @@ pub struct lv_gauge_ext_t {
     pub needle_count: u8,
     pub label_count: u8,
 }
-pub const LV_GAUGE_STYLE_MAIN: _bindgen_ty_70 = 0;
-pub type _bindgen_ty_70 = u32;
+pub const LV_GAUGE_STYLE_MAIN: _bindgen_ty_68 = 0;
+pub type _bindgen_ty_68 = u32;
 pub type lv_gauge_style_t = u8;
 extern "C" {
     #[doc = " Create a gauge objects"]
@@ -11187,15 +10651,15 @@ impl lv_sw_ext_t {
     }
 }
 #[doc = "< Switch background."]
-pub const LV_SW_STYLE_BG: _bindgen_ty_71 = 0;
+pub const LV_SW_STYLE_BG: _bindgen_ty_69 = 0;
 #[doc = "< Switch fill area."]
-pub const LV_SW_STYLE_INDIC: _bindgen_ty_71 = 1;
+pub const LV_SW_STYLE_INDIC: _bindgen_ty_69 = 1;
 #[doc = "< Switch knob (when off)."]
-pub const LV_SW_STYLE_KNOB_OFF: _bindgen_ty_71 = 2;
+pub const LV_SW_STYLE_KNOB_OFF: _bindgen_ty_69 = 2;
 #[doc = "< Switch knob (when on)."]
-pub const LV_SW_STYLE_KNOB_ON: _bindgen_ty_71 = 3;
+pub const LV_SW_STYLE_KNOB_ON: _bindgen_ty_69 = 3;
 #[doc = " Switch styles."]
-pub type _bindgen_ty_71 = u32;
+pub type _bindgen_ty_69 = u32;
 pub type lv_sw_style_t = u8;
 extern "C" {
     #[doc = " Create a switch objects"]
@@ -11257,8 +10721,8 @@ pub struct lv_arc_ext_t {
     pub angle_start: lv_coord_t,
     pub angle_end: lv_coord_t,
 }
-pub const LV_ARC_STYLE_MAIN: _bindgen_ty_72 = 0;
-pub type _bindgen_ty_72 = u32;
+pub const LV_ARC_STYLE_MAIN: _bindgen_ty_70 = 0;
+pub type _bindgen_ty_70 = u32;
 pub type lv_arc_style_t = u8;
 extern "C" {
     #[doc = " Create a arc objects"]
@@ -11300,16 +10764,16 @@ extern "C" {
     #[doc = " @return style pointer to the style"]
     pub fn lv_arc_get_style(arc: *const lv_obj_t, type_: lv_arc_style_t) -> *const lv_style_t;
 }
-pub const LV_PRELOAD_TYPE_SPINNING_ARC: _bindgen_ty_73 = 0;
-pub const LV_PRELOAD_TYPE_FILLSPIN_ARC: _bindgen_ty_73 = 1;
-pub const LV_PRELOAD_TYPE_CONSTANT_ARC: _bindgen_ty_73 = 2;
+pub const LV_PRELOAD_TYPE_SPINNING_ARC: _bindgen_ty_71 = 0;
+pub const LV_PRELOAD_TYPE_FILLSPIN_ARC: _bindgen_ty_71 = 1;
+pub const LV_PRELOAD_TYPE_CONSTANT_ARC: _bindgen_ty_71 = 2;
 #[doc = " Type of preloader."]
-pub type _bindgen_ty_73 = u32;
+pub type _bindgen_ty_71 = u32;
 pub type lv_preload_type_t = u8;
-pub const LV_PRELOAD_DIR_FORWARD: _bindgen_ty_74 = 0;
-pub const LV_PRELOAD_DIR_BACKWARD: _bindgen_ty_74 = 1;
+pub const LV_PRELOAD_DIR_FORWARD: _bindgen_ty_72 = 0;
+pub const LV_PRELOAD_DIR_BACKWARD: _bindgen_ty_72 = 1;
 #[doc = " Direction the preloader should spin."]
-pub type _bindgen_ty_74 = u32;
+pub type _bindgen_ty_72 = u32;
 pub type lv_preload_dir_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -11361,8 +10825,8 @@ impl lv_preload_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_PRELOAD_STYLE_MAIN: _bindgen_ty_75 = 0;
-pub type _bindgen_ty_75 = u32;
+pub const LV_PRELOAD_STYLE_MAIN: _bindgen_ty_73 = 0;
+pub type _bindgen_ty_73 = u32;
 pub type lv_preload_style_t = u8;
 extern "C" {
     #[doc = " Create a pre loader objects"]
@@ -11473,22 +10937,22 @@ pub struct lv_calendar_ext_t {
     pub style_today_box: *const lv_style_t,
 }
 #[doc = "< Background and \"normal\" date numbers style"]
-pub const LV_CALENDAR_STYLE_BG: _bindgen_ty_76 = 0;
-pub const LV_CALENDAR_STYLE_HEADER: _bindgen_ty_76 = 1;
+pub const LV_CALENDAR_STYLE_BG: _bindgen_ty_74 = 0;
+pub const LV_CALENDAR_STYLE_HEADER: _bindgen_ty_74 = 1;
 #[doc = " Calendar header style"]
-pub const LV_CALENDAR_STYLE_HEADER_PR: _bindgen_ty_76 = 2;
+pub const LV_CALENDAR_STYLE_HEADER_PR: _bindgen_ty_74 = 2;
 #[doc = " Calendar header style (when pressed)"]
-pub const LV_CALENDAR_STYLE_DAY_NAMES: _bindgen_ty_76 = 3;
+pub const LV_CALENDAR_STYLE_DAY_NAMES: _bindgen_ty_74 = 3;
 #[doc = " Day name style"]
-pub const LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS: _bindgen_ty_76 = 4;
+pub const LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS: _bindgen_ty_74 = 4;
 #[doc = " Highlighted day style"]
-pub const LV_CALENDAR_STYLE_INACTIVE_DAYS: _bindgen_ty_76 = 5;
+pub const LV_CALENDAR_STYLE_INACTIVE_DAYS: _bindgen_ty_74 = 5;
 #[doc = " Inactive day style"]
-pub const LV_CALENDAR_STYLE_WEEK_BOX: _bindgen_ty_76 = 6;
+pub const LV_CALENDAR_STYLE_WEEK_BOX: _bindgen_ty_74 = 6;
 #[doc = " Week highlight style"]
-pub const LV_CALENDAR_STYLE_TODAY_BOX: _bindgen_ty_76 = 7;
+pub const LV_CALENDAR_STYLE_TODAY_BOX: _bindgen_ty_74 = 7;
 #[doc = " Calendar styles"]
-pub type _bindgen_ty_76 = u32;
+pub type _bindgen_ty_74 = u32;
 pub type lv_calendar_style_t = u8;
 extern "C" {
     #[doc = " Create a calendar objects"]
@@ -11675,10 +11139,10 @@ impl lv_spinbox_ext_t {
         __bindgen_bitfield_unit
     }
 }
-pub const LV_SPINBOX_STYLE_BG: _bindgen_ty_77 = 0;
-pub const LV_SPINBOX_STYLE_SB: _bindgen_ty_77 = 1;
-pub const LV_SPINBOX_STYLE_CURSOR: _bindgen_ty_77 = 2;
-pub type _bindgen_ty_77 = u32;
+pub const LV_SPINBOX_STYLE_BG: _bindgen_ty_75 = 0;
+pub const LV_SPINBOX_STYLE_SB: _bindgen_ty_75 = 1;
+pub const LV_SPINBOX_STYLE_CURSOR: _bindgen_ty_75 = 2;
+pub type _bindgen_ty_75 = u32;
 pub type lv_spinbox_style_t = u8;
 extern "C" {
     #[doc = " Create a spinbox objects"]
@@ -11789,7 +11253,19 @@ extern "C" {
     pub fn lv_img_cache_invalidate_src(src: *const cty::c_void);
 }
 extern "C" {
-    pub fn lvsys_color_make(r: u8, g: u8, b: u8) -> lv_color_t;
+    pub fn _LV_COLOR_MAKE(r: u8, g: u8, b: u8) -> lv_color_t;
+}
+extern "C" {
+    pub fn _LV_COLOR_GET_R(color: lv_color_t) -> u16;
+}
+extern "C" {
+    pub fn _LV_COLOR_GET_G(color: lv_color_t) -> u16;
+}
+extern "C" {
+    pub fn _LV_COLOR_GET_B(color: lv_color_t) -> u16;
+}
+extern "C" {
+    pub fn _LV_COLOR_GET_A(color: lv_color_t) -> u16;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

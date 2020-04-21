@@ -1,14 +1,18 @@
+use embedded_graphics::prelude::*;
+use embedded_graphics_simulator::{
+    BinaryColorTheme, OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
+};
 use lvgl;
 use lvgl::Object;
 use lvgl_sys;
+use std::sync::mpsc;
 use std::time::Duration;
-use embedded_graphics::pixelcolor::Rgb888;
-use embedded_graphics::mock_display::MockDisplay;
-use embedded_graphics::prelude::*;
-use embedded_graphics_simulator::{OutputSettingsBuilder, SimulatorDisplay, Window, BinaryColorTheme, SimulatorEvent};
 
 fn main() -> Result<(), String> {
-    let mut display: SimulatorDisplay<Rgb888> = SimulatorDisplay::new(Size::new(lvgl_sys::LV_HOR_RES_MAX,lvgl_sys::LV_VER_RES_MAX));
+    let mut display = SimulatorDisplay::new(Size::new(
+        lvgl_sys::LV_HOR_RES_MAX,
+        lvgl_sys::LV_VER_RES_MAX,
+    ));
 
     let output_settings = OutputSettingsBuilder::new()
         .theme(BinaryColorTheme::OledBlue)
@@ -64,6 +68,16 @@ fn main() -> Result<(), String> {
     power.set_label_align(lvgl::LabelAlign::Right);
     power.set_align(&mut screen, lvgl::Align::InTopRight, 0, 0);
 
+    let (stop_ch, read_ch) = mpsc::channel();
+    let tick_thr = std::thread::spawn(move || loop {
+        ::std::thread::sleep(Duration::from_millis(5));
+        unsafe {
+            lvgl_sys::lv_tick_inc(5);
+        }
+        if read_ch.try_recv().is_ok() {
+            break;
+        }
+    });
 
     let mut i = 0;
     'running: loop {
@@ -73,12 +87,14 @@ fn main() -> Result<(), String> {
         time.set_text(format!("21:{:02}\0", i).as_str());
         i = 1 + i;
 
-        ::std::thread::sleep(Duration::from_millis(10));
+        ::std::thread::sleep(Duration::from_millis(
+            lvgl_sys::LV_DISP_DEF_REFR_PERIOD as u64,
+        ));
 
         unsafe {
             lvgl_sys::lv_task_handler();
-            lvgl_sys::lv_tick_inc(10);
         }
+
         window.update(&display);
 
         for event in window.events() {
@@ -88,6 +104,9 @@ fn main() -> Result<(), String> {
             }
         }
     }
+
+    stop_ch.send(true).unwrap();
+    tick_thr.join().unwrap();
 
     Ok(())
 }

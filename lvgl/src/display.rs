@@ -1,16 +1,16 @@
 use crate::objx::ObjectX;
+use core::marker::PhantomData;
+use core::mem::MaybeUninit;
 use core::ptr;
 use embedded_graphics;
+use embedded_graphics::pixelcolor::raw::RawU16;
+use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 use embedded_graphics::{drawable, DrawTarget};
-use core::mem::MaybeUninit;
-use embedded_graphics::pixelcolor::Rgb888;
-use core::marker::PhantomData;
-
 
 pub struct DisplayDriver<'a, T>
-    where
-        T: DrawTarget<Rgb888>,
+where
+    T: DrawTarget<Rgb565>,
 {
     raw: lvgl_sys::lv_disp_drv_t,
     display_buffer: MaybeUninit<lvgl_sys::lv_disp_buf_t>,
@@ -18,8 +18,9 @@ pub struct DisplayDriver<'a, T>
     phantom: &'a PhantomData<T>,
 }
 
-impl<'a, T> DisplayDriver<'a, T> where
-    T: DrawTarget<Rgb888>
+impl<'a, T> DisplayDriver<'a, T>
+where
+    T: DrawTarget<Rgb565>,
 {
     pub fn new(device: &'a mut T) -> Self {
         // Create a display buffer for LittlevGL
@@ -71,28 +72,32 @@ unsafe extern "C" fn display_callback_wrapper<T>(
     area: *const lvgl_sys::lv_area_t,
     color_p: *mut lvgl_sys::lv_color_t,
 ) where
-    T: DrawTarget<Rgb888>,
+    T: DrawTarget<Rgb565>,
 {
     // We need to make sure panics can't escape across the FFI boundary.
-    //let _ = panic::catch_unwind(|| {
-        let mut i = 0;
-        let disp = *disp_drv;
+    //let _ = std::panic::catch_unwind(|| {
+    let mut i = 0;
+    let display_driver = *disp_drv;
 
-        // Rust code closure reference
-        let device = &mut *(disp.user_data as *mut T);
+    // Rust code closure reference
+    let device = &mut *(display_driver.user_data as *mut T);
 
-        for y in (*area).y1..=(*area).y2 {
-            for x in (*area).x1..=(*area).x2 {
-                // Convert C color representation to high-level Rust
-                let raw_color = *color_p.add(i);
-                i = i + 1;
-                let color = Rgb888::new(raw_color.ch.red, raw_color.ch.green, raw_color.ch.blue);
-                // Callback the Rust closure to flush the new points to the screen
-                let _ = device.draw_pixel(drawable::Pixel(Point::new(x as i32, y as i32), color));
-            }
+    for y in (*area).y1..=(*area).y2 {
+        for x in (*area).x1..=(*area).x2 {
+            let raw_color = *color_p.add(i);
+            i = i + 1;
+            // Convert Lvgl to embedded-graphics color
+            let color = Rgb565::new(
+                lvgl_sys::_LV_COLOR_GET_R(raw_color) as u8,
+                lvgl_sys::_LV_COLOR_GET_G(raw_color) as u8,
+                lvgl_sys::_LV_COLOR_GET_B(raw_color) as u8,
+            );
+            let _ = device.draw_pixel(drawable::Pixel(Point::new(x as i32, y as i32), color));
         }
-        // Indicate to LittlevGL that you are ready with the flushing
-        lvgl_sys::lv_disp_flush_ready(disp_drv);
+    }
+
+    // Indicate to LittlevGL that you are ready with the flushing
+    lvgl_sys::lv_disp_flush_ready(disp_drv);
     //}); // end of panic::catch_unwind
 }
 

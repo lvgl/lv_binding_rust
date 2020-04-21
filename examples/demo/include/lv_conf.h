@@ -1,14 +1,3 @@
-/**
- * @file lv_conf.h
- *
- */
-
-/*
- * COPY THIS FILE AS `lv_conf.h` NEXT TO the `lvgl` FOLDER
- */
-
-#if 1 /*Set it to "1" to enable content*/
-
 #ifndef LV_CONF_H
 #define LV_CONF_H
 /* clang-format off */
@@ -56,7 +45,7 @@
 /* Dot Per Inch: used to initialize default sizes.
  * E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
-#define LV_DPI              100     /*[px]*/
+#define LV_DPI              298     /*[px]*/
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
 typedef int16_t lv_coord_t;
@@ -72,7 +61,7 @@ typedef int16_t lv_coord_t;
 #define LV_MEM_CUSTOM      0
 #if LV_MEM_CUSTOM == 0
 /* Size of the memory used by `lv_mem_alloc` in bytes (>= 2kB)*/
-#  define LV_MEM_SIZE    (128U * 1024U)
+#  define LV_MEM_SIZE    (4U * 1024U)
 
 /* Complier prefix for a big array declaration */
 #  define LV_MEM_ATTR
@@ -145,10 +134,10 @@ typedef void * lv_group_user_data_t;
 #endif  /*LV_USE_GROUP*/
 
 /* 1: Enable GPU interface*/
-#define LV_USE_GPU              1
+#define LV_USE_GPU              0
 
 /* 1: Enable file system (might be required for images */
-#define LV_USE_FILESYSTEM       1
+#define LV_USE_FILESYSTEM       0
 #if LV_USE_FILESYSTEM
 /*Declare the type of the user data of file system drivers (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_fs_drv_user_data_t;
@@ -224,7 +213,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  *===============*/
 
 /*1: Enable the log module*/
-#define LV_USE_LOG      1
+#define LV_USE_LOG      0
 #if LV_USE_LOG
 /* How important log should be added:
  * LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information
@@ -237,7 +226,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /* 1: Print the log with 'printf';
  * 0: user need to register a callback with `lv_log_register_print_cb`*/
-#  define LV_LOG_PRINTF   1
+#  define LV_LOG_PRINTF   0
 #endif  /*LV_USE_LOG*/
 
 /*=================
@@ -253,7 +242,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  * The behavior of asserts can be overwritten by redefining them here.
  * E.g. #define LV_ASSERT_MEM(p)  <my_assert_code>
  */
-#define LV_USE_DEBUG        1
+#define LV_USE_DEBUG        0
 #if LV_USE_DEBUG
 
 /*Check if the parameter is NULL. (Quite fast) */
@@ -265,11 +254,11 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 /* Check the strings.
  * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
  * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
-#define LV_USE_ASSERT_STR       1
+#define LV_USE_ASSERT_STR       0
 
 /* Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)
  * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
-#define LV_USE_ASSERT_OBJ       1
+#define LV_USE_ASSERT_OBJ       0
 
 /*Check if the styles are properly initialized. (Fast)*/
 #define LV_USE_ASSERT_STYLE     1
@@ -282,13 +271,13 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_THEME_LIVE_UPDATE    0   /*1: Allow theme switching at run time. Uses 8..10 kB of RAM*/
 
 #define LV_USE_THEME_TEMPL      0   /*Just for test*/
-#define LV_USE_THEME_DEFAULT    1   /*Built mainly from the built-in styles. Consumes very few RAM*/
-#define LV_USE_THEME_ALIEN      1   /*Dark futuristic theme*/
-#define LV_USE_THEME_NIGHT      1   /*Dark elegant theme*/
-#define LV_USE_THEME_MONO       1   /*Mono color theme for monochrome displays*/
-#define LV_USE_THEME_MATERIAL   1   /*Flat theme with bold colors and light shadows*/
-#define LV_USE_THEME_ZEN        1   /*Peaceful, mainly light theme */
-#define LV_USE_THEME_NEMO       1   /*Water-like theme based on the movie "Finding Nemo"*/
+#define LV_USE_THEME_DEFAULT    0   /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define LV_USE_THEME_ALIEN      0   /*Dark futuristic theme*/
+#define LV_USE_THEME_NIGHT      0   /*Dark elegant theme*/
+#define LV_USE_THEME_MONO       0   /*Mono color theme for monochrome displays*/
+#define LV_USE_THEME_MATERIAL   0   /*Flat theme with bold colors and light shadows*/
+#define LV_USE_THEME_ZEN        0   /*Peaceful, mainly light theme */
+#define LV_USE_THEME_NEMO       0   /*Water-like theme based on the movie "Finding Nemo"*/
 
 /*==================
  *    FONT USAGE
@@ -302,10 +291,10 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /* Robot fonts with bpp = 4
  * https://fonts.google.com/specimen/Roboto  */
-#define LV_FONT_ROBOTO_12       1
-#define LV_FONT_ROBOTO_16       1
-#define LV_FONT_ROBOTO_22       1
-#define LV_FONT_ROBOTO_28       1
+#define LV_FONT_ROBOTO_12    0
+#define LV_FONT_ROBOTO_16    0
+#define LV_FONT_ROBOTO_22    0
+#define LV_FONT_ROBOTO_28    1
 
 /* Demonstrate special features */
 #define LV_FONT_ROBOTO_12_SUBPX 1
@@ -313,7 +302,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /*Pixel perfect monospace font
  * http://pelulamu.net/unscii/ */
-#define LV_FONT_UNSCII_8     1
+#define LV_FONT_UNSCII_8     0
 
 /* Optionally declare your custom fonts here.
  * You can use these fonts as default font too
@@ -324,7 +313,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_FONT_CUSTOM_DECLARE
 
 /*Always set a default font from the built-in fonts*/
-#define LV_FONT_DEFAULT        &lv_font_roboto_16
+#define LV_FONT_DEFAULT        &lv_font_roboto_28
 
 /* Enable it if you have fonts with a lot of characters.
  * The limit depends on the font size, font face and bpp
@@ -351,7 +340,7 @@ typedef void * lv_font_user_data_t;
  * */
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
- /*Can break (wrap) texts on these chars*/
+/*Can break (wrap) texts on these chars*/
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 
 
@@ -374,7 +363,7 @@ typedef void * lv_font_user_data_t;
  * Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
-#define LV_USE_BIDI     1
+#define LV_USE_BIDI     0
 #if LV_USE_BIDI
 /* Set the default direction. Supported values:
  * `LV_BIDI_DIR_LTR` Left-to-Right
@@ -588,5 +577,3 @@ typedef void * lv_obj_user_data_t;
 #include "lvgl/src/lv_conf_checker.h"
 
 #endif /*LV_CONF_H*/
-
-#endif /*End of "Content enable"*/
