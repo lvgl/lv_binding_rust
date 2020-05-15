@@ -37,3 +37,6 @@ We recommend the `lv_conf.h` file to be in your project's root directory. If so,
 $ DEP_LV_CONFIG_PATH=`pwd` cargo build
 ```
 
+## Running the demo
+
+[This project contains an example that can run in a desktop simulator.](./examples/demo)
