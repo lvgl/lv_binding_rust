@@ -173,7 +173,7 @@ pub const WINT_MIN: u32 = 0;
 pub const WINT_MAX: u32 = 4294967295;
 pub const LV_HOR_RES_MAX: u32 = 240;
 pub const LV_VER_RES_MAX: u32 = 240;
-pub const LV_COLOR_DEPTH: u32 = 32;
+pub const LV_COLOR_DEPTH: u32 = 16;
 pub const LV_COLOR_16_SWAP: u32 = 0;
 pub const LV_COLOR_SCREEN_TRANSP: u32 = 0;
 pub const LV_INDEXED_CHROMA: u32 = 1;
@@ -294,7 +294,7 @@ pub const LV_BEZIER_VAL_MAX: u32 = 1024;
 pub const LV_BEZIER_VAL_SHIFT: u32 = 10;
 pub const LV_OPA_MIN: u32 = 16;
 pub const LV_OPA_MAX: u32 = 251;
-pub const LV_COLOR_SIZE: u32 = 32;
+pub const LV_COLOR_SIZE: u32 = 16;
 pub const _STRING_H: u32 = 1;
 pub const _BITS_TYPES_LOCALE_T_H: u32 = 1;
 pub const _BITS_TYPES___LOCALE_T_H: u32 = 1;
@@ -371,7 +371,7 @@ pub const LV_EXT_CLICK_AREA_FULL: u32 = 2;
 pub const __GNUC_VA_LIST: u32 = 1;
 pub const LV_TXT_ENC_UTF8: u32 = 1;
 pub const LV_TXT_ENC_ASCII: u32 = 2;
-pub const LV_IMG_PX_SIZE_ALPHA_BYTE: u32 = 4;
+pub const LV_IMG_PX_SIZE_ALPHA_BYTE: u32 = 3;
 pub const LV_DRAW_LABEL_NO_TXT_SEL: u32 = 65535;
 pub const LV_LABEL_DOT_NUM: u32 = 3;
 pub const LV_LABEL_POS_LAST: u32 = 65535;
@@ -1086,8 +1086,8 @@ pub struct lv_color32_t__bindgen_ty_1 {
     pub red: u8,
     pub alpha: u8,
 }
-pub type lv_color_int_t = u32;
-pub type lv_color_t = lv_color32_t;
+pub type lv_color_int_t = u16;
+pub type lv_color_t = lv_color16_t;
 pub type lv_opa_t = u8;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

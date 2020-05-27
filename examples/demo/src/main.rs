@@ -1,22 +1,21 @@
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
-    BinaryColorTheme, OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
+    OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl;
 use lvgl::Object;
 use lvgl_sys;
 use std::sync::mpsc;
 use std::time::Duration;
+use embedded_graphics::pixelcolor::{Rgb565};
 
 fn main() -> Result<(), String> {
-    let mut display = SimulatorDisplay::new(Size::new(
+    let mut display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
     ));
 
-    let output_settings = OutputSettingsBuilder::new()
-        .theme(BinaryColorTheme::OledBlue)
-        .build();
+    let output_settings = OutputSettingsBuilder::new().scale(4).build();
     let mut window = Window::new("Hello World", &output_settings);
 
     unsafe {

@@ -3,24 +3,27 @@ use core::marker::PhantomData;
 use core::mem::MaybeUninit;
 use core::ptr;
 use embedded_graphics;
-use embedded_graphics::pixelcolor::raw::RawU16;
-use embedded_graphics::pixelcolor::Rgb565;
+use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 use embedded_graphics::prelude::*;
 use embedded_graphics::{drawable, DrawTarget};
+use lvgl_sys::lv_color_t;
 
-pub struct DisplayDriver<'a, T>
+pub struct DisplayDriver<'a, T, C>
 where
-    T: DrawTarget<Rgb565>,
+    T: DrawTarget<C>,
+    C: PixelColor + From<ColorRgb>
 {
     raw: lvgl_sys::lv_disp_drv_t,
     display_buffer: MaybeUninit<lvgl_sys::lv_disp_buf_t>,
     refresh_buffer: [MaybeUninit<lvgl_sys::lv_color_t>; lvgl_sys::LV_HOR_RES_MAX as usize * 10],
     phantom: &'a PhantomData<T>,
+    phantom2: PhantomData<C>,
 }
 
-impl<'a, T> DisplayDriver<'a, T>
+impl<'a, T, C> DisplayDriver<'a, T, C>
 where
-    T: DrawTarget<Rgb565>,
+    T: DrawTarget<C>,
+    C: PixelColor + From<ColorRgb>
 {
     pub fn new(device: &'a mut T) -> Self {
         // Create a display buffer for LittlevGL
@@ -44,7 +47,7 @@ where
             // Basic initialization
             lvgl_sys::lv_disp_drv_init(&mut disp_drv);
             // Set your driver function
-            disp_drv.flush_cb = Some(display_callback_wrapper::<T>);
+            disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
             disp_drv.user_data = device as *mut _ as *mut cty::c_void;
             disp_drv
         };
@@ -59,6 +62,7 @@ where
             display_buffer,
             refresh_buffer,
             phantom: &PhantomData,
+            phantom2: PhantomData,
         }
     }
 
@@ -67,12 +71,43 @@ where
     }
 }
 
-unsafe extern "C" fn display_callback_wrapper<T>(
+pub struct ColorRgb(lv_color_t);
+
+impl From<ColorRgb> for Rgb888 {
+    fn from(color: ColorRgb) -> Self {
+        // Convert Lvgl to embedded-graphics color
+        let raw_color = color.0;
+        unsafe {
+            Rgb888::new(
+                lvgl_sys::_LV_COLOR_GET_R(raw_color) as u8,
+                lvgl_sys::_LV_COLOR_GET_G(raw_color) as u8,
+                lvgl_sys::_LV_COLOR_GET_B(raw_color) as u8,
+            )
+        }
+    }
+}
+
+impl From<ColorRgb> for Rgb565 {
+    fn from(color: ColorRgb) -> Self {
+        // Convert Lvgl to embedded-graphics color
+        let raw_color = color.0;
+        unsafe {
+            Rgb565::new(
+                lvgl_sys::_LV_COLOR_GET_R(raw_color) as u8,
+                lvgl_sys::_LV_COLOR_GET_G(raw_color) as u8,
+                lvgl_sys::_LV_COLOR_GET_B(raw_color) as u8,
+            )
+        }
+    }
+}
+
+unsafe extern "C" fn display_callback_wrapper<T, C>(
     disp_drv: *mut lvgl_sys::lv_disp_drv_t,
     area: *const lvgl_sys::lv_area_t,
     color_p: *mut lvgl_sys::lv_color_t,
 ) where
-    T: DrawTarget<Rgb565>,
+    T: DrawTarget<C>,
+    C: PixelColor + From<ColorRgb>
 {
     // We need to make sure panics can't escape across the FFI boundary.
     //let _ = std::panic::catch_unwind(|| {
@@ -82,17 +117,14 @@ unsafe extern "C" fn display_callback_wrapper<T>(
     // Rust code closure reference
     let device = &mut *(display_driver.user_data as *mut T);
 
+    // TODO: create a fixed image buffer iterator somehow, maybe a fixed size array
+    //let image_buffer =
     for y in (*area).y1..=(*area).y2 {
         for x in (*area).x1..=(*area).x2 {
-            let raw_color = *color_p.add(i);
+            let raw_color = ColorRgb(*color_p.add(i));
             i = i + 1;
-            // Convert Lvgl to embedded-graphics color
-            let color = Rgb565::new(
-                lvgl_sys::_LV_COLOR_GET_R(raw_color) as u8,
-                lvgl_sys::_LV_COLOR_GET_G(raw_color) as u8,
-                lvgl_sys::_LV_COLOR_GET_B(raw_color) as u8,
-            );
-            let _ = device.draw_pixel(drawable::Pixel(Point::new(x as i32, y as i32), color));
+            // TODO: Use device.draw_iter
+            let _ = device.draw_pixel(drawable::Pixel(Point::new(x as i32, y as i32), raw_color.into()));
         }
     }
 
