@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 use core::sync::atomic::{AtomicBool, Ordering};
+use core::cell::{RefCell, RefMut};
 
 // There can only be a single reference to LittlevGL library.
 static LVGL_IN_USE: AtomicBool = AtomicBool::new(false);
@@ -12,7 +13,8 @@ pub enum LvError {
 
 pub struct UI {
     // LittlevGL is not thread-safe by default.
-    _not_send: PhantomData<*const ()>
+    _not_send: PhantomData<*const ()>,
+    display: Option<DisplayDriver>,
 }
 
 impl UI {
@@ -21,15 +23,26 @@ impl UI {
             // lvgl_sys::lv_init();
             Ok(Self {
                 _not_send: PhantomData,
+                display: None,
             })
         } else {
             Err(LvError::AlreadyInUse)
         }
     }
 
-    pub fn disp_drv_register(&mut self, _display: &mut DisplayDriver) {
+    pub fn disp_drv_register(&mut self, display: DisplayDriver) {
         // register it
         // lvgl_sys::lv_disp_drv_register(&mut disp_drv);
+        self.display = Some(display);
+    }
+
+    pub fn scr_act(&self) -> Option<&Screen> {
+        match self.display.as_ref() {
+            Some(drv) => {
+                Some(drv.scr_act())
+            },
+            None => None
+        }
     }
 
     pub fn tick_inc(&mut self, _tick_period: Duration) {
@@ -56,8 +69,8 @@ impl DisplayDriver {
         self.current_screen = screen;
     }
 
-    pub fn scr_act(&mut self) -> &mut Screen {
-        &mut self.current_screen
+    pub fn scr_act(&self) -> &Screen {
+        &self.current_screen
     }
 }
 
@@ -114,27 +127,22 @@ impl<'a, F> LvObject for Button<'a, F> where F: FnMut() {}
 mod test {
     use crate::api::{UI, DisplayDriver, LvObject};
     use core::time::Duration;
-    use core::cell::RefCell;
 
     #[test]
     fn basic_usage() {
         let mut ui = UI::init().unwrap();
 
         let refresh_lines = 10;
-        let mut display = DisplayDriver::new(refresh_lines);
-        ui.disp_drv_register(&mut display);
-        let display = RefCell::new(display);
+        let display = DisplayDriver::new(refresh_lines);
+        ui.disp_drv_register(display);
 
         {
-            let mut d = display.borrow_mut();
-            let screen = d.scr_act();
-
+            let screen = ui.scr_act().unwrap();
             let mut button = screen.btn_create();
 
             button.on_event(|| {
                 // something
-                let mut disp = display.borrow_mut();
-                let screen = disp.scr_act();
+                let screen = ui.scr_act().unwrap();
                 let mut label = screen.label_create();
                 label.set_text("Clicked");
             });
@@ -144,8 +152,7 @@ mod test {
         };
 
         {
-            let mut d = display.borrow_mut();
-            let screen = d.scr_act();
+            let screen = ui.scr_act().unwrap();
             let mut button2 = screen.btn_create();
             button2.on_event(|| {
                 // else
