@@ -114,7 +114,7 @@ impl<'a, F> LvObject for Button<'a, F> where F: FnMut() {}
 mod test {
     use crate::api::{UI, DisplayDriver, LvObject};
     use core::time::Duration;
-    use std::sync::{Mutex, Arc};
+    use core::cell::RefCell;
 
     #[test]
     fn basic_usage() {
@@ -123,19 +123,17 @@ mod test {
         let refresh_lines = 10;
         let mut display = DisplayDriver::new(refresh_lines);
         ui.disp_drv_register(&mut display);
-        let display = Arc::new(Mutex::new(display));
+        let display = RefCell::new(display);
 
         {
-            let mut disp = display.clone();
-            let mut d = disp.lock().unwrap();
+            let mut d = display.borrow_mut();
             let screen = d.scr_act();
 
             let mut button = screen.btn_create();
 
-            let mut inner_disp = display.clone();
             button.on_event(|| {
                 // something
-                let mut disp = inner_disp.lock().unwrap();
+                let mut disp = display.borrow_mut();
                 let screen = disp.scr_act();
                 let mut label = screen.label_create();
                 label.set_text("Clicked");
@@ -146,8 +144,7 @@ mod test {
         };
 
         {
-            let mut disp = display.clone();
-            let mut d = disp.lock().unwrap();
+            let mut d = display.borrow_mut();
             let screen = d.scr_act();
             let mut button2 = screen.btn_create();
             button2.on_event(|| {
