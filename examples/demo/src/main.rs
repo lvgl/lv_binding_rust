@@ -112,7 +112,7 @@ fn main() -> Result<(), String> {
 }
 
 // Reference to native font for LittlevGL, defined in the file: "fonts_noto_sans_numeric_80.c"
-// TODO: Create a macro for definiting a safe wrapper for fonts.
+// TODO: Create a macro for defining a safe wrapper for fonts.
 // Maybe sometihng like:
 //
 // font! {
