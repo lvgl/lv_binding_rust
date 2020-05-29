@@ -1,7 +1,12 @@
 #![no_std]
 
-pub mod display;
-mod objx;
+extern crate alloc;
 
+mod global;
+mod display;
+mod support;
+mod widgets;
+
+pub use global::{UI, LvError};
 pub use display::DisplayDriver;
-pub use objx::*;
+pub use support::*;
