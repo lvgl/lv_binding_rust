@@ -1,30 +1,31 @@
+use alloc::boxed::Box;
 use core::mem;
 use core::ptr;
 use cty;
+use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 use lvgl_sys;
 
 pub trait NativeObject {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t>;
 }
 
-pub struct ObjectX<'a> {
+pub struct ObjectX {
     raw: ptr::NonNull<lvgl_sys::lv_obj_t>,
-    style: Option<&'a mut Style>,
 }
 
-impl<'a> ObjectX<'a> {
-    pub(crate) fn new(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
-        Self { raw, style: None }
+impl ObjectX {
+    pub(crate) fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
+        Self { raw }
     }
 }
 
-impl<'a> NativeObject for ObjectX<'a> {
+impl NativeObject for ObjectX {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
         unsafe { ptr::NonNull::new_unchecked(self.raw.as_ptr()) }
     }
 }
 
-pub trait Object<'a>: NativeObject {
+pub trait Object: NativeObject {
     fn set_pos(&mut self, x: i16, y: i16) {
         unsafe {
             lvgl_sys::lv_obj_set_pos(
@@ -95,36 +96,36 @@ pub trait Object<'a>: NativeObject {
         }
     }
 
-    fn set_style(&mut self, style: &'a mut Style);
+    fn set_style(&mut self, style: Style);
 }
 
-impl<'a> Object<'a> for ObjectX<'a> {
-    fn set_style(&mut self, style: &'a mut Style) {
+impl Object for ObjectX {
+    fn set_style(&mut self, style: Style) {
         unsafe {
-            lvgl_sys::lv_obj_set_style(self.raw().as_mut(), style.raw());
+            let boxed = Box::new(style.raw);
+            lvgl_sys::lv_obj_set_style(self.raw().as_mut(), Box::into_raw(boxed));
         };
-        self.style = Some(style);
     }
 }
 
 macro_rules! define_object {
     ($item:ident) => {
-        pub struct $item<'a> {
-            core: ObjectX<'a>,
+        pub struct $item {
+            core: ObjectX,
         }
 
-        impl<'a> NativeObject for $item<'a> {
+        impl NativeObject for $item {
             fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
                 self.core.raw()
             }
         }
 
-        impl<'a> Object<'a> for $item<'a> {
-            fn set_style(&mut self, style: &'a mut Style) {
+        impl Object for $item {
+            fn set_style(&mut self, style: Style) {
                 unsafe {
-                    lvgl_sys::lv_obj_set_style(self.raw().as_mut(), style.raw());
+                    let boxed = Box::new(style.raw);
+                    lvgl_sys::lv_obj_set_style(self.raw().as_mut(), Box::into_raw(boxed));
                 };
-                self.core.style = Some(style);
             }
         }
     };
@@ -132,7 +133,7 @@ macro_rules! define_object {
 
 define_object!(Button);
 
-impl<'a> Button<'a> {
+impl Button {
     pub fn new<C>(parent: &mut C) -> Self
     where
         C: NativeObject,
@@ -141,7 +142,7 @@ impl<'a> Button<'a> {
             let ptr = lvgl_sys::lv_btn_create(parent.raw().as_mut(), ptr::null_mut());
             ptr::NonNull::new_unchecked(ptr)
         };
-        let core = ObjectX::new(raw);
+        let core = ObjectX::from_raw(raw);
         Self { core }
     }
 }
@@ -155,7 +156,7 @@ pub enum LabelAlign {
 
 define_object!(Label);
 
-impl<'a> Label<'a> {
+impl Label {
     pub fn new<C>(parent: &mut C) -> Self
     where
         C: NativeObject,
@@ -164,7 +165,7 @@ impl<'a> Label<'a> {
             let ptr = lvgl_sys::lv_label_create(parent.raw().as_mut(), ptr::null_mut());
             ptr::NonNull::new_unchecked(ptr)
         };
-        let core = ObjectX::new(raw);
+        let core = ObjectX::from_raw(raw);
         Self { core }
     }
 
@@ -263,6 +264,34 @@ impl Color {
     pub fn from_rgb((r, g, b): (u8, u8, u8)) -> Self {
         let raw = unsafe { lvgl_sys::_LV_COLOR_MAKE(r, g, b) };
         Self { raw }
+    }
+
+    pub fn from_raw(raw: lvgl_sys::lv_color_t) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<Color> for Rgb888 {
+    fn from(color: Color) -> Self {
+        unsafe {
+            Rgb888::new(
+                lvgl_sys::_LV_COLOR_GET_R(color.raw) as u8,
+                lvgl_sys::_LV_COLOR_GET_G(color.raw) as u8,
+                lvgl_sys::_LV_COLOR_GET_B(color.raw) as u8,
+            )
+        }
+    }
+}
+
+impl From<Color> for Rgb565 {
+    fn from(color: Color) -> Self {
+        unsafe {
+            Rgb565::new(
+                lvgl_sys::_LV_COLOR_GET_R(color.raw) as u8,
+                lvgl_sys::_LV_COLOR_GET_G(color.raw) as u8,
+                lvgl_sys::_LV_COLOR_GET_B(color.raw) as u8,
+            )
+        }
     }
 }
 
