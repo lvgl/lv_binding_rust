@@ -17,7 +17,7 @@ fn main() -> Result<(), String> {
     ));
 
     let output_settings = OutputSettingsBuilder::new().scale(4).build();
-    let mut window = Window::new("Hello World", &output_settings);
+    let mut window = Window::new("PineTime", &output_settings);
 
     let mut ui = UI::init().unwrap();
 
@@ -42,7 +42,7 @@ fn main() -> Result<(), String> {
     style_time.set_text_color(lvgl::Color::from_rgb((255, 255, 255)));
     time.set_style(style_time);
     time.set_align(&mut screen, lvgl::Align::InLeftMid, 20, 0);
-    time.set_text("20:46\0");
+    time.set_text("20:46");
     time.set_width(240);
     time.set_height(240);
 
@@ -54,7 +54,7 @@ fn main() -> Result<(), String> {
     bt.set_width(50);
     bt.set_height(80);
     bt.set_recolor(true);
-    bt.set_text("#5794f2 \u{F293}#\0");
+    bt.set_text("#5794f2 \u{F293}#");
     bt.set_label_align(lvgl::LabelAlign::Left);
     bt.set_align(&mut screen, lvgl::Align::InTopLeft, 0, 0);
 
@@ -63,7 +63,7 @@ fn main() -> Result<(), String> {
     power.set_recolor(true);
     power.set_width(80);
     power.set_height(20);
-    power.set_text("#fade2a 20%#\0");
+    power.set_text("#fade2a 20%#");
     power.set_label_align(lvgl::LabelAlign::Right);
     power.set_align(&mut screen, lvgl::Align::InTopRight, 0, 0);
 
@@ -86,7 +86,7 @@ fn main() -> Result<(), String> {
         if i > 59 {
             i = 0;
         }
-        time.set_text(format!("21:{:02}\0", i).as_str());
+        time.set_text(format!("21:{:02}", i).as_str());
         i = 1 + i;
 
         sleep(Duration::from_millis(
@@ -112,6 +112,13 @@ fn main() -> Result<(), String> {
 }
 
 // Reference to native font for LittlevGL, defined in the file: "fonts_noto_sans_numeric_80.c"
+// TODO: Create a macro for definiting a safe wrapper for fonts.
+// Maybe sometihng like:
+//
+// font! {
+//     NotoSansNumeric80 = noto_sans_numeric_80;
+// };
+//
 extern "C" {
     pub static mut noto_sans_numeric_80: lvgl_sys::lv_font_t;
 }

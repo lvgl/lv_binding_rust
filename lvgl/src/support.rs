@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 use core::mem;
 use core::ptr;
-use cty;
+use cstr_core::CString;
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 use lvgl_sys;
 
@@ -170,11 +170,9 @@ impl Label {
     }
 
     pub fn set_text(&mut self, text: &str) {
+        let text = CString::new(text).unwrap();
         unsafe {
-            lvgl_sys::lv_label_set_text(
-                self.core.raw().as_mut(),
-                text.as_ptr() as *const cty::c_char,
-            );
+            lvgl_sys::lv_label_set_text(self.core.raw().as_mut(), text.as_ptr());
         }
     }
 
@@ -233,10 +231,6 @@ impl Style {
     /// Font used for displaying the text.
     pub fn set_text_font(&mut self, font: &lvgl_sys::lv_font_t) {
         self.raw.text.font = font;
-    }
-
-    fn raw(&mut self) -> *const lvgl_sys::lv_style_t {
-        &mut self.raw
     }
 }
 

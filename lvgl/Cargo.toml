@@ -16,3 +16,4 @@ keywords = ["littlevgl", "lvgl", "graphical_interfaces"]
 lvgl-sys = {path="../lvgl-sys", version="0.1"}
 cty = "0.2"
 embedded-graphics = "0.6"
+cstr_core = { version = "0.2", default-features = false, features = ["alloc"] }

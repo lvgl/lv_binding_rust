@@ -15,8 +15,6 @@ pub enum LvError {
     AlreadyInUse,
 }
 
-type LvResult<T> = Result<T, LvError>;
-
 pub struct UI {
     // LittlevGL is not thread-safe by default.
     _not_sync: PhantomData<*mut ()>,
