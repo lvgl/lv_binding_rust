@@ -35,6 +35,23 @@ We recommend the `lv_conf.h` file to be in your project's root directory. If so,
 $ DEP_LV_CONFIG_PATH=`pwd` cargo build
 ```
 
+### Building for embedded environments
+
+We make use of `bindgen` for generating the bindings to LittlevGL at build time. There is a problem in cargo when building
+for `no_std`, so we need to use a workaround to build "lvgl-rs". The mainstrem issue in cargo is being tracked at
+[rust-lang/cargo#7915](https://github.com/rust-lang/cargo/issues/7915).
+
+```shell
+$ DEP_LV_CONFIG_PATH=`pwd` cargo build -Zfeatures=build_dep
+```
+
+#### Requirements / Limitations
+
+LittlevGL C libary do allocate memory dynamically and we need to allocate memory on the heap in the Rust side as well
+([`Box`](https://doc.rust-lang.org/beta/alloc/boxed/struct.Box.html)).
+That is required, so we can safely provide Rust pointers through FFI. For that reason, we do require
+[`alloc`](https://doc.rust-lang.org/alloc/) module to be available.
+
 ## Running the demo
 
 [This project contains an example that can run in a desktop simulator.](./examples/demo)
