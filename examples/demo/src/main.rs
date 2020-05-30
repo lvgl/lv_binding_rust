@@ -16,7 +16,7 @@ fn main() -> Result<(), String> {
         lvgl_sys::LV_VER_RES_MAX,
     ));
 
-    let output_settings = OutputSettingsBuilder::new().scale(4).build();
+    let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("PineTime", &output_settings);
 
     let mut ui = UI::init().unwrap();
@@ -89,9 +89,7 @@ fn main() -> Result<(), String> {
         time.set_text(format!("21:{:02}", i).as_str());
         i = 1 + i;
 
-        sleep(Duration::from_millis(
-            lvgl_sys::LV_DISP_DEF_REFR_PERIOD as u64,
-        ));
+        sleep(Duration::from_secs(1));
 
         threaded_ui.lock().unwrap().task_handler();
 

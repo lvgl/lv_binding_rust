@@ -117,10 +117,9 @@ pub const __GLIBC__: u32 = 2;
 pub const __GLIBC_MINOR__: u32 = 27;
 pub const _SYS_CDEFS_H: u32 = 1;
 pub const __glibc_c99_flexarr_available: u32 = 1;
-pub const __WORDSIZE: u32 = 32;
-pub const __WORDSIZE32_SIZE_ULONG: u32 = 0;
-pub const __WORDSIZE32_PTRDIFF_LONG: u32 = 0;
-pub const __WORDSIZE_TIME64_COMPAT32: u32 = 0;
+pub const __WORDSIZE: u32 = 64;
+pub const __WORDSIZE_TIME64_COMPAT32: u32 = 1;
+pub const __SYSCALL_WORDSIZE: u32 = 64;
 pub const __HAVE_GENERIC_SELECTION: u32 = 1;
 pub const __GLIBC_USE_LIB_EXT2: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_BFP_EXT: u32 = 0;
@@ -128,7 +127,9 @@ pub const __GLIBC_USE_IEC_60559_FUNCS_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_TYPES_EXT: u32 = 0;
 pub const _BITS_TYPES_H: u32 = 1;
 pub const _BITS_TYPESIZES_H: u32 = 1;
-pub const __RLIM_T_MATCHES_RLIM64_T: u32 = 0;
+pub const __OFF_T_MATCHES_OFF64_T: u32 = 1;
+pub const __INO_T_MATCHES_INO64_T: u32 = 1;
+pub const __RLIM_T_MATCHES_RLIM64_T: u32 = 1;
 pub const __FD_SETSIZE: u32 = 1024;
 pub const _BITS_WCHAR_H: u32 = 1;
 pub const _BITS_STDINT_INTN_H: u32 = 1;
@@ -152,22 +153,22 @@ pub const UINT_LEAST8_MAX: u32 = 255;
 pub const UINT_LEAST16_MAX: u32 = 65535;
 pub const UINT_LEAST32_MAX: u32 = 4294967295;
 pub const INT_FAST8_MIN: i32 = -128;
-pub const INT_FAST16_MIN: i32 = -2147483648;
-pub const INT_FAST32_MIN: i32 = -2147483648;
+pub const INT_FAST16_MIN: i64 = -9223372036854775808;
+pub const INT_FAST32_MIN: i64 = -9223372036854775808;
 pub const INT_FAST8_MAX: u32 = 127;
-pub const INT_FAST16_MAX: u32 = 2147483647;
-pub const INT_FAST32_MAX: u32 = 2147483647;
+pub const INT_FAST16_MAX: u64 = 9223372036854775807;
+pub const INT_FAST32_MAX: u64 = 9223372036854775807;
 pub const UINT_FAST8_MAX: u32 = 255;
-pub const UINT_FAST16_MAX: u32 = 4294967295;
-pub const UINT_FAST32_MAX: u32 = 4294967295;
-pub const INTPTR_MIN: i32 = -2147483648;
-pub const INTPTR_MAX: u32 = 2147483647;
-pub const UINTPTR_MAX: u32 = 4294967295;
-pub const PTRDIFF_MIN: i32 = -2147483648;
-pub const PTRDIFF_MAX: u32 = 2147483647;
+pub const UINT_FAST16_MAX: i32 = -1;
+pub const UINT_FAST32_MAX: i32 = -1;
+pub const INTPTR_MIN: i64 = -9223372036854775808;
+pub const INTPTR_MAX: u64 = 9223372036854775807;
+pub const UINTPTR_MAX: i32 = -1;
+pub const PTRDIFF_MIN: i64 = -9223372036854775808;
+pub const PTRDIFF_MAX: u64 = 9223372036854775807;
 pub const SIG_ATOMIC_MIN: i32 = -2147483648;
 pub const SIG_ATOMIC_MAX: u32 = 2147483647;
-pub const SIZE_MAX: u32 = 4294967295;
+pub const SIZE_MAX: i32 = -1;
 pub const WINT_MIN: u32 = 0;
 pub const WINT_MAX: u32 = 4294967295;
 pub const LV_HOR_RES_MAX: u32 = 240;
@@ -396,21 +397,21 @@ pub type __int16_t = cty::c_short;
 pub type __uint16_t = cty::c_ushort;
 pub type __int32_t = cty::c_int;
 pub type __uint32_t = cty::c_uint;
-pub type __int64_t = cty::c_longlong;
-pub type __uint64_t = cty::c_ulonglong;
-pub type __quad_t = cty::c_longlong;
-pub type __u_quad_t = cty::c_ulonglong;
-pub type __intmax_t = cty::c_longlong;
-pub type __uintmax_t = cty::c_ulonglong;
-pub type __dev_t = __u_quad_t;
+pub type __int64_t = cty::c_long;
+pub type __uint64_t = cty::c_ulong;
+pub type __quad_t = cty::c_long;
+pub type __u_quad_t = cty::c_ulong;
+pub type __intmax_t = cty::c_long;
+pub type __uintmax_t = cty::c_ulong;
+pub type __dev_t = cty::c_ulong;
 pub type __uid_t = cty::c_uint;
 pub type __gid_t = cty::c_uint;
 pub type __ino_t = cty::c_ulong;
-pub type __ino64_t = __u_quad_t;
+pub type __ino64_t = cty::c_ulong;
 pub type __mode_t = cty::c_uint;
-pub type __nlink_t = cty::c_uint;
+pub type __nlink_t = cty::c_ulong;
 pub type __off_t = cty::c_long;
-pub type __off64_t = __quad_t;
+pub type __off64_t = cty::c_long;
 pub type __pid_t = cty::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -419,7 +420,7 @@ pub struct __fsid_t {
 }
 pub type __clock_t = cty::c_long;
 pub type __rlim_t = cty::c_ulong;
-pub type __rlim64_t = __u_quad_t;
+pub type __rlim64_t = cty::c_ulong;
 pub type __id_t = cty::c_uint;
 pub type __time_t = cty::c_long;
 pub type __useconds_t = cty::c_uint;
@@ -430,36 +431,36 @@ pub type __clockid_t = cty::c_int;
 pub type __timer_t = *mut cty::c_void;
 pub type __blksize_t = cty::c_long;
 pub type __blkcnt_t = cty::c_long;
-pub type __blkcnt64_t = __quad_t;
+pub type __blkcnt64_t = cty::c_long;
 pub type __fsblkcnt_t = cty::c_ulong;
-pub type __fsblkcnt64_t = __u_quad_t;
+pub type __fsblkcnt64_t = cty::c_ulong;
 pub type __fsfilcnt_t = cty::c_ulong;
-pub type __fsfilcnt64_t = __u_quad_t;
-pub type __fsword_t = cty::c_int;
-pub type __ssize_t = cty::c_int;
+pub type __fsfilcnt64_t = cty::c_ulong;
+pub type __fsword_t = cty::c_long;
+pub type __ssize_t = cty::c_long;
 pub type __syscall_slong_t = cty::c_long;
 pub type __syscall_ulong_t = cty::c_ulong;
 pub type __loff_t = __off64_t;
 pub type __caddr_t = *mut cty::c_char;
-pub type __intptr_t = cty::c_int;
+pub type __intptr_t = cty::c_long;
 pub type __socklen_t = cty::c_uint;
 pub type __sig_atomic_t = cty::c_int;
 pub type int_least8_t = cty::c_schar;
 pub type int_least16_t = cty::c_short;
 pub type int_least32_t = cty::c_int;
-pub type int_least64_t = cty::c_longlong;
+pub type int_least64_t = cty::c_long;
 pub type uint_least8_t = cty::c_uchar;
 pub type uint_least16_t = cty::c_ushort;
 pub type uint_least32_t = cty::c_uint;
-pub type uint_least64_t = cty::c_ulonglong;
+pub type uint_least64_t = cty::c_ulong;
 pub type int_fast8_t = cty::c_schar;
-pub type int_fast16_t = cty::c_int;
-pub type int_fast32_t = cty::c_int;
-pub type int_fast64_t = cty::c_longlong;
+pub type int_fast16_t = cty::c_long;
+pub type int_fast32_t = cty::c_long;
+pub type int_fast64_t = cty::c_long;
 pub type uint_fast8_t = cty::c_uchar;
-pub type uint_fast16_t = cty::c_uint;
-pub type uint_fast32_t = cty::c_uint;
-pub type uint_fast64_t = cty::c_ulonglong;
+pub type uint_fast16_t = cty::c_ulong;
+pub type uint_fast32_t = cty::c_ulong;
+pub type uint_fast64_t = cty::c_ulong;
 pub type intmax_t = __intmax_t;
 pub type uintmax_t = __uintmax_t;
 pub type lv_coord_t = i16;
@@ -476,20 +477,22 @@ pub struct _silence_gcc_warning {
     _unused: [u8; 0],
 }
 pub type lv_log_level_t = i8;
-pub type size_t = cty::c_uint;
-pub type wchar_t = cty::c_uint;
+pub type size_t = cty::c_ulong;
+pub type wchar_t = cty::c_int;
 #[repr(C)]
+#[repr(align(16))]
 #[derive(Debug, Copy, Clone)]
 pub struct max_align_t {
     pub __clang_max_align_nonce1: cty::c_longlong,
-    pub __clang_max_align_nonce2: f64,
+    pub __bindgen_padding_0: u64,
+    pub __clang_max_align_nonce2: u128,
 }
 pub const LV_RES_INV: _bindgen_ty_1 = 0;
 pub const LV_RES_OK: _bindgen_ty_1 = 1;
 #[doc = " LittlevGL error codes."]
 pub type _bindgen_ty_1 = u32;
 pub type lv_res_t = u8;
-pub type lv_uintptr_t = u32;
+pub type lv_uintptr_t = u64;
 #[doc = " Heap information structure."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -685,7 +688,7 @@ pub struct _lv_task_t {
     #[doc = "< Custom user data"]
     pub user_data: *mut cty::c_void,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl _lv_task_t {
     #[inline]
@@ -1119,14 +1122,14 @@ extern "C" {
     pub fn memcpy(
         __dest: *mut cty::c_void,
         __src: *const cty::c_void,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> *mut cty::c_void;
 }
 extern "C" {
     pub fn memmove(
         __dest: *mut cty::c_void,
         __src: *const cty::c_void,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> *mut cty::c_void;
 }
 extern "C" {
@@ -1138,17 +1141,17 @@ extern "C" {
     ) -> *mut cty::c_void;
 }
 extern "C" {
-    pub fn memset(__s: *mut cty::c_void, __c: cty::c_int, __n: cty::c_uint) -> *mut cty::c_void;
+    pub fn memset(__s: *mut cty::c_void, __c: cty::c_int, __n: cty::c_ulong) -> *mut cty::c_void;
 }
 extern "C" {
     pub fn memcmp(
         __s1: *const cty::c_void,
         __s2: *const cty::c_void,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> cty::c_int;
 }
 extern "C" {
-    pub fn memchr(__s: *const cty::c_void, __c: cty::c_int, __n: cty::c_uint) -> *mut cty::c_void;
+    pub fn memchr(__s: *const cty::c_void, __c: cty::c_int, __n: cty::c_ulong) -> *mut cty::c_void;
 }
 extern "C" {
     pub fn strcpy(__dest: *mut cty::c_char, __src: *const cty::c_char) -> *mut cty::c_char;
@@ -1157,7 +1160,7 @@ extern "C" {
     pub fn strncpy(
         __dest: *mut cty::c_char,
         __src: *const cty::c_char,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> *mut cty::c_char;
 }
 extern "C" {
@@ -1167,7 +1170,7 @@ extern "C" {
     pub fn strncat(
         __dest: *mut cty::c_char,
         __src: *const cty::c_char,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> *mut cty::c_char;
 }
 extern "C" {
@@ -1177,7 +1180,7 @@ extern "C" {
     pub fn strncmp(
         __s1: *const cty::c_char,
         __s2: *const cty::c_char,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> cty::c_int;
 }
 extern "C" {
@@ -1187,8 +1190,8 @@ extern "C" {
     pub fn strxfrm(
         __dest: *mut cty::c_char,
         __src: *const cty::c_char,
-        __n: cty::c_uint,
-    ) -> cty::c_uint;
+        __n: cty::c_ulong,
+    ) -> cty::c_ulong;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -1220,7 +1223,7 @@ extern "C" {
     pub fn strdup(__s: *const cty::c_char) -> *mut cty::c_char;
 }
 extern "C" {
-    pub fn strndup(__string: *const cty::c_char, __n: cty::c_uint) -> *mut cty::c_char;
+    pub fn strndup(__string: *const cty::c_char, __n: cty::c_ulong) -> *mut cty::c_char;
 }
 extern "C" {
     pub fn strchr(__s: *const cty::c_char, __c: cty::c_int) -> *mut cty::c_char;
@@ -1229,10 +1232,10 @@ extern "C" {
     pub fn strrchr(__s: *const cty::c_char, __c: cty::c_int) -> *mut cty::c_char;
 }
 extern "C" {
-    pub fn strcspn(__s: *const cty::c_char, __reject: *const cty::c_char) -> cty::c_uint;
+    pub fn strcspn(__s: *const cty::c_char, __reject: *const cty::c_char) -> cty::c_ulong;
 }
 extern "C" {
-    pub fn strspn(__s: *const cty::c_char, __accept: *const cty::c_char) -> cty::c_uint;
+    pub fn strspn(__s: *const cty::c_char, __accept: *const cty::c_char) -> cty::c_ulong;
 }
 extern "C" {
     pub fn strpbrk(__s: *const cty::c_char, __accept: *const cty::c_char) -> *mut cty::c_char;
@@ -1259,7 +1262,7 @@ extern "C" {
     ) -> *mut cty::c_char;
 }
 extern "C" {
-    pub fn strlen(__s: *const cty::c_char) -> cty::c_uint;
+    pub fn strlen(__s: *const cty::c_char) -> cty::c_ulong;
 }
 extern "C" {
     pub fn strnlen(__string: *const cty::c_char, __maxlen: size_t) -> size_t;
@@ -1279,14 +1282,17 @@ extern "C" {
     pub fn strerror_l(__errnum: cty::c_int, __l: locale_t) -> *mut cty::c_char;
 }
 extern "C" {
-    pub fn bcmp(__s1: *const cty::c_void, __s2: *const cty::c_void, __n: cty::c_uint)
-        -> cty::c_int;
+    pub fn bcmp(
+        __s1: *const cty::c_void,
+        __s2: *const cty::c_void,
+        __n: cty::c_ulong,
+    ) -> cty::c_int;
 }
 extern "C" {
     pub fn bcopy(__src: *const cty::c_void, __dest: *mut cty::c_void, __n: size_t);
 }
 extern "C" {
-    pub fn bzero(__s: *mut cty::c_void, __n: cty::c_uint);
+    pub fn bzero(__s: *mut cty::c_void, __n: cty::c_ulong);
 }
 extern "C" {
     pub fn index(__s: *const cty::c_char, __c: cty::c_int) -> *mut cty::c_char;
@@ -1310,7 +1316,7 @@ extern "C" {
     pub fn strncasecmp(
         __s1: *const cty::c_char,
         __s2: *const cty::c_char,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> cty::c_int;
 }
 extern "C" {
@@ -1357,7 +1363,7 @@ extern "C" {
     pub fn stpncpy(
         __dest: *mut cty::c_char,
         __src: *const cty::c_char,
-        __n: cty::c_uint,
+        __n: cty::c_ulong,
     ) -> *mut cty::c_char;
 }
 #[doc = " Represents a point on the screen."]
@@ -1819,14 +1825,14 @@ pub struct _lv_indev_proc_t {
     #[doc = "< Long press repeat time stamp"]
     pub longpr_rep_timestamp: u32,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union _lv_indev_proc_t__bindgen_ty_1 {
     pub pointer: _lv_indev_proc_t__bindgen_ty_1__bindgen_ty_1,
     pub keypad: _lv_indev_proc_t__bindgen_ty_1__bindgen_ty_2,
-    _bindgen_union_align: [u32; 9usize],
+    _bindgen_union_align: [u64; 7usize],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -1843,7 +1849,7 @@ pub struct _lv_indev_proc_t__bindgen_ty_1__bindgen_ty_1 {
     pub last_obj: *mut _lv_obj_t,
     pub last_pressed: *mut _lv_obj_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl _lv_indev_proc_t__bindgen_ty_1__bindgen_ty_1 {
     #[inline]
@@ -2248,7 +2254,7 @@ pub struct _lv_anim_t {
     #[doc = "< Custom user data"]
     pub user_data: lv_anim_user_data_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl _lv_anim_t {
     #[inline]
@@ -3743,7 +3749,7 @@ pub struct _lv_group_t {
     pub style_tmp: lv_style_t,
     pub user_data: lv_group_user_data_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl _lv_group_t {
     #[inline]
@@ -4566,6 +4572,7 @@ pub struct lv_font_fmt_txt_kern_pair_t {
     pub glyph_ids: *const cty::c_void,
     pub values: *const i8,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u32>,
+    pub __bindgen_padding_0: u32,
 }
 impl lv_font_fmt_txt_kern_pair_t {
     #[inline]
@@ -4753,7 +4760,7 @@ extern "C" {
         buffer: *mut cty::c_char,
         count: size_t,
         format: *const cty::c_char,
-        va: va_list,
+        va: *mut __va_list_tag,
     ) -> cty::c_int;
 }
 #[doc = "< No layout"]
@@ -4974,7 +4981,7 @@ pub struct lv_btn_ext_t {
     #[doc = "Styles in each state"]
     pub styles: [*const lv_style_t; 5usize],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl lv_btn_ext_t {
     #[inline]
@@ -6126,14 +6133,14 @@ pub struct lv_label_ext_t {
     pub offset: lv_point_t,
     pub anim_speed: u16,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize], u8>,
-    pub __bindgen_padding_0: u16,
+    pub __bindgen_padding_0: [u16; 3usize],
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union lv_label_ext_t__bindgen_ty_1 {
     pub tmp_ptr: *mut cty::c_char,
     pub tmp: [cty::c_char; 4usize],
-    _bindgen_union_align: u32,
+    _bindgen_union_align: u64,
 }
 impl lv_label_ext_t {
     #[inline]
@@ -6434,7 +6441,7 @@ pub struct lv_img_ext_t {
     pub w: lv_coord_t,
     pub h: lv_coord_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl lv_img_ext_t {
     #[inline]
@@ -6567,7 +6574,7 @@ pub struct lv_line_ext_t {
     pub point_array: *const lv_point_t,
     pub point_num: u16,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: u8,
+    pub __bindgen_padding_0: [u8; 5usize],
 }
 impl lv_line_ext_t {
     #[inline]
@@ -6682,7 +6689,7 @@ pub struct lv_page_ext_t {
     pub edge_flash: lv_page_ext_t__bindgen_ty_2,
     pub anim_time: u16,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: u8,
+    pub __bindgen_padding_0: [u8; 5usize],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -6691,7 +6698,7 @@ pub struct lv_page_ext_t__bindgen_ty_1 {
     pub hor_area: lv_area_t,
     pub ver_area: lv_area_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl lv_page_ext_t__bindgen_ty_1 {
     #[inline]
@@ -6756,7 +6763,7 @@ pub struct lv_page_ext_t__bindgen_ty_2 {
     pub state: lv_anim_value_t,
     pub style: *const lv_style_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl lv_page_ext_t__bindgen_ty_2 {
     #[inline]
@@ -8264,7 +8271,7 @@ pub struct lv_slider_ext_t {
     pub style_knob: *const lv_style_t,
     pub drag_value: i16,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: u8,
+    pub __bindgen_padding_0: [u8; 5usize],
 }
 impl lv_slider_ext_t {
     #[inline]
@@ -8638,7 +8645,7 @@ pub struct lv_kb_ext_t {
     pub ta: *mut lv_obj_t,
     pub mode: lv_kb_mode_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: u16,
+    pub __bindgen_padding_0: [u16; 3usize],
 }
 impl lv_kb_ext_t {
     #[inline]
@@ -8969,7 +8976,7 @@ pub type lv_roller_mode_t = u8;
 pub struct lv_roller_ext_t {
     pub ddlist: lv_ddlist_ext_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl lv_roller_ext_t {
     #[inline]
@@ -9101,7 +9108,7 @@ pub struct lv_ta_ext_t {
     pub pwd_show_time: u16,
     pub cursor: lv_ta_ext_t__bindgen_ty_1,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9113,7 +9120,7 @@ pub struct lv_ta_ext_t__bindgen_ty_1 {
     pub area: lv_area_t,
     pub txt_byte_pos: u16,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl lv_ta_ext_t__bindgen_ty_1 {
     #[inline]
@@ -9879,7 +9886,7 @@ pub struct lv_tabview_ext_t {
     pub tab_cnt: u16,
     pub anim_time: u16,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: u8,
+    pub __bindgen_padding_0: [u8; 5usize],
 }
 impl lv_tabview_ext_t {
     #[inline]
@@ -10118,7 +10125,7 @@ pub struct lv_tileview_ext_t {
     pub anim_time: u16,
     pub act_id: lv_point_t,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub __bindgen_padding_0: [u8; 3usize],
+    pub __bindgen_padding_0: [u8; 7usize],
 }
 impl lv_tileview_ext_t {
     #[inline]
@@ -11073,7 +11080,7 @@ pub struct lv_spinbox_ext_t {
     pub range_min: i32,
     pub step: i32,
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize], u8>,
-    pub __bindgen_padding_0: u16,
+    pub __bindgen_padding_0: [u16; 3usize],
 }
 impl lv_spinbox_ext_t {
     #[inline]
@@ -11265,9 +11272,12 @@ extern "C" {
 pub struct __locale_data {
     pub _address: u8,
 }
-pub type __builtin_va_list = __va_list;
+pub type __builtin_va_list = [__va_list_tag; 1usize];
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct __va_list {
-    pub __ap: *mut cty::c_void,
+pub struct __va_list_tag {
+    pub gp_offset: cty::c_uint,
+    pub fp_offset: cty::c_uint,
+    pub overflow_arg_area: *mut cty::c_void,
+    pub reg_save_area: *mut cty::c_void,
 }
