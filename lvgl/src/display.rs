@@ -1,7 +1,6 @@
 use crate::Color;
 use alloc::boxed::Box;
-use alloc::rc::Rc;
-use core::cell::RefCell;
+use alloc::vec::Vec;
 use core::mem::MaybeUninit;
 use embedded_graphics;
 use embedded_graphics::prelude::*;
@@ -75,7 +74,7 @@ impl DisplayDriver {
 // the reference is kept in the callback function of the drawing handler
 // we need a reference counter for the drawing target and free the ref counter when the display is
 // destroyed.
-type DrawHandler = Rc<RefCell<u8>>;
+//type DrawHandler = Rc<RefCell<u8>>;
 //
 // impl Drop for DrawHandler {
 //     fn drop(&mut self) {
@@ -100,18 +99,19 @@ unsafe extern "C" fn display_callback_wrapper<T, C>(
     let device = &mut *(display_driver.user_data as *mut T);
 
     // TODO: create a fixed image buffer iterator somehow, maybe a fixed size array
-    //let image_buffer =
+    let mut image_buffer = Vec::new();
     for y in (*area).y1..=(*area).y2 {
         for x in (*area).x1..=(*area).x2 {
             let raw_color = Color::from_raw(*color_p.add(i));
             i = i + 1;
-            // TODO: Use device.draw_iter
-            let _ = device.draw_pixel(drawable::Pixel(
+            image_buffer.push(drawable::Pixel(
                 Point::new(x as i32, y as i32),
                 raw_color.into(),
             ));
         }
     }
+
+    let _ = device.draw_iter(image_buffer.into_iter());
 
     // Indicate to LittlevGL that you are ready with the flushing
     lvgl_sys::lv_disp_flush_ready(disp_drv);
