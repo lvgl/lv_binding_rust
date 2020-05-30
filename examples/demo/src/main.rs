@@ -115,7 +115,7 @@ fn main() -> Result<(), String> {
 // TODO: Create a macro for defining a safe wrapper for fonts.
 // Maybe sometihng like:
 //
-// font! {
+// font_declare! {
 //     NotoSansNumeric80 = noto_sans_numeric_80;
 // };
 //

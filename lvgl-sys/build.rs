@@ -75,6 +75,7 @@ fn main() {
         .header(shims_dir.join("lvgl_sys.h").to_str().unwrap())
         .layout_tests(false)
         .use_core()
+        .rustfmt_bindings(true)
         .ctypes_prefix("cty")
         .raw_line("use cty;")
         .clang_args(&cc_args)
