@@ -24,19 +24,22 @@ impl DisplayDriver {
                 Box::new(MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit().assume_init());
 
             // Declare a buffer for the refresh rate
-            let refresh_buffer = Box::new(
-                MaybeUninit::<
-                    [MaybeUninit<lvgl_sys::lv_color_t>; lvgl_sys::LV_HOR_RES_MAX as usize * 10],
-                >::uninit()
-                .assume_init(),
-            );
+            let refresh_buffer =
+                Box::new(
+                    MaybeUninit::<
+                        [MaybeUninit<lvgl_sys::lv_color_t>; lvgl_sys::LV_HOR_RES_MAX as usize],
+                    >::uninit()
+                    .assume_init(),
+                );
+
+            let refresh_buffer_len = refresh_buffer.len();
 
             // Initialize the display buffer
             lvgl_sys::lv_disp_buf_init(
                 display_buffer.as_mut(),
                 Box::into_raw(refresh_buffer) as *mut cty::c_void,
                 core::ptr::null_mut(),
-                (lvgl_sys::LV_HOR_RES_MAX * 10) as u32,
+                refresh_buffer_len as u32,
             );
 
             // Descriptor of a display driver

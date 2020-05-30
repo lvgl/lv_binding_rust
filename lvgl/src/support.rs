@@ -232,6 +232,16 @@ impl Style {
     pub fn set_text_font(&mut self, font: &lvgl_sys::lv_font_t) {
         self.raw.text.font = font;
     }
+
+    /// Body radius for rounded corners.
+    pub fn set_body_radius(&mut self, radius: i16) {
+        self.raw.body.radius = radius;
+    }
+
+    /// Border color.
+    pub fn set_body_border_color(&mut self, color: Color) {
+        self.raw.body.border.color = color.raw;
+    }
 }
 
 impl Clone for Style {
