@@ -72,6 +72,8 @@ fn main() {
         "-I",
         vendor.to_str().unwrap(),
     ];
+
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindgen::Builder::default()
         .header(shims_dir.join("lvgl_sys.h").to_str().unwrap())
         .layout_tests(false)
@@ -82,7 +84,7 @@ fn main() {
         .clang_args(&cc_args)
         .generate()
         .expect("Unable to generate bindings")
-        .write_to_file(project_dir.join("src").join("bindings.rs"))
+        .write_to_file(out_path.join("bindings.rs"))
         .expect("Can't write bindings!");
 }
 
