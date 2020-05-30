@@ -1,6 +1,5 @@
 use crate::Color;
 use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::mem::MaybeUninit;
 use embedded_graphics;
 use embedded_graphics::prelude::*;
@@ -23,22 +22,28 @@ impl DisplayDriver {
                 Box::new(MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit().assume_init());
 
             // Declare a buffer for the refresh rate
-            let refresh_buffer =
-                Box::new(
-                    MaybeUninit::<
-                        [MaybeUninit<lvgl_sys::lv_color_t>; lvgl_sys::LV_HOR_RES_MAX as usize],
-                    >::uninit()
-                    .assume_init(),
-                );
-
-            let refresh_buffer_len = refresh_buffer.len();
+            const REFRESH_BUFFER_LEN: usize = 2;
+            let refresh_buffer1 = Box::new(
+                MaybeUninit::<
+                    [MaybeUninit<lvgl_sys::lv_color_t>;
+                        lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN],
+                >::uninit()
+                .assume_init(),
+            );
+            let refresh_buffer2 = Box::new(
+                MaybeUninit::<
+                    [MaybeUninit<lvgl_sys::lv_color_t>;
+                        lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN],
+                >::uninit()
+                .assume_init(),
+            );
 
             // Initialize the display buffer
             lvgl_sys::lv_disp_buf_init(
                 display_buffer.as_mut(),
-                Box::into_raw(refresh_buffer) as *mut cty::c_void,
-                core::ptr::null_mut(),
-                refresh_buffer_len as u32,
+                Box::into_raw(refresh_buffer1) as *mut cty::c_void,
+                Box::into_raw(refresh_buffer2) as *mut cty::c_void,
+                lvgl_sys::LV_HOR_RES_MAX * REFRESH_BUFFER_LEN as u32,
             );
 
             // Descriptor of a display driver
@@ -92,26 +97,26 @@ unsafe extern "C" fn display_callback_wrapper<T, C>(
 {
     // We need to make sure panics can't escape across the FFI boundary.
     //let _ = std::panic::catch_unwind(|| {
-    let mut i = 0;
     let display_driver = *disp_drv;
 
     // Rust code closure reference
     let device = &mut *(display_driver.user_data as *mut T);
 
-    // TODO: create a fixed image buffer iterator somehow, maybe a fixed size array
-    let mut image_buffer = Vec::new();
-    for y in (*area).y1..=(*area).y2 {
-        for x in (*area).x1..=(*area).x2 {
-            let raw_color = Color::from_raw(*color_p.add(i));
-            i = i + 1;
-            image_buffer.push(drawable::Pixel(
-                Point::new(x as i32, y as i32),
-                raw_color.into(),
-            ));
-        }
-    }
-
-    let _ = device.draw_iter(image_buffer.into_iter());
+    let ys = (*area).y1..=(*area).y2;
+    let xs = ((*area).x1..=(*area).x2).enumerate();
+    let x_len = ((*area).x2 - (*area).x1 + 1) as usize;
+    let pixels = ys
+        .enumerate()
+        .map(|(iy, y)| {
+            xs.clone().map(move |(ix, x)| {
+                let color_len = x_len * iy + ix;
+                let raw_color = Color::from_raw(*color_p.add(color_len));
+                drawable::Pixel(Point::new(x as i32, y as i32), raw_color.into())
+            })
+        })
+        .flatten();
+    // TODO: Maybe find a way to use `draw_image` method on the device instance.
+    let _ = device.draw_iter(pixels.into_iter());
 
     // Indicate to LittlevGL that you are ready with the flushing
     lvgl_sys::lv_disp_flush_ready(disp_drv);

@@ -34,6 +34,7 @@ fn main() -> Result<(), String> {
     let mut screen_style = lvgl::Style::new();
     screen_style.set_body_main_color(lvgl::Color::from_rgb((0, 0, 0)));
     screen_style.set_body_grad_color(lvgl::Color::from_rgb((0, 0, 0)));
+    screen_style.set_body_radius(0);
     screen.set_style(screen_style);
 
     let mut time = lvgl::Label::new(&mut screen);
@@ -72,7 +73,7 @@ fn main() -> Result<(), String> {
     let (stop_ch, read_ch) = mpsc::channel();
     let closure_ui = threaded_ui.clone();
     let tick_thr = std::thread::spawn(move || loop {
-        let period = Duration::from_millis(5);
+        let period = Duration::from_millis(250);
         closure_ui.lock().unwrap().tick_inc(period);
 
         sleep(period);
