@@ -325,3 +325,17 @@ pub enum Align {
     OutRightMid,
     OutRightBottom,
 }
+
+pub enum Animation {
+    ON,
+    OFF,
+}
+
+impl From<Animation> for lvgl_sys::lv_anim_enable_t {
+    fn from(anim: Animation) -> Self {
+        match anim {
+            Animation::ON => lvgl_sys::LV_ANIM_ON as u8,
+            Animation::OFF => lvgl_sys::LV_ANIM_OFF as u8,
+        }
+    }
+}

@@ -1,3 +1,4 @@
+use crate::support::Animation;
 use crate::support::{NativeObject, ObjectX};
 use core::ptr;
 use lvgl_sys;
@@ -24,10 +25,10 @@ impl Bar {
         }
     }
 
-    /// Set the value of the bar
-    pub fn set_value(&mut self, value: i16) {
+    /// Set a new value on the bar
+    pub fn set_value(&mut self, value: i16, anim: Animation) {
         unsafe {
-            lvgl_sys::lv_bar_set_value(self.core.raw().as_mut(), value, 0);
+            lvgl_sys::lv_bar_set_value(self.core.raw().as_mut(), value, anim.into());
         }
     }
 }

@@ -3,7 +3,7 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::{self, widgets::Bar, Align, Color, DisplayDriver, Label, Object, Style, UI};
+use lvgl::{self, widgets::Bar, Align, Animation, Color, DisplayDriver, Label, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -38,7 +38,7 @@ fn main() -> Result<(), String> {
     bar.set_size(175, 50);
     bar.set_align(&mut screen, Align::Center, 0, 0);
     bar.set_range(0, 100);
-    bar.set_value(0);
+    bar.set_value(0, Animation::OFF);
 
     let mut loading_lbl = Label::new(&mut screen);
     loading_lbl.set_text("Loading...");
@@ -67,7 +67,7 @@ fn main() -> Result<(), String> {
         if i > 100 {
             i = 0;
         }
-        bar.set_value(i);
+        bar.set_value(i, Animation::OFF);
         i += 1;
 
         sleep(Duration::from_millis(25));
