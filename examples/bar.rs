@@ -3,7 +3,7 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::{self, widgets::Bar, Align, Color, DisplayDriver, Object, Style, UI};
+use lvgl::{self, widgets::Bar, Align, Color, DisplayDriver, Label, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -30,14 +30,23 @@ fn main() -> Result<(), String> {
     let mut screen_style = Style::new();
     screen_style.set_body_main_color(Color::from_rgb((0, 0, 0)));
     screen_style.set_body_grad_color(Color::from_rgb((0, 0, 0)));
+    screen_style.set_body_radius(0);
     screen.set_style(screen_style);
 
     // Create the bar object
     let mut bar = Bar::new(&mut screen);
-    bar.set_size(50, 175);
+    bar.set_size(175, 50);
     bar.set_align(&mut screen, Align::Center, 0, 0);
     bar.set_range(0, 100);
     bar.set_value(0);
+
+    let mut loading_lbl = Label::new(&mut screen);
+    loading_lbl.set_text("Loading...");
+    loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10);
+
+    let mut loading_style = Style::new();
+    loading_style.set_text_color(Color::from_rgb((255, 255, 255)));
+    loading_lbl.set_style(loading_style);
 
     let threaded_ui = Arc::new(Mutex::new(ui));
 
