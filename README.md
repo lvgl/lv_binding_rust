@@ -54,4 +54,10 @@ That is required, so we can safely provide Rust pointers through FFI. For that r
 
 ## Running the demo
 
-[This project contains an example that can run in a desktop simulator.](./examples/demo)
+[This project contains examples that can run in a desktop simulator.](./examples)
+
+To run the `demo` example:
+
+```shell
+$ DEP_LV_CONFIG_PATH=`pwd`/examples/include cargo run --example demo
+```

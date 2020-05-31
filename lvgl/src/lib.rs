@@ -2,11 +2,12 @@
 
 extern crate alloc;
 
-mod global;
 mod display;
+mod global;
+#[macro_use]
 mod support;
-mod widgets;
+pub mod widgets;
 
-pub use global::{UI, LvError};
 pub use display::DisplayDriver;
+pub use global::{LvError, UI};
 pub use support::*;
