@@ -56,7 +56,7 @@ That is required, so we can safely provide Rust pointers through FFI. For that r
 
 [This project contains examples that can run in a desktop simulator.](./examples)
 
-First of all you will have to pull lvgl submodule :
+First, make sure to pull `lvgl-rs` submodules:
 ```shell
 $ git submodule init
 $ git submodule update 
