@@ -1,4 +1,4 @@
-use crate::{DisplayDriver, ObjectX};
+use crate::{DisplayDriver, Object, ObjectX};
 use alloc::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr;

@@ -45,6 +45,12 @@ fn main() -> Result<(), String> {
     loading_lbl.set_text("Loading...");
     loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10);
 
+    loading_lbl.on_event(|mut this, event| {
+        if let lvgl::Event::Clicked = event {
+            this.set_text("Clicked!");
+        }
+    });
+
     let mut loading_style = Style::new();
     loading_style.set_text_color(Color::from_rgb((255, 255, 255)));
     loading_lbl.set_style(loading_style);

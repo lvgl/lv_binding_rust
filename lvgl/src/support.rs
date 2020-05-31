@@ -1,21 +1,20 @@
 use alloc::boxed::Box;
+use core::convert::{TryFrom, TryInto};
 use core::mem;
 use core::ptr;
+use core::ptr::NonNull;
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 use lvgl_sys;
 
+/// Represents a native LittlevGL object
 pub trait NativeObject {
+    /// Provide common way to access to the underlying native object pointer.
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t>;
 }
 
+/// Stores the native LittlevGL raw pointer
 pub struct ObjectX {
     raw: ptr::NonNull<lvgl_sys::lv_obj_t>,
-}
-
-impl ObjectX {
-    pub(crate) fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
-        Self { raw }
-    }
 }
 
 impl NativeObject for ObjectX {
@@ -24,7 +23,12 @@ impl NativeObject for ObjectX {
     }
 }
 
+/// A wrapper for all LittlevGL common operations on generic objects.
 pub trait Object: NativeObject {
+    type SpecialEvent;
+
+    unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
+
     fn set_pos(&mut self, x: i16, y: i16) {
         unsafe {
             lvgl_sys::lv_obj_set_pos(
@@ -103,12 +107,39 @@ pub trait Object: NativeObject {
     }
 }
 
-impl Object for ObjectX {}
+impl Object for ObjectX {
+    type SpecialEvent = ();
+
+    unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
+        Self { raw }
+    }
+}
 
 macro_rules! define_object {
     ($item:ident) => {
         pub struct $item {
             core: $crate::support::ObjectX,
+        }
+
+        impl $item {
+            pub fn on_event<F>(&mut self, f: F)
+            where
+                F: FnMut(
+                    alloc::boxed::Box<Self>,
+                    $crate::support::Event<<Self as $crate::support::Object>::SpecialEvent>,
+                ),
+            {
+                unsafe {
+                    let mut raw = self.raw();
+                    let obj = raw.as_mut();
+                    let user_closure = alloc::boxed::Box::new(f);
+                    obj.user_data = alloc::boxed::Box::into_raw(user_closure) as *mut cty::c_void;
+                    lvgl_sys::lv_obj_set_event_cb(
+                        obj,
+                        lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),
+                    );
+                }
+            }
         }
 
         impl $crate::support::NativeObject for $item {
@@ -117,7 +148,57 @@ macro_rules! define_object {
             }
         }
 
-        impl $crate::support::Object for $item {}
+        impl $crate::support::Object for $item {
+            type SpecialEvent = ();
+
+            unsafe fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
+                Self {
+                    core: $crate::support::ObjectX::from_raw(raw_pointer),
+                }
+            }
+        }
+    };
+    ($item:ident, $event_type:ident) => {
+        pub struct $item {
+            core: $crate::support::ObjectX,
+        }
+
+        impl $item {
+            pub fn on_event<F, S>(&mut self, f: F)
+            where
+                F: FnMut(
+                    Box<Self>,
+                    $crate::support::Event<<Self as $crate::support::Object>::SpecialEvent>,
+                ),
+            {
+                unsafe {
+                    let mut raw = self.raw();
+                    let obj = raw.as_mut();
+                    let user_closure = alloc::boxed::Box::new(f);
+                    obj.user_data = alloc::boxed::Box::into_raw(user_closure) as *mut cty::c_void;
+                    lvgl_sys::lv_obj_set_event_cb(
+                        obj,
+                        lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),
+                    );
+                }
+            }
+        }
+
+        impl $crate::support::NativeObject for $item {
+            fn raw(&self) -> core::ptr::NonNull<lvgl_sys::lv_obj_t> {
+                self.core.raw()
+            }
+        }
+
+        impl $crate::support::Object for $item {
+            type SpecialEvent = $event_type;
+
+            unsafe fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
+                Self {
+                    core: $crate::support::ObjectX::from_raw(raw_pointer),
+                }
+            }
+        }
     };
 }
 
@@ -221,6 +302,100 @@ impl From<Color> for Rgb565 {
                 lvgl_sys::_LV_COLOR_GET_G(color.raw) as u8,
                 lvgl_sys::_LV_COLOR_GET_B(color.raw) as u8,
             )
+        }
+    }
+}
+
+/// Events are triggered in LittlevGL when something happens which might be interesting to
+/// the user, e.g. if an object:
+///  - is clicked
+///  - is dragged
+///  - its value has changed, etc.
+///
+/// All objects (such as Buttons/Labels/Sliders etc.) receive these generic events
+/// regardless of their type.
+pub enum Event<T> {
+    /// The object has been pressed
+    Pressed,
+
+    /// The object is being pressed (sent continuously while pressing)
+    Pressing,
+
+    /// The input device is still being pressed but is no longer on the object
+    PressLost,
+
+    /// Released before `long_press_time` config time. Not called if dragged.
+    ShortClicked,
+
+    /// Called on release if not dragged (regardless to long press)
+    Clicked,
+
+    /// Pressing for `long_press_time` config time. Not called if dragged.
+    LongPressed,
+
+    /// Called after `long_press_time` config in every `long_press_rep_time` ms. Not
+    /// called if dragged.
+    LongPressedRepeat,
+
+    /// Called in every case when the object has been released even if it was dragged. Not called
+    /// if slid from the object while pressing and released outside of the object. In this
+    /// case, `Event<_>::PressLost` is sent.
+    Released,
+
+    /// Pointer-like input devices events (E.g. mouse or touchpad)
+    Pointer(PointerEvent),
+
+    /// Special event for the object type
+    Special(T),
+}
+
+impl<S> TryFrom<lvgl_sys::lv_event_t> for Event<S> {
+    type Error = ();
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value as u32 {
+            lvgl_sys::LV_EVENT_PRESSED => Ok(Event::Pressed),
+            lvgl_sys::LV_EVENT_PRESSING => Ok(Event::Pressing),
+            lvgl_sys::LV_EVENT_PRESS_LOST => Ok(Event::PressLost),
+            lvgl_sys::LV_EVENT_SHORT_CLICKED => Ok(Event::ShortClicked),
+            lvgl_sys::LV_EVENT_CLICKED => Ok(Event::Clicked),
+            lvgl_sys::LV_EVENT_LONG_PRESSED => Ok(Event::LongPressed),
+            lvgl_sys::LV_EVENT_LONG_PRESSED_REPEAT => Ok(Event::LongPressedRepeat),
+            lvgl_sys::LV_EVENT_RELEASED => Ok(Event::Released),
+            _ => Err(()),
+            // _ => {
+            //     if let Ok(special_event_type) = S::try_from(value) {
+            //         Ok(Event::Special(special_event_type))
+            //     } else {
+            //         Err(())
+            //     }
+            // }
+        }
+    }
+}
+
+/// These events are sent only by pointer-like input devices (E.g. mouse or touchpad)
+pub enum PointerEvent {
+    DragBegin,
+    DragEnd,
+    DragThrowBegin,
+}
+
+pub(crate) unsafe extern "C" fn event_callback<T, F>(
+    obj: *mut lvgl_sys::lv_obj_t,
+    event: lvgl_sys::lv_event_t,
+) where
+    T: Object + Sized,
+    F: FnMut(Box<T>, Event<T::SpecialEvent>),
+{
+    // convert the lv_event_t to lvgl-rs Event type
+    if let Ok(event) = event.try_into() {
+        if let Some(obj_ptr) = NonNull::new(obj) {
+            let object = Box::new(T::from_raw(obj_ptr));
+            // get the pointer from the Rust callback closure FnMut provided by users
+            let user_closure = &mut *((*obj).user_data as *mut F);
+            // call user callback closure
+            user_closure(object, event);
         }
     }
 }
