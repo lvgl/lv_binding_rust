@@ -111,17 +111,17 @@ impl Object for ObjectX {
 macro_rules! define_object {
     ($item:ident) => {
         pub struct $item {
-            core: ObjectX,
+            core: $crate::support::ObjectX,
         }
 
-        impl NativeObject for $item {
+        impl $crate::support::NativeObject for $item {
             fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
                 self.core.raw()
             }
         }
 
-        impl Object for $item {
-            fn set_style(&mut self, style: Style) {
+        impl $crate::support::Object for $item {
+            fn set_style(&mut self, style: $crate::support::Style) {
                 unsafe {
                     let boxed = Box::new(style.raw);
                     lvgl_sys::lv_obj_set_style(self.raw().as_mut(), Box::into_raw(boxed));
@@ -200,7 +200,7 @@ pub enum Themes {
 }
 
 pub struct Style {
-    raw: lvgl_sys::lv_style_t,
+    pub(crate) raw: lvgl_sys::lv_style_t,
 }
 
 impl Style {
