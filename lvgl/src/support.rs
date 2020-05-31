@@ -115,7 +115,7 @@ macro_rules! define_object {
         }
 
         impl $crate::support::NativeObject for $item {
-            fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
+            fn raw(&self) -> core::ptr::NonNull<lvgl_sys::lv_obj_t> {
                 self.core.raw()
             }
         }
@@ -123,8 +123,11 @@ macro_rules! define_object {
         impl $crate::support::Object for $item {
             fn set_style(&mut self, style: $crate::support::Style) {
                 unsafe {
-                    let boxed = Box::new(style.raw);
-                    lvgl_sys::lv_obj_set_style(self.raw().as_mut(), Box::into_raw(boxed));
+                    let boxed = alloc::boxed::Box::new(style.raw);
+                    lvgl_sys::lv_obj_set_style(
+                        self.raw().as_mut(),
+                        alloc::boxed::Box::into_raw(boxed),
+                    );
                 };
             }
         }

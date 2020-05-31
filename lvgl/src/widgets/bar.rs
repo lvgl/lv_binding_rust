@@ -1,6 +1,4 @@
-// use crate::define_object;
 use crate::support::{NativeObject, ObjectX};
-use alloc::boxed::Box;
 use core::ptr;
 use lvgl_sys;
 
