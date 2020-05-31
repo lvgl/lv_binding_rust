@@ -95,30 +95,53 @@ unsafe extern "C" fn display_callback_wrapper<T, C>(
     T: DrawTarget<C>,
     C: PixelColor + From<Color>,
 {
-    // We need to make sure panics can't escape across the FFI boundary.
-    //let _ = std::panic::catch_unwind(|| {
+    // In the `std` world we would make sure to capture panics here and make them not escape across
+    // the FFI boundary. Since this library is focused on embedded platforms, we don't
+    // have an standard unwinding mechanism to rely upon.
     let display_driver = *disp_drv;
-
     // Rust code closure reference
     let device = &mut *(display_driver.user_data as *mut T);
+    let x1 = (*area).x1;
+    let x2 = (*area).x2;
+    let y1 = (*area).y1;
+    let y2 = (*area).y2;
+    // TODO: Can we do anything when there is a error while flushing?
+    let _ = display_flush(device, (x1, x2), (y1, y2), color_p);
+    // Indicate to LittlevGL that we are ready with the flushing
+    lvgl_sys::lv_disp_flush_ready(disp_drv);
+}
 
-    let ys = (*area).y1..=(*area).y2;
-    let xs = ((*area).x1..=(*area).x2).enumerate();
-    let x_len = ((*area).x2 - (*area).x1 + 1) as usize;
+// We separate this display flush function to reduce the amount of unsafe code we need to write.
+// This also provides a good separation of concerns, what is necessary from LittlevGL to work and
+// what is the lvgl-rs wrapper responsibility.
+fn display_flush<T, C>(
+    display: &mut T,
+    (x1, x2): (i16, i16),
+    (y1, y2): (i16, i16),
+    color_p: *mut lvgl_sys::lv_color_t,
+) -> Result<(), T::Error>
+where
+    T: DrawTarget<C>,
+    C: PixelColor + From<Color>,
+{
+    let ys = y1..=y2;
+    let xs = (x1..=x2).enumerate();
+    let x_len = (x2 - x1 + 1) as usize;
+
+    // We use iterators here to ensure that the Rust compiler can apply all possible
+    // optimizations at compile time.
     let pixels = ys
         .enumerate()
         .map(|(iy, y)| {
             xs.clone().map(move |(ix, x)| {
                 let color_len = x_len * iy + ix;
-                let raw_color = Color::from_raw(*color_p.add(color_len));
+                let lv_color = unsafe { *color_p.add(color_len) };
+                let raw_color = Color::from_raw(lv_color);
                 drawable::Pixel(Point::new(x as i32, y as i32), raw_color.into())
             })
         })
         .flatten();
-    // TODO: Maybe find a way to use `draw_image` method on the device instance.
-    let _ = device.draw_iter(pixels.into_iter());
 
-    // Indicate to LittlevGL that you are ready with the flushing
-    lvgl_sys::lv_disp_flush_ready(disp_drv);
-    //}); // end of panic::catch_unwind
+    // TODO: Maybe find a way to use `draw_image` method on the device instance.
+    Ok(display.draw_iter(pixels.into_iter())?)
 }
