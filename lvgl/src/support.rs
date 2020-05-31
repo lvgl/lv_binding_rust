@@ -95,10 +95,6 @@ pub trait Object: NativeObject {
         }
     }
 
-    fn set_style(&mut self, style: Style);
-}
-
-impl Object for ObjectX {
     fn set_style(&mut self, style: Style) {
         unsafe {
             let boxed = Box::new(style.raw);
@@ -106,6 +102,8 @@ impl Object for ObjectX {
         };
     }
 }
+
+impl Object for ObjectX {}
 
 macro_rules! define_object {
     ($item:ident) => {
@@ -119,17 +117,7 @@ macro_rules! define_object {
             }
         }
 
-        impl $crate::support::Object for $item {
-            fn set_style(&mut self, style: $crate::support::Style) {
-                unsafe {
-                    let boxed = alloc::boxed::Box::new(style.raw);
-                    lvgl_sys::lv_obj_set_style(
-                        self.raw().as_mut(),
-                        alloc::boxed::Box::into_raw(boxed),
-                    );
-                };
-            }
-        }
+        impl $crate::support::Object for $item {}
     };
 }
 
