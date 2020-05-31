@@ -14,3 +14,7 @@ embedded-graphics-simulator = "0.2.0"
 [[example]]
 name = "demo"
 path = "demo.rs"
+
+[[example]]
+name = "bar"
+path = "bar.rs"
