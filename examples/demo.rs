@@ -4,6 +4,7 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl;
+use lvgl::widgets::{Label, LabelAlign};
 use lvgl::{Object, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
@@ -37,7 +38,7 @@ fn main() -> Result<(), String> {
     screen_style.set_body_radius(0);
     screen.set_style(screen_style);
 
-    let mut time = lvgl::Label::new(&mut screen);
+    let mut time = Label::new(&mut screen);
     let mut style_time = lvgl::Style::new();
     style_time.set_text_font(font_noto_sans_numeric_28);
     style_time.set_text_color(lvgl::Color::from_rgb((255, 255, 255)));
@@ -47,7 +48,7 @@ fn main() -> Result<(), String> {
     time.set_width(240);
     time.set_height(240);
 
-    let mut bt = lvgl::Label::new(&mut screen);
+    let mut bt = Label::new(&mut screen);
     let mut style_bt = lvgl::Style::new();
     style_bt.set_text_font(font_roboto_28);
     let style_power = style_bt.clone();
@@ -56,16 +57,16 @@ fn main() -> Result<(), String> {
     bt.set_height(80);
     bt.set_recolor(true);
     bt.set_text("#5794f2 \u{F293}#");
-    bt.set_label_align(lvgl::LabelAlign::Left);
+    bt.set_label_align(LabelAlign::Left);
     bt.set_align(&mut screen, lvgl::Align::InTopLeft, 0, 0);
 
-    let mut power = lvgl::Label::new(&mut screen);
+    let mut power = Label::new(&mut screen);
     power.set_style(style_power);
     power.set_recolor(true);
     power.set_width(80);
     power.set_height(20);
     power.set_text("#fade2a 20%#");
-    power.set_label_align(lvgl::LabelAlign::Right);
+    power.set_label_align(LabelAlign::Right);
     power.set_align(&mut screen, lvgl::Align::InTopRight, 0, 0);
 
     let threaded_ui = Arc::new(Mutex::new(ui));
