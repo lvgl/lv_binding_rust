@@ -3,7 +3,7 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::widgets::{Bar, Label};
+use lvgl::widgets::{Bar, BarComponent, Label};
 use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
@@ -40,6 +40,19 @@ fn main() -> Result<(), String> {
     bar.set_align(&mut screen, Align::Center, 0, 0);
     bar.set_range(0, 100);
     bar.set_value(0, Animation::OFF);
+
+    // Set the indicator style for the bar object
+    let mut ind_style = Style::new();
+    ind_style.set_body_main_color(Color::from_rgb((100, 245, 0)));
+    ind_style.set_body_grad_color(Color::from_rgb((100, 245, 0)));
+    bar.set_bar_style(BarComponent::Indicator, ind_style);
+
+    // Set the background style for the bar object
+    let mut bg_style = Style::new();
+    bg_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
+    bg_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
+    bg_style.set_body_radius(0);
+    bar.set_bar_style(BarComponent::Background, bg_style);
 
     let mut loading_lbl = Label::new(&mut screen);
     loading_lbl.set_text("Loading...");
