@@ -4,7 +4,7 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::widgets::{Bar, Label};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Object, Style, UI};
+use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -45,9 +45,9 @@ fn main() -> Result<(), String> {
     loading_lbl.set_text("Loading...");
     loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10);
 
-    loading_lbl.on_event(|mut this, event| {
+    loading_lbl.on_event(|_, event| {
         if let lvgl::Event::Clicked = event {
-            this.set_text("Clicked!");
+            println!("Loaded!");
         }
     });
 
@@ -73,6 +73,10 @@ fn main() -> Result<(), String> {
     'running: loop {
         if i > 100 {
             i = 0;
+            threaded_ui
+                .lock()
+                .unwrap()
+                .event_send(&mut loading_lbl, Event::Clicked)
         }
         bar.set_value(i, Animation::OFF);
         i += 1;

@@ -1,4 +1,4 @@
-use crate::{DisplayDriver, Object, ObjectX};
+use crate::{DisplayDriver, Event, Object, ObjectX};
 use alloc::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr;
@@ -51,6 +51,15 @@ impl UI {
         unsafe {
             let screen = lvgl_sys::lv_disp_get_scr_act(ptr::null_mut());
             ObjectX::from_raw(NonNull::new_unchecked(screen))
+        }
+    }
+
+    pub fn event_send<T>(&mut self, obj: &mut T, event: Event<T::SpecialEvent>)
+    where
+        T: Object,
+    {
+        unsafe {
+            lvgl_sys::lv_event_send(obj.raw().as_mut(), event.into(), ptr::null_mut());
         }
     }
 

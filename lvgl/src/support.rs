@@ -374,6 +374,24 @@ impl<S> TryFrom<lvgl_sys::lv_event_t> for Event<S> {
     }
 }
 
+impl<S> From<Event<S>> for lvgl_sys::lv_event_t {
+    fn from(event: Event<S>) -> Self {
+        let native_event = match event {
+            Event::Pressed => lvgl_sys::LV_EVENT_PRESSED,
+            Event::Pressing => lvgl_sys::LV_EVENT_PRESSING,
+            Event::PressLost => lvgl_sys::LV_EVENT_PRESS_LOST,
+            Event::ShortClicked => lvgl_sys::LV_EVENT_SHORT_CLICKED,
+            Event::Clicked => lvgl_sys::LV_EVENT_CLICKED,
+            Event::LongPressed => lvgl_sys::LV_EVENT_LONG_PRESSED,
+            Event::LongPressedRepeat => lvgl_sys::LV_EVENT_LONG_PRESSED_REPEAT,
+            Event::Released => lvgl_sys::LV_EVENT_RELEASED,
+            // TODO: handle all types...
+            _ => lvgl_sys::LV_EVENT_CLICKED,
+        };
+        native_event as lvgl_sys::lv_event_t
+    }
+}
+
 /// These events are sent only by pointer-like input devices (E.g. mouse or touchpad)
 pub enum PointerEvent {
     DragBegin,
