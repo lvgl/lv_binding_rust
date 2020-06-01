@@ -6,20 +6,30 @@ use core::ptr::NonNull;
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 use lvgl_sys;
 
+const PANIC_MESSAGE: &str = "Value was dropped by LittlevGL";
+
 /// Represents a native LittlevGL object
 pub trait NativeObject {
     /// Provide common way to access to the underlying native object pointer.
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t>;
 }
 
-/// Stores the native LittlevGL raw pointer
+/// Stores the native LittlevGL raw pointer.
+///
+/// This is the parent object of all widget objects in `lvgl-rs`.
+///
+/// # Panics
+///
+/// Panics if LittlevGL internally deallocated the original object.
 pub struct ObjectX {
-    raw: ptr::NonNull<lvgl_sys::lv_obj_t>,
+    // We use a raw pointer here because we do not control this memory address, it is controlled
+    // by LittlevGL's C code.
+    raw: *mut lvgl_sys::lv_obj_t,
 }
 
 impl NativeObject for ObjectX {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
-        unsafe { ptr::NonNull::new_unchecked(self.raw.as_ptr()) }
+        ptr::NonNull::new(self.raw).expect(PANIC_MESSAGE)
     }
 }
 
@@ -111,7 +121,7 @@ impl Object for ObjectX {
     type SpecialEvent = ();
 
     unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
-        Self { raw }
+        Self { raw: raw.as_ptr() }
     }
 }
 
@@ -125,7 +135,7 @@ macro_rules! define_object {
             pub fn on_event<F>(&mut self, f: F)
             where
                 F: FnMut(
-                    alloc::boxed::Box<Self>,
+                    Self,
                     $crate::support::Event<<Self as $crate::support::Object>::SpecialEvent>,
                 ),
             {
@@ -167,7 +177,7 @@ macro_rules! define_object {
             pub fn on_event<F, S>(&mut self, f: F)
             where
                 F: FnMut(
-                    Box<Self>,
+                    Self,
                     $crate::support::Event<<Self as $crate::support::Object>::SpecialEvent>,
                 ),
             {
@@ -404,12 +414,12 @@ pub(crate) unsafe extern "C" fn event_callback<T, F>(
     event: lvgl_sys::lv_event_t,
 ) where
     T: Object + Sized,
-    F: FnMut(Box<T>, Event<T::SpecialEvent>),
+    F: FnMut(T, Event<T::SpecialEvent>),
 {
     // convert the lv_event_t to lvgl-rs Event type
     if let Ok(event) = event.try_into() {
         if let Some(obj_ptr) = NonNull::new(obj) {
-            let object = Box::new(T::from_raw(obj_ptr));
+            let object = T::from_raw(obj_ptr);
             // get the pointer from the Rust callback closure FnMut provided by users
             let user_closure = &mut *((*obj).user_data as *mut F);
             // call user callback closure

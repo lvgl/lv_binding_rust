@@ -3,7 +3,7 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::widgets::{Bar, BarComponent, Label};
+use lvgl::widgets::{Bar, Button, Label};
 use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
@@ -34,40 +34,17 @@ fn main() -> Result<(), String> {
     screen_style.set_body_radius(0);
     screen.set_style(screen_style);
 
-    // Create the bar object
-    let mut bar = Bar::new(&mut screen);
-    bar.set_size(175, 50);
-    bar.set_align(&mut screen, Align::Center, 0, 0);
-    bar.set_range(0, 100);
-    bar.set_value(0, Animation::OFF);
-
-    // Set the indicator style for the bar object
-    let mut ind_style = Style::new();
-    ind_style.set_body_main_color(Color::from_rgb((100, 245, 0)));
-    ind_style.set_body_grad_color(Color::from_rgb((100, 245, 0)));
-    bar.set_bar_style(BarComponent::Indicator, ind_style);
-
-    // Set the background style for the bar object
-    let mut bg_style = Style::new();
-    bg_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
-    bg_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
-    bg_style.set_body_radius(0);
-    bar.set_bar_style(BarComponent::Background, bg_style);
-
-    let mut loading_lbl = Label::new(&mut screen);
-    loading_lbl.set_text("Loading...");
-    loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10);
-
-    loading_lbl.on_event(|mut this, event| {
-        this.set_text("Loaded!");
+    // Create the button
+    let mut button = Button::new(&mut screen);
+    button.set_align(&mut screen, Align::InLeftMid, 30, 0);
+    button.set_size(180, 80);
+    let mut btn_lbl = Label::new(&mut button);
+    btn_lbl.set_text("Click me!");
+    button.on_event(|_, event| {
         if let lvgl::Event::Clicked = event {
-            println!("Loaded!");
+            println!("Clicked!");
         }
     });
-
-    let mut loading_style = Style::new();
-    loading_style.set_text_color(Color::from_rgb((255, 255, 255)));
-    loading_lbl.set_style(loading_style);
 
     let threaded_ui = Arc::new(Mutex::new(ui));
 
@@ -75,6 +52,8 @@ fn main() -> Result<(), String> {
     let closure_ui = threaded_ui.clone();
     let tick_thr = std::thread::spawn(move || loop {
         let period = Duration::from_millis(5);
+
+        // Needs to be called periodically for LittlevGL internal timing calculations.
         closure_ui.lock().unwrap().tick_inc(period);
 
         sleep(period);
@@ -83,30 +62,29 @@ fn main() -> Result<(), String> {
         }
     });
 
-    let mut i = 0;
     'running: loop {
-        if i > 100 {
-            i = 0;
-            threaded_ui
-                .lock()
-                .unwrap()
-                .event_send(&mut loading_lbl, Event::Clicked)
-        }
-        bar.set_value(i, Animation::OFF);
-        i += 1;
-
-        sleep(Duration::from_millis(25));
-
         threaded_ui.lock().unwrap().task_handler();
 
         window.update(&display);
-
         for event in window.events() {
             match event {
+                SimulatorEvent::MouseButtonUp {
+                    mouse_btn: _,
+                    point,
+                } => {
+                    println!("Clicked on: {:?}", point);
+                    // Send a event to the button directly
+                    threaded_ui
+                        .lock()
+                        .unwrap()
+                        .event_send(&mut button, Event::Clicked);
+                }
                 SimulatorEvent::Quit => break 'running,
                 _ => {}
             }
         }
+
+        sleep(Duration::from_millis(25));
     }
 
     stop_ch.send(true).unwrap();

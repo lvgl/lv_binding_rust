@@ -18,3 +18,7 @@ path = "demo.rs"
 [[example]]
 name = "bar"
 path = "bar.rs"
+
+[[example]]
+name = "button_click"
+path = "button_click.rs"
