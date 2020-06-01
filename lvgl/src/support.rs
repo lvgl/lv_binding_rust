@@ -216,6 +216,17 @@ pub enum Themes {
     Pretty,
 }
 
+bitflags! {
+    pub struct Border: u32 {
+        const NONE   = lvgl_sys::LV_BORDER_NONE;
+        const BOTTOM = lvgl_sys::LV_BORDER_BOTTOM;
+        const TOP    = lvgl_sys::LV_BORDER_TOP;
+        const LEFT   = lvgl_sys::LV_BORDER_LEFT;
+        const RIGHT  = lvgl_sys::LV_BORDER_RIGHT;
+        const FULL   = lvgl_sys::LV_BORDER_FULL;
+    }
+}
+
 pub struct Style {
     pub(crate) raw: lvgl_sys::lv_style_t,
 }
@@ -230,7 +241,7 @@ impl Style {
         Self { raw }
     }
 
-    /// Object's main background color.
+    /// Object's main background color
     pub fn set_body_main_color(&mut self, color: Color) {
         self.raw.body.main_color = color.raw;
     }
@@ -240,24 +251,59 @@ impl Style {
         self.raw.body.grad_color = color.raw;
     }
 
-    /// Text color.
-    pub fn set_text_color(&mut self, color: Color) {
-        self.raw.text.color = color.raw;
-    }
-
-    /// Font used for displaying the text.
-    pub fn set_text_font(&mut self, font: &lvgl_sys::lv_font_t) {
-        self.raw.text.font = font;
-    }
-
-    /// Body radius for rounded corners.
+    /// Body radius for rounded corners
     pub fn set_body_radius(&mut self, radius: i16) {
         self.raw.body.radius = radius;
     }
 
-    /// Border color.
+    /// Border color
     pub fn set_body_border_color(&mut self, color: Color) {
         self.raw.body.border.color = color.raw;
+    }
+
+    /// Border opacity
+    pub fn set_body_border_opa(&mut self, opa: u8) {
+        self.raw.body.border.opa = opa;
+    }
+
+    /// Border width
+    pub fn set_body_border_width(&mut self, width: i16) {
+        self.raw.body.border.width = width;
+    }
+
+    /// Which borders to draw
+    pub fn set_body_border_part(&mut self, part: Border) {
+        self.raw.body.border.part = part.bits as u8;
+    }
+
+    /// Text color
+    pub fn set_text_color(&mut self, color: Color) {
+        self.raw.text.color = color.raw;
+    }
+
+    /// Font used for displaying the text
+    pub fn set_text_font(&mut self, font: &lvgl_sys::lv_font_t) {
+        self.raw.text.font = font;
+    }
+
+    /// Space between letters
+    pub fn set_text_letter_space(&mut self, space: i16) {
+        self.raw.text.letter_space = space;
+    }
+
+    /// Space between lines (vertical)
+    pub fn set_text_line_space(&mut self, space: i16) {
+        self.raw.text.line_space = space;
+    }
+
+    /// Text opacity
+    pub fn set_text_opa(&mut self, opa: u8) {
+        self.raw.text.opa = opa;
+    }
+
+    /// Text selection background color
+    pub fn set_text_sel_color(&mut self, color: Color) {
+        self.raw.text.sel_color = color.raw;
     }
 }
 

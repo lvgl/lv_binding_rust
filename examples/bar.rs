@@ -3,8 +3,8 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::widgets::{Bar, BarComponent, Label};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Object, Style, UI};
+use lvgl::widgets::{Bar, BarComponent, Label, LabelAlign};
+use lvgl::{self, Align, Animation, Border, Color, DisplayDriver, Event, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -29,15 +29,15 @@ fn main() -> Result<(), String> {
     let mut screen = ui.scr_act();
 
     let mut screen_style = Style::new();
-    screen_style.set_body_main_color(Color::from_rgb((0, 0, 0)));
-    screen_style.set_body_grad_color(Color::from_rgb((0, 0, 0)));
+    screen_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
+    screen_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
     screen_style.set_body_radius(0);
     screen.set_style(screen_style);
 
     // Create the bar object
     let mut bar = Bar::new(&mut screen);
     bar.set_size(175, 50);
-    bar.set_align(&mut screen, Align::Center, 0, 0);
+    bar.set_align(&mut screen, Align::Center, 0, 20);
     bar.set_range(0, 100);
     bar.set_value(0, Animation::OFF);
 
@@ -52,21 +52,17 @@ fn main() -> Result<(), String> {
     bg_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
     bg_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
     bg_style.set_body_radius(0);
+    bg_style.set_body_border_part(Border::TOP);
+    bg_style.set_body_border_width(1);
     bar.set_bar_style(BarComponent::Background, bg_style);
 
     let mut loading_lbl = Label::new(&mut screen);
     loading_lbl.set_text("Loading...");
     loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10);
-
-    loading_lbl.on_event(|mut this, event| {
-        this.set_text("Loaded!");
-        if let lvgl::Event::Clicked = event {
-            println!("Loaded!");
-        }
-    });
+    loading_lbl.set_label_align(LabelAlign::Center);
 
     let mut loading_style = Style::new();
-    loading_style.set_text_color(Color::from_rgb((255, 255, 255)));
+    loading_style.set_text_color(Color::from_rgb((0, 0, 0)));
     loading_lbl.set_style(loading_style);
 
     let threaded_ui = Arc::new(Mutex::new(ui));

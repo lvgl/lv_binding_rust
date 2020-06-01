@@ -15,3 +15,4 @@ lvgl-sys = { path = "../lvgl-sys", version = "0.2.0" }
 cty = "0.2.1"
 embedded-graphics = "0.6.2"
 cstr_core = { version = "0.2.0", default-features = false, features = ["alloc"] }
+bitflags = "1.2.1"
