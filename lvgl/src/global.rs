@@ -1,4 +1,4 @@
-use crate::{DisplayDriver, Event, Object, ObjectX};
+use crate::{DisplayDriver, Event, GenericObject, Object};
 use alloc::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr;
@@ -47,10 +47,10 @@ impl UI {
         }
     }
 
-    pub fn scr_act(&self) -> ObjectX {
+    pub fn scr_act(&self) -> GenericObject {
         unsafe {
             let screen = lvgl_sys::lv_disp_get_scr_act(ptr::null_mut());
-            ObjectX::from_raw(NonNull::new_unchecked(screen))
+            GenericObject::from_raw(NonNull::new_unchecked(screen))
         }
     }
 

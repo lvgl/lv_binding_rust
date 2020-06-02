@@ -4,7 +4,7 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::widgets::{Bar, Button, Label};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Object, Style, UI};
+use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, NativeObject, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;

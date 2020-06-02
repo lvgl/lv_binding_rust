@@ -17,17 +17,13 @@ pub trait NativeObject {
 /// Generic LVGL object.
 ///
 /// This is the parent object of all widget types. It stores the native LVGL raw pointer.
-///
-/// # Panics
-///
-/// Panics if LVGL internally freed the original object.
-pub struct ObjectX {
+pub struct GenericObject {
     // We use a raw pointer here because we do not control this memory address, it is controlled
     // by LVGL's global state.
     raw: *mut lvgl_sys::lv_obj_t,
 }
 
-impl NativeObject for ObjectX {
+impl NativeObject for GenericObject {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
         ptr::NonNull::new(self.raw).expect(PANIC_MESSAGE)
     }
@@ -117,7 +113,7 @@ pub trait Object: NativeObject {
     }
 }
 
-impl Object for ObjectX {
+impl Object for GenericObject {
     type SpecialEvent = ();
 
     unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
@@ -125,7 +121,7 @@ impl Object for ObjectX {
     }
 }
 
-impl Default for ObjectX {
+impl Default for GenericObject {
     fn default() -> Self {
         Self {
             raw: unsafe { lvgl_sys::lv_obj_create(ptr::null_mut(), ptr::null_mut()) },
@@ -136,7 +132,7 @@ impl Default for ObjectX {
 macro_rules! define_object {
     ($item:ident) => {
         pub struct $item {
-            core: $crate::support::ObjectX,
+            core: $crate::support::GenericObject,
         }
 
         impl $item {
@@ -171,14 +167,14 @@ macro_rules! define_object {
 
             unsafe fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
                 Self {
-                    core: $crate::support::ObjectX::from_raw(raw_pointer),
+                    core: $crate::support::GenericObject::from_raw(raw_pointer),
                 }
             }
         }
     };
     ($item:ident, $event_type:ident) => {
         pub struct $item {
-            core: $crate::support::ObjectX,
+            core: $crate::support::GenericObject,
         }
 
         impl $item {
@@ -213,7 +209,7 @@ macro_rules! define_object {
 
             unsafe fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
                 Self {
-                    core: $crate::support::ObjectX::from_raw(raw_pointer),
+                    core: $crate::support::GenericObject::from_raw(raw_pointer),
                 }
             }
         }

@@ -80,8 +80,7 @@ List of LVGL features that impacts the library usage in general.
       draw to the display. You can use `lvgl-rs` with any of the
       [`embedded_graphics` supported displays](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/#supported-displays).
 - [x] Events: You can listen and trigger events in widget objects.
-- [x] Styles: Partially supported. You can set styles in any exposed object. We are still missing the
-      possibility of defining base styles.
+- [x] Styles: You can set styles in any exposed object. We are still missing the possibility of defining base styles.
 - [ ] Input Devices
 - [ ] Fonts
 - [ ] Images

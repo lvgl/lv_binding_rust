@@ -1,4 +1,4 @@
-use crate::support::{Animation, NativeObject, ObjectX, Style};
+use crate::support::{Animation, GenericObject, NativeObject, Style};
 use crate::Object;
 use alloc::boxed::Box;
 use core::ptr;
@@ -14,7 +14,7 @@ impl Bar {
         unsafe {
             let ptr = lvgl_sys::lv_bar_create(parent.raw().as_mut(), ptr::null_mut());
             let raw = ptr::NonNull::new_unchecked(ptr);
-            let core = ObjectX::from_raw(raw);
+            let core = GenericObject::from_raw(raw);
             Self { core }
         }
     }
