@@ -4,7 +4,6 @@ use core::mem;
 use core::ptr;
 use core::ptr::NonNull;
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
-use lvgl_sys;
 
 const PANIC_MESSAGE: &str = "Value was dropped by LittlevGL";
 
@@ -33,6 +32,11 @@ impl NativeObject for GenericObject {
 pub trait Object: NativeObject {
     type SpecialEvent;
 
+    /// Construct an instance of the object from a raw pointer.
+    ///
+    /// # Safety
+    /// Provided the LVGL library can allocate memory this should be safe.
+    ///
     unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
 
     fn set_pos(&mut self, x: i16, y: i16) {
@@ -236,15 +240,6 @@ pub struct Style {
 }
 
 impl Style {
-    pub fn new() -> Self {
-        let raw = unsafe {
-            let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
-            lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), &lvgl_sys::lv_style_pretty);
-            native_style.assume_init()
-        };
-        Self { raw }
-    }
-
     /// Object's main background color
     pub fn set_body_main_color(&mut self, color: Color) {
         self.raw.body.main_color = color.raw;
@@ -308,6 +303,17 @@ impl Style {
     /// Text selection background color
     pub fn set_text_sel_color(&mut self, color: Color) {
         self.raw.text.sel_color = color.raw;
+    }
+}
+
+impl Default for Style {
+    fn default() -> Self {
+        let raw = unsafe {
+            let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
+            lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), &lvgl_sys::lv_style_pretty);
+            native_style.assume_init()
+        };
+        Self { raw }
     }
 }
 

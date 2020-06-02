@@ -5,7 +5,7 @@ use embedded_graphics_simulator::{
 };
 use lvgl;
 use lvgl::widgets::{Label, LabelAlign};
-use lvgl::{Object, UI};
+use lvgl::{Align, Color, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -32,24 +32,24 @@ fn main() -> Result<(), String> {
     let font_roboto_28 = unsafe { &lvgl_sys::lv_font_roboto_28 };
     let font_noto_sans_numeric_28 = unsafe { &noto_sans_numeric_80 };
 
-    let mut screen_style = lvgl::Style::new();
-    screen_style.set_body_main_color(lvgl::Color::from_rgb((0, 0, 0)));
-    screen_style.set_body_grad_color(lvgl::Color::from_rgb((0, 0, 0)));
+    let mut screen_style = Default::default();
+    screen_style.set_body_main_color(Color::from_rgb((0, 0, 0)));
+    screen_style.set_body_grad_color(Color::from_rgb((0, 0, 0)));
     screen_style.set_body_radius(0);
     screen.set_style(screen_style);
 
     let mut time = Label::new(&mut screen);
-    let mut style_time = lvgl::Style::new();
+    let mut style_time = Default::default();
     style_time.set_text_font(font_noto_sans_numeric_28);
     style_time.set_text_color(lvgl::Color::from_rgb((255, 255, 255)));
     time.set_style(style_time);
-    time.set_align(&mut screen, lvgl::Align::InLeftMid, 20, 0);
+    time.set_align(&mut screen, Align::InLeftMid, 20, 0);
     time.set_text("20:46");
     time.set_width(240);
     time.set_height(240);
 
     let mut bt = Label::new(&mut screen);
-    let mut style_bt = lvgl::Style::new();
+    let mut style_bt = Default::default();
     style_bt.set_text_font(font_roboto_28);
     let style_power = style_bt.clone();
     bt.set_style(style_bt);
@@ -58,7 +58,7 @@ fn main() -> Result<(), String> {
     bt.set_recolor(true);
     bt.set_text("#5794f2 \u{F293}#");
     bt.set_label_align(LabelAlign::Left);
-    bt.set_align(&mut screen, lvgl::Align::InTopLeft, 0, 0);
+    bt.set_align(&mut screen, Align::InTopLeft, 0, 0);
 
     let mut power = Label::new(&mut screen);
     power.set_style(style_power);
@@ -67,7 +67,7 @@ fn main() -> Result<(), String> {
     power.set_height(20);
     power.set_text("#fade2a 20%#");
     power.set_label_align(LabelAlign::Right);
-    power.set_align(&mut screen, lvgl::Align::InTopRight, 0, 0);
+    power.set_align(&mut screen, Align::InTopRight, 0, 0);
 
     let threaded_ui = Arc::new(Mutex::new(ui));
 

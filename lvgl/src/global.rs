@@ -25,7 +25,7 @@ unsafe impl Send for UI {}
 
 impl UI {
     pub fn init() -> Result<Self, LvError> {
-        if LVGL_IN_USE.compare_and_swap(false, true, Ordering::SeqCst) == false {
+        if !LVGL_IN_USE.compare_and_swap(false, true, Ordering::SeqCst) {
             unsafe {
                 lvgl_sys::lv_init();
             }

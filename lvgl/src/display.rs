@@ -1,7 +1,6 @@
 use crate::Color;
 use alloc::boxed::Box;
 use core::mem::MaybeUninit;
-use embedded_graphics;
 use embedded_graphics::prelude::*;
 use embedded_graphics::{drawable, DrawTarget};
 
@@ -18,8 +17,7 @@ impl DisplayDriver {
     {
         let disp_drv = unsafe {
             // Create a display buffer for LittlevGL
-            let mut display_buffer =
-                Box::new(MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit().assume_init());
+            let mut display_buffer = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
 
             // Declare a buffer for the refresh rate
             const REFRESH_BUFFER_LEN: usize = 2;
@@ -40,27 +38,23 @@ impl DisplayDriver {
 
             // Initialize the display buffer
             lvgl_sys::lv_disp_buf_init(
-                display_buffer.as_mut(),
+                display_buffer.as_mut_ptr(),
                 Box::into_raw(refresh_buffer1) as *mut cty::c_void,
                 Box::into_raw(refresh_buffer2) as *mut cty::c_void,
                 lvgl_sys::LV_HOR_RES_MAX * REFRESH_BUFFER_LEN as u32,
             );
+            let display_buffer = Box::new(display_buffer.assume_init());
 
-            // Descriptor of a display driver
-            let mut disp_drv = MaybeUninit::<lvgl_sys::lv_disp_drv_t>::uninit().assume_init();
-
-            // Basic initialization
-            lvgl_sys::lv_disp_drv_init(&mut disp_drv);
-
+            // Basic initialization of the display driver
+            let mut disp_drv = MaybeUninit::<lvgl_sys::lv_disp_drv_t>::uninit();
+            lvgl_sys::lv_disp_drv_init(disp_drv.as_mut_ptr());
+            let mut disp_drv = disp_drv.assume_init();
             // Assign the buffer to the display
             disp_drv.buffer = Box::into_raw(display_buffer);
-
             // Set your driver function
             disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
-
             // TODO: DrawHandler type here
             disp_drv.user_data = device as *mut _ as *mut cty::c_void;
-
             disp_drv
         };
         Self { raw: disp_drv }
@@ -143,5 +137,5 @@ where
         .flatten();
 
     // TODO: Maybe find a way to use `draw_image` method on the device instance.
-    Ok(display.draw_iter(pixels.into_iter())?)
+    Ok(display.draw_iter(pixels)?)
 }

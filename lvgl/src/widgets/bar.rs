@@ -2,7 +2,6 @@ use crate::support::{Animation, GenericObject, NativeObject, Style};
 use crate::Object;
 use alloc::boxed::Box;
 use core::ptr;
-use lvgl_sys;
 
 define_object!(Bar);
 

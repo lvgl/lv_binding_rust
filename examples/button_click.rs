@@ -3,8 +3,8 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::widgets::{Bar, Button, Label};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, NativeObject, Object, Style, UI};
+use lvgl::widgets::{Button, Label};
+use lvgl::{self, Align, Color, DisplayDriver, Event, Object, Style, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -28,7 +28,7 @@ fn main() -> Result<(), String> {
     // Create screen and widgets
     let mut screen = ui.scr_act();
 
-    let mut screen_style = Style::new();
+    let mut screen_style = Style::default();
     screen_style.set_body_main_color(Color::from_rgb((0, 0, 0)));
     screen_style.set_body_grad_color(Color::from_rgb((0, 0, 0)));
     screen_style.set_body_radius(0);

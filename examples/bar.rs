@@ -28,7 +28,7 @@ fn main() -> Result<(), String> {
     // Create screen and widgets
     let mut screen = ui.scr_act();
 
-    let mut screen_style = Style::new();
+    let mut screen_style = Style::default();
     screen_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
     screen_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
     screen_style.set_body_radius(0);
@@ -42,13 +42,13 @@ fn main() -> Result<(), String> {
     bar.set_value(0, Animation::OFF);
 
     // Set the indicator style for the bar object
-    let mut ind_style = Style::new();
+    let mut ind_style = Style::default();
     ind_style.set_body_main_color(Color::from_rgb((100, 245, 0)));
     ind_style.set_body_grad_color(Color::from_rgb((100, 245, 0)));
     bar.set_bar_style(BarComponent::Indicator, ind_style);
 
     // Set the background style for the bar object
-    let mut bg_style = Style::new();
+    let mut bg_style = Style::default();
     bg_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
     bg_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
     bg_style.set_body_radius(0);
@@ -61,7 +61,7 @@ fn main() -> Result<(), String> {
     loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10);
     loading_lbl.set_label_align(LabelAlign::Center);
 
-    let mut loading_style = Style::new();
+    let mut loading_style = Style::default();
     loading_style.set_text_color(Color::from_rgb((0, 0, 0)));
     loading_lbl.set_style(loading_style);
 

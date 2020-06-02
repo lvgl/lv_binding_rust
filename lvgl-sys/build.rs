@@ -1,4 +1,3 @@
-use bindgen;
 use cc::Build;
 use std::{env, path::Path, path::PathBuf};
 
@@ -13,13 +12,12 @@ fn main() {
     let vendor_src = vendor.join("lvgl").join("src");
 
     let lv_config_dir = {
-        let raw_path = env::var(CONFIG_NAME).expect(
-            format!(
+        let raw_path = env::var(CONFIG_NAME).unwrap_or_else(|_| {
+            panic!(
                 "The environment variable {} is required to be defined",
                 CONFIG_NAME
-            )
-            .as_str(),
-        );
+            );
+        });
         let conf_path = PathBuf::from(raw_path);
 
         if !conf_path.exists() {
@@ -80,7 +78,6 @@ fn main() {
         .use_core()
         .rustfmt_bindings(true)
         .ctypes_prefix("cty")
-        .raw_line("use cty;")
         .clang_args(&cc_args)
         .generate()
         .expect("Unable to generate bindings")
