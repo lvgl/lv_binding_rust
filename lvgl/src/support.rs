@@ -14,16 +14,16 @@ pub trait NativeObject {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t>;
 }
 
-/// Stores the native LittlevGL raw pointer.
+/// Generic LVGL object.
 ///
-/// This is the parent object of all widget objects in `lvgl-rs`.
+/// This is the parent object of all widget types. It stores the native LVGL raw pointer.
 ///
 /// # Panics
 ///
-/// Panics if LittlevGL internally deallocated the original object.
+/// Panics if LVGL internally freed the original object.
 pub struct ObjectX {
     // We use a raw pointer here because we do not control this memory address, it is controlled
-    // by LittlevGL's C code.
+    // by LVGL's global state.
     raw: *mut lvgl_sys::lv_obj_t,
 }
 
@@ -122,6 +122,14 @@ impl Object for ObjectX {
 
     unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
         Self { raw: raw.as_ptr() }
+    }
+}
+
+impl Default for ObjectX {
+    fn default() -> Self {
+        Self {
+            raw: unsafe { lvgl_sys::lv_obj_create(ptr::null_mut(), ptr::null_mut()) },
+        }
     }
 }
 
