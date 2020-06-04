@@ -5,7 +5,7 @@ use embedded_graphics_simulator::{
 };
 use lvgl::style::Style;
 use lvgl::widgets::{Bar, BarPart, Label, LabelAlign};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, ObjPart, Object, State, UI};
+use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Object, Part, State, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -32,7 +32,7 @@ fn main() -> Result<(), String> {
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
     screen_style.set_radius(State::DEFAULT, 0);
-    screen.add_style(ObjPart::Main, screen_style);
+    screen.add_style(Part::Main, screen_style);
 
     // Create the bar object
     let mut bar = Bar::new(&mut screen);
@@ -52,7 +52,7 @@ fn main() -> Result<(), String> {
 
     let mut loading_style = Style::default();
     loading_style.set_text_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
-    loading_lbl.add_style(ObjPart::Main, loading_style);
+    loading_lbl.add_style(Part::Main, loading_style);
 
     let threaded_ui = Arc::new(Mutex::new(ui));
 

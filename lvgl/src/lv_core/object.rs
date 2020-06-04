@@ -94,7 +94,7 @@ pub trait Object: NativeObject {
 
 impl Object for GenericObject {
     type SpecialEvent = ();
-    type Part = ObjPart;
+    type Part = Part;
 
     unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
         Self { raw: raw.as_ptr() }
@@ -111,10 +111,10 @@ impl Default for GenericObject {
 
 macro_rules! define_object {
     ($item:ident) => {
-        define_object!($item, event = (), part = $crate::ObjPart);
+        define_object!($item, event = (), part = $crate::Part);
     };
     ($item:ident, event = $event_type:ty) => {
-        define_object!($item, event = $event_type, part = $crate::ObjPart);
+        define_object!($item, event = $event_type, part = $crate::Part);
     };
     ($item:ident, part = $part_type:ty) => {
         define_object!($item, event = (), part = $part_type);
@@ -189,16 +189,16 @@ impl State {
     }
 }
 
-pub enum ObjPart {
+pub enum Part {
     Main,
     All,
 }
 
-impl Into<u8> for ObjPart {
+impl Into<u8> for Part {
     fn into(self) -> u8 {
         match self {
-            ObjPart::Main => lvgl_sys::LV_OBJ_PART_MAIN as u8,
-            ObjPart::All => lvgl_sys::LV_OBJ_PART_ALL as u8,
+            Part::Main => lvgl_sys::LV_OBJ_PART_MAIN as u8,
+            Part::All => lvgl_sys::LV_OBJ_PART_ALL as u8,
         }
     }
 }

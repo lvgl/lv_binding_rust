@@ -29,7 +29,6 @@ impl Style {
         let native_state: u32 = state.get_bits();
         let string = CString::new(value).unwrap();
         unsafe {
-            lvgl_sys::LV_OPA_COVER;
             lvgl_sys::_lv_style_set_ptr(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_VALUE_STR

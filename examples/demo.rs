@@ -6,7 +6,7 @@ use embedded_graphics_simulator::{
 use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Label, LabelAlign};
-use lvgl::{Align, Color, ObjPart, Object, State, UI};
+use lvgl::{Align, Color, Object, Part, State, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -36,13 +36,13 @@ fn main() -> Result<(), String> {
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
     screen_style.set_radius(State::DEFAULT, 0);
-    screen.add_style(ObjPart::Main, screen_style);
+    screen.add_style(Part::Main, screen_style);
 
     let mut time = Label::new(&mut screen);
     let mut style_time = Style::default();
     //style_time.set_text_font(font_noto_sans_numeric_28);
     style_time.set_text_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
-    time.add_style(ObjPart::Main, style_time);
+    time.add_style(Part::Main, style_time);
     time.set_align(&mut screen, Align::Center, 0, 0);
     time.set_text("20:46");
     time.set_width(240);
