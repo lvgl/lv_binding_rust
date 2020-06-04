@@ -8,8 +8,10 @@ mod display;
 mod global;
 #[macro_use]
 mod support;
+mod lv_core;
 pub mod widgets;
 
 pub use display::DisplayDriver;
 pub use global::{LvError, UI};
+pub use lv_core::*;
 pub use support::*;
