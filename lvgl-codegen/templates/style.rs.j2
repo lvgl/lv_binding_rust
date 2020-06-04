@@ -11,7 +11,7 @@ pub fn set_{{func_name}}(&mut self, state: State,
     {% endif %}
 
 ) {
-    let native_state: u32 = state.bits;
+    let native_state: u32 = state.get_bits();
     unsafe {
         lvgl_sys::_lv_style_set{{style_type}}(
             self.raw.as_mut(),

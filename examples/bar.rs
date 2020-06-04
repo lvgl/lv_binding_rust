@@ -3,9 +3,9 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::style::{State, Style};
+use lvgl::style::Style;
 use lvgl::widgets::{Bar, BarPart, Label, LabelAlign};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, ObjPart, Object, UI};
+use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, ObjPart, Object, State, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;

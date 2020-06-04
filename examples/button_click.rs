@@ -3,8 +3,9 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
+use lvgl::style::Style;
 use lvgl::widgets::{Button, Label};
-use lvgl::{self, Align, Color, DisplayDriver, Event, Object, Style, UI};
+use lvgl::{self, Align, Color, DisplayDriver, Event, ObjPart, Object, State, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -29,10 +30,8 @@ fn main() -> Result<(), String> {
     let mut screen = ui.scr_act();
 
     let mut screen_style = Style::default();
-    screen_style.set_body_main_color(Color::from_rgb((0, 0, 0)));
-    screen_style.set_body_grad_color(Color::from_rgb((0, 0, 0)));
-    screen_style.set_body_radius(0);
-    screen.set_style(screen_style);
+    screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
+    screen.add_style(ObjPart::Main, screen_style);
 
     // Create the button
     let mut button = Button::new(&mut screen);
