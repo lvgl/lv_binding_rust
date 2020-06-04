@@ -1,4 +1,4 @@
-use crate::Color;
+use crate::{Color, State};
 use alloc::boxed::Box;
 use core::mem;
 use cstr_core::CString;
@@ -14,7 +14,7 @@ pub struct Style {
 
 impl Style {
     pub fn set_value_str(&mut self, state: State, value: &str) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         let string = CString::new(value).unwrap();
         unsafe {
             lvgl_sys::_lv_style_set_ptr(
@@ -47,25 +47,6 @@ impl Clone for Style {
                 raw: Box::new(native_style.assume_init()),
             }
         }
-    }
-}
-
-bitflags! {
-    pub struct State: u32 {
-        /// Normal, released
-        const DEFAULT  = lvgl_sys::LV_STATE_DEFAULT;
-        /// Toggled or checked
-        const CHECKED  = lvgl_sys::LV_STATE_CHECKED;
-        /// Focused via keypad or encoder or clicked via touchpad/mouse
-        const FOCUSED  = lvgl_sys::LV_STATE_FOCUSED;
-        /// Edit by an encoder
-        const EDITED   = lvgl_sys::LV_STATE_EDITED;
-        /// Hovered by mouse (not supported now)
-        const HOVERED  = lvgl_sys::LV_STATE_HOVERED;
-        /// Pressed
-        const PRESSED  = lvgl_sys::LV_STATE_PRESSED;
-        /// Disabled or inactive
-        const DISABLED = lvgl_sys::LV_STATE_DISABLED;
     }
 }
 
@@ -169,7 +150,7 @@ bitflags! {
 // Auto-gen code, please look into lvgl-codegen for any changes.
 impl Style {
     pub fn set_radius(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -181,7 +162,7 @@ impl Style {
     }
 
     pub fn set_clip_corner(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -193,7 +174,7 @@ impl Style {
     }
 
     pub fn set_size(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -205,7 +186,7 @@ impl Style {
     }
 
     pub fn set_transform_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -217,7 +198,7 @@ impl Style {
     }
 
     pub fn set_transform_height(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -229,7 +210,7 @@ impl Style {
     }
 
     pub fn set_transform_angle(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -241,7 +222,7 @@ impl Style {
     }
 
     pub fn set_transform_zoom(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -253,7 +234,7 @@ impl Style {
     }
 
     pub fn set_opa_scale(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -265,7 +246,7 @@ impl Style {
     }
 
     pub fn set_pad_top(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -277,7 +258,7 @@ impl Style {
     }
 
     pub fn set_pad_bottom(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -289,7 +270,7 @@ impl Style {
     }
 
     pub fn set_pad_left(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -301,7 +282,7 @@ impl Style {
     }
 
     pub fn set_pad_right(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -313,7 +294,7 @@ impl Style {
     }
 
     pub fn set_pad_inner(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -325,7 +306,7 @@ impl Style {
     }
 
     pub fn set_margin_top(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -337,7 +318,7 @@ impl Style {
     }
 
     pub fn set_margin_bottom(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -349,7 +330,7 @@ impl Style {
     }
 
     pub fn set_margin_left(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -361,7 +342,7 @@ impl Style {
     }
 
     pub fn set_margin_right(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -373,7 +354,7 @@ impl Style {
     }
 
     pub fn set_bg_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -385,7 +366,7 @@ impl Style {
     }
 
     pub fn set_bg_main_stop(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -397,7 +378,7 @@ impl Style {
     }
 
     pub fn set_bg_grad_stop(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -409,7 +390,7 @@ impl Style {
     }
 
     pub fn set_bg_grad_dir(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -421,7 +402,7 @@ impl Style {
     }
 
     pub fn set_bg_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -433,7 +414,7 @@ impl Style {
     }
 
     pub fn set_bg_grad_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -445,7 +426,7 @@ impl Style {
     }
 
     pub fn set_bg_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -457,7 +438,7 @@ impl Style {
     }
 
     pub fn set_border_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -469,7 +450,7 @@ impl Style {
     }
 
     pub fn set_border_side(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -481,7 +462,7 @@ impl Style {
     }
 
     pub fn set_border_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -493,7 +474,7 @@ impl Style {
     }
 
     pub fn set_border_post(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -505,7 +486,7 @@ impl Style {
     }
 
     pub fn set_border_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -517,7 +498,7 @@ impl Style {
     }
 
     pub fn set_border_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -529,7 +510,7 @@ impl Style {
     }
 
     pub fn set_outline_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -541,7 +522,7 @@ impl Style {
     }
 
     pub fn set_outline_pad(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -553,7 +534,7 @@ impl Style {
     }
 
     pub fn set_outline_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -565,7 +546,7 @@ impl Style {
     }
 
     pub fn set_outline_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -577,7 +558,7 @@ impl Style {
     }
 
     pub fn set_outline_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -589,7 +570,7 @@ impl Style {
     }
 
     pub fn set_shadow_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -601,7 +582,7 @@ impl Style {
     }
 
     pub fn set_shadow_ofs_x(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -613,7 +594,7 @@ impl Style {
     }
 
     pub fn set_shadow_ofs_y(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -625,7 +606,7 @@ impl Style {
     }
 
     pub fn set_shadow_spread(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -637,7 +618,7 @@ impl Style {
     }
 
     pub fn set_shadow_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -649,7 +630,7 @@ impl Style {
     }
 
     pub fn set_shadow_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -661,7 +642,7 @@ impl Style {
     }
 
     pub fn set_shadow_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -673,7 +654,7 @@ impl Style {
     }
 
     pub fn set_pattern_repeat(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -685,7 +666,7 @@ impl Style {
     }
 
     pub fn set_pattern_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -697,7 +678,7 @@ impl Style {
     }
 
     pub fn set_pattern_recolor(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -709,7 +690,7 @@ impl Style {
     }
 
     pub fn set_pattern_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -721,7 +702,7 @@ impl Style {
     }
 
     pub fn set_pattern_recolor_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -733,7 +714,7 @@ impl Style {
     }
 
     pub fn set_value_letter_space(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -745,7 +726,7 @@ impl Style {
     }
 
     pub fn set_value_line_space(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -757,7 +738,7 @@ impl Style {
     }
 
     pub fn set_value_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -769,7 +750,7 @@ impl Style {
     }
 
     pub fn set_value_ofs_x(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -781,7 +762,7 @@ impl Style {
     }
 
     pub fn set_value_ofs_y(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -793,7 +774,7 @@ impl Style {
     }
 
     pub fn set_value_align(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -805,7 +786,7 @@ impl Style {
     }
 
     pub fn set_value_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -817,7 +798,7 @@ impl Style {
     }
 
     pub fn set_value_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -829,7 +810,7 @@ impl Style {
     }
 
     pub fn set_text_letter_space(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -841,7 +822,7 @@ impl Style {
     }
 
     pub fn set_text_line_space(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -853,7 +834,7 @@ impl Style {
     }
 
     pub fn set_text_decor(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -865,7 +846,7 @@ impl Style {
     }
 
     pub fn set_text_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -877,7 +858,7 @@ impl Style {
     }
 
     pub fn set_text_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -889,7 +870,7 @@ impl Style {
     }
 
     pub fn set_text_sel_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -901,7 +882,7 @@ impl Style {
     }
 
     pub fn set_text_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -913,7 +894,7 @@ impl Style {
     }
 
     pub fn set_line_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -925,7 +906,7 @@ impl Style {
     }
 
     pub fn set_line_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -937,7 +918,7 @@ impl Style {
     }
 
     pub fn set_line_dash_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -949,7 +930,7 @@ impl Style {
     }
 
     pub fn set_line_dash_gap(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -961,7 +942,7 @@ impl Style {
     }
 
     pub fn set_line_rounded(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -973,7 +954,7 @@ impl Style {
     }
 
     pub fn set_line_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -985,7 +966,7 @@ impl Style {
     }
 
     pub fn set_line_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -997,7 +978,7 @@ impl Style {
     }
 
     pub fn set_image_blend_mode(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1009,7 +990,7 @@ impl Style {
     }
 
     pub fn set_image_recolor(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -1021,7 +1002,7 @@ impl Style {
     }
 
     pub fn set_image_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -1033,7 +1014,7 @@ impl Style {
     }
 
     pub fn set_image_recolor_opa(&mut self, state: State, value: u8) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
@@ -1045,7 +1026,7 @@ impl Style {
     }
 
     pub fn set_transition_time(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1057,7 +1038,7 @@ impl Style {
     }
 
     pub fn set_transition_delay(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1069,7 +1050,7 @@ impl Style {
     }
 
     pub fn set_transition_prop_1(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1081,7 +1062,7 @@ impl Style {
     }
 
     pub fn set_transition_prop_2(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1093,7 +1074,7 @@ impl Style {
     }
 
     pub fn set_transition_prop_3(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1105,7 +1086,7 @@ impl Style {
     }
 
     pub fn set_transition_prop_4(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1117,7 +1098,7 @@ impl Style {
     }
 
     pub fn set_transition_prop_5(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1129,7 +1110,7 @@ impl Style {
     }
 
     pub fn set_transition_prop_6(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1141,7 +1122,7 @@ impl Style {
     }
 
     pub fn set_scale_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1153,7 +1134,7 @@ impl Style {
     }
 
     pub fn set_scale_border_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1165,7 +1146,7 @@ impl Style {
     }
 
     pub fn set_scale_end_border_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1177,7 +1158,7 @@ impl Style {
     }
 
     pub fn set_scale_end_line_width(&mut self, state: State, value: i16) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
@@ -1189,7 +1170,7 @@ impl Style {
     }
 
     pub fn set_scale_grad_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
@@ -1201,7 +1182,7 @@ impl Style {
     }
 
     pub fn set_scale_end_color(&mut self, state: State, value: Color) {
-        let native_state: u32 = state.bits;
+        let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),

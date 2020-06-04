@@ -128,7 +128,7 @@ macro_rules! define_object {
         }
 
         impl $item {
-            pub fn on_event<F, S>(&mut self, f: F)
+            pub fn on_event<F>(&mut self, f: F)
             where
                 F: FnMut(Self, $crate::support::Event<<Self as $crate::Object>::SpecialEvent>),
             {
@@ -162,6 +162,31 @@ macro_rules! define_object {
             }
         }
     };
+}
+
+bitflags! {
+    pub struct State: u32 {
+        /// Normal, released
+        const DEFAULT  = lvgl_sys::LV_STATE_DEFAULT;
+        /// Toggled or checked
+        const CHECKED  = lvgl_sys::LV_STATE_CHECKED;
+        /// Focused via keypad or encoder or clicked via touchpad/mouse
+        const FOCUSED  = lvgl_sys::LV_STATE_FOCUSED;
+        /// Edit by an encoder
+        const EDITED   = lvgl_sys::LV_STATE_EDITED;
+        /// Hovered by mouse (not supported now)
+        const HOVERED  = lvgl_sys::LV_STATE_HOVERED;
+        /// Pressed
+        const PRESSED  = lvgl_sys::LV_STATE_PRESSED;
+        /// Disabled or inactive
+        const DISABLED = lvgl_sys::LV_STATE_DISABLED;
+    }
+}
+
+impl State {
+    pub(crate) fn get_bits(&self) -> u32 {
+        self.bits
+    }
 }
 
 pub enum ObjPart {
