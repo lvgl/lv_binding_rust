@@ -6,8 +6,8 @@ extern crate bitflags;
 
 mod display;
 mod global;
-#[macro_use]
 mod support;
+#[macro_use]
 mod lv_core;
 pub mod widgets;
 

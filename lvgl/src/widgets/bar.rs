@@ -1,5 +1,5 @@
-use crate::support::{Animation, GenericObject, NativeObject};
-use crate::Object;
+use crate::support::Animation;
+use crate::{GenericObject, NativeObject, Object};
 use core::ptr;
 
 define_object!(Bar, part = BarPart);
