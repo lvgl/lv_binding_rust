@@ -1,3 +1,4 @@
+use crate::lv_core::style::Style;
 use alloc::boxed::Box;
 use core::convert::{TryFrom, TryInto};
 use core::mem;
@@ -109,10 +110,13 @@ pub trait Object: NativeObject {
         }
     }
 
-    fn set_style(&mut self, style: Style) {
+    fn add_style(&mut self, style: Style) {
         unsafe {
-            let boxed = Box::new(style.raw);
-            lvgl_sys::lv_obj_set_style(self.raw().as_mut(), Box::into_raw(boxed));
+            lvgl_sys::lv_obj_add_style(
+                self.raw().as_mut(),
+                lvgl_sys::LV_OBJ_PART_MAIN as u8,
+                Box::into_raw(style.raw),
+            );
         };
     }
 }
@@ -220,121 +224,9 @@ macro_rules! define_object {
     };
 }
 
-pub enum Themes {
-    Pretty,
-}
-
-bitflags! {
-    pub struct Border: u32 {
-        const NONE   = lvgl_sys::LV_BORDER_NONE;
-        const BOTTOM = lvgl_sys::LV_BORDER_BOTTOM;
-        const TOP    = lvgl_sys::LV_BORDER_TOP;
-        const LEFT   = lvgl_sys::LV_BORDER_LEFT;
-        const RIGHT  = lvgl_sys::LV_BORDER_RIGHT;
-        const FULL   = lvgl_sys::LV_BORDER_FULL;
-    }
-}
-
-pub struct Style {
-    pub(crate) raw: lvgl_sys::lv_style_t,
-}
-
-impl Style {
-    /// Object's main background color
-    pub fn set_body_main_color(&mut self, color: Color) {
-        self.raw.body.main_color = color.raw;
-    }
-
-    /// Second color. If not equal to `set_body_main_color` a gradient will be drawn for the background.
-    pub fn set_body_grad_color(&mut self, color: Color) {
-        self.raw.body.grad_color = color.raw;
-    }
-
-    /// Body radius for rounded corners
-    pub fn set_body_radius(&mut self, radius: i16) {
-        self.raw.body.radius = radius;
-    }
-
-    /// Border color
-    pub fn set_body_border_color(&mut self, color: Color) {
-        self.raw.body.border.color = color.raw;
-    }
-
-    /// Border opacity
-    pub fn set_body_border_opa(&mut self, opa: u8) {
-        self.raw.body.border.opa = opa;
-    }
-
-    /// Border width
-    pub fn set_body_border_width(&mut self, width: i16) {
-        self.raw.body.border.width = width;
-    }
-
-    /// Which borders to draw
-    pub fn set_body_border_part(&mut self, part: Border) {
-        self.raw.body.border.part = part.bits as u8;
-    }
-
-    /// Text color
-    pub fn set_text_color(&mut self, color: Color) {
-        self.raw.text.color = color.raw;
-    }
-
-    /// Font used for displaying the text
-    pub fn set_text_font(&mut self, font: &lvgl_sys::lv_font_t) {
-        self.raw.text.font = font;
-    }
-
-    /// Space between letters
-    pub fn set_text_letter_space(&mut self, space: i16) {
-        self.raw.text.letter_space = space;
-    }
-
-    /// Space between lines (vertical)
-    pub fn set_text_line_space(&mut self, space: i16) {
-        self.raw.text.line_space = space;
-    }
-
-    /// Text opacity
-    pub fn set_text_opa(&mut self, opa: u8) {
-        self.raw.text.opa = opa;
-    }
-
-    /// Text selection background color
-    pub fn set_text_sel_color(&mut self, color: Color) {
-        self.raw.text.sel_color = color.raw;
-    }
-}
-
-impl Default for Style {
-    fn default() -> Self {
-        let raw = unsafe {
-            let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
-            lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), &lvgl_sys::lv_style_pretty);
-            native_style.assume_init()
-        };
-        Self { raw }
-    }
-}
-
-impl Clone for Style {
-    fn clone(&self) -> Self {
-        let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
-        unsafe {
-            lvgl_sys::lv_style_copy(
-                native_style.as_mut_ptr(),
-                &self.raw as *const lvgl_sys::lv_style_t,
-            );
-            Self {
-                raw: native_style.assume_init(),
-            }
-        }
-    }
-}
-
 #[derive(Clone)]
 pub struct Color {
-    raw: lvgl_sys::lv_color_t,
+    pub(crate) raw: lvgl_sys::lv_color_t,
 }
 
 impl Color {

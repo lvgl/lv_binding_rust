@@ -47,11 +47,11 @@ fn main() {
     add_c_files(&mut cfg, vendor_src.join("lv_core"));
     add_c_files(&mut cfg, vendor_src.join("lv_draw"));
     add_c_files(&mut cfg, vendor_src.join("lv_font"));
+    add_c_files(&mut cfg, vendor_src.join("lv_gpu"));
     add_c_files(&mut cfg, vendor_src.join("lv_hal"));
     add_c_files(&mut cfg, vendor_src.join("lv_misc"));
-    add_c_files(&mut cfg, vendor_src.join("lv_objx"));
     add_c_files(&mut cfg, vendor_src.join("lv_themes"));
-    add_c_files(&mut cfg, vendor_src.join("lv_themes"));
+    add_c_files(&mut cfg, vendor_src.join("lv_widgets"));
     add_c_files(&mut cfg, &lv_config_dir);
     add_c_files(&mut cfg, &shims_dir);
 

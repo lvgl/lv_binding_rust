@@ -2,5 +2,6 @@
 members = [
     "lvgl",
     "lvgl-sys",
+    "lvgl-codegen",
     "examples"
 ]

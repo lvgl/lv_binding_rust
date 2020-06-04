@@ -1,4 +1,5 @@
-use crate::support::{Animation, GenericObject, NativeObject, Style};
+use crate::style::Style;
+use crate::support::{Animation, GenericObject, NativeObject};
 use crate::Object;
 use alloc::boxed::Box;
 use core::ptr;
@@ -33,12 +34,12 @@ impl Bar {
     }
 
     /// Set the style, for the given `BarComponent`
-    pub fn set_bar_style(&mut self, component: BarComponent, style: Style) {
-        let boxed = Box::new(style.raw);
+    pub fn set_bar_style(&mut self, style: Style) {
+        let boxed = style.raw;
         unsafe {
-            lvgl_sys::lv_bar_set_style(
+            lvgl_sys::lv_obj_add_style(
                 self.core.raw().as_mut(),
-                component.into(),
+                lvgl_sys::LV_OBJ_PART_MAIN as u8,
                 Box::into_raw(boxed),
             );
         }
