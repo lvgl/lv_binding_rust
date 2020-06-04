@@ -2,7 +2,6 @@ use crate::{Color, State};
 use alloc::boxed::Box;
 use core::mem;
 use cstr_core::CString;
-use lvgl_sys;
 
 pub enum Themes {
     Pretty,
@@ -25,6 +24,20 @@ impl Style {
             );
         }
     }
+
+    pub fn set_font(&mut self, state: State, value: &str) {
+        let native_state: u32 = state.get_bits();
+        let string = CString::new(value).unwrap();
+        unsafe {
+            lvgl_sys::LV_OPA_COVER;
+            lvgl_sys::_lv_style_set_ptr(
+                self.raw.as_mut(),
+                (lvgl_sys::LV_STYLE_VALUE_STR
+                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
+                string.into_raw() as *mut cty::c_void,
+            );
+        }
+    }
 }
 
 impl Default for Style {
@@ -38,15 +51,27 @@ impl Default for Style {
     }
 }
 
-impl Clone for Style {
-    fn clone(&self) -> Self {
-        let mut native_style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
-        unsafe {
-            lvgl_sys::lv_style_copy(native_style.as_mut_ptr(), self.raw.as_ref());
-            Self {
-                raw: Box::new(native_style.assume_init()),
-            }
-        }
+bitflags! {
+    pub struct Opacity: u32 {
+        const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP;
+        const OPA_0 = lvgl_sys::LV_OPA_0;
+        const OPA_10 = lvgl_sys::LV_OPA_10;
+        const OPA_20 = lvgl_sys::LV_OPA_20;
+        const OPA_30 = lvgl_sys::LV_OPA_30;
+        const OPA_40 = lvgl_sys::LV_OPA_40;
+        const OPA_50 = lvgl_sys::LV_OPA_50;
+        const OPA_60 = lvgl_sys::LV_OPA_60;
+        const OPA_70 = lvgl_sys::LV_OPA_70;
+        const OPA_80 = lvgl_sys::LV_OPA_80;
+        const OPA_90 = lvgl_sys::LV_OPA_90;
+        const OPA_100 = lvgl_sys::LV_OPA_100;
+        const OPA_COVER = lvgl_sys::LV_OPA_COVER;
+    }
+}
+
+impl Into<u8> for Opacity {
+    fn into(self) -> u8 {
+        self.bits as u8
     }
 }
 
@@ -233,14 +258,14 @@ impl Style {
         }
     }
 
-    pub fn set_opa_scale(&mut self, state: State, value: u8) {
+    pub fn set_opa_scale(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_OPA_SCALE
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -425,14 +450,14 @@ impl Style {
         }
     }
 
-    pub fn set_bg_opa(&mut self, state: State, value: u8) {
+    pub fn set_bg_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_BG_OPA | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32))
                     as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -497,14 +522,14 @@ impl Style {
         }
     }
 
-    pub fn set_border_opa(&mut self, state: State, value: u8) {
+    pub fn set_border_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_BORDER_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -557,14 +582,14 @@ impl Style {
         }
     }
 
-    pub fn set_outline_opa(&mut self, state: State, value: u8) {
+    pub fn set_outline_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_OUTLINE_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -641,14 +666,14 @@ impl Style {
         }
     }
 
-    pub fn set_shadow_opa(&mut self, state: State, value: u8) {
+    pub fn set_shadow_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_SHADOW_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -689,26 +714,26 @@ impl Style {
         }
     }
 
-    pub fn set_pattern_opa(&mut self, state: State, value: u8) {
+    pub fn set_pattern_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_PATTERN_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
 
-    pub fn set_pattern_recolor_opa(&mut self, state: State, value: u8) {
+    pub fn set_pattern_recolor_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_PATTERN_RECOLOR_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -797,14 +822,14 @@ impl Style {
         }
     }
 
-    pub fn set_value_opa(&mut self, state: State, value: u8) {
+    pub fn set_value_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_VALUE_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -881,14 +906,14 @@ impl Style {
         }
     }
 
-    pub fn set_text_opa(&mut self, state: State, value: u8) {
+    pub fn set_text_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_TEXT_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -965,14 +990,14 @@ impl Style {
         }
     }
 
-    pub fn set_line_opa(&mut self, state: State, value: u8) {
+    pub fn set_line_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_LINE_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
@@ -1001,26 +1026,26 @@ impl Style {
         }
     }
 
-    pub fn set_image_opa(&mut self, state: State, value: u8) {
+    pub fn set_image_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_IMAGE_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }
 
-    pub fn set_image_recolor_opa(&mut self, state: State, value: u8) {
+    pub fn set_image_recolor_opa(&mut self, state: State, value: Opacity) {
         let native_state: u32 = state.get_bits();
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_IMAGE_RECOLOR_OPA
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                value,
+                value.into(),
             );
         }
     }

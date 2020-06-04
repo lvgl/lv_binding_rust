@@ -7,7 +7,7 @@ pub fn set_{{func_name}}(&mut self, state: State,
     {% elif style_type == "_ptr" %}
     value: Any
     {% elif style_type == "_opa" %}
-    value: u8
+    value: Opacity
     {% endif %}
 
 ) {
@@ -23,7 +23,7 @@ pub fn set_{{func_name}}(&mut self, state: State,
             {% elif style_type == "_int" %}
                 value
             {% elif style_type == "_opa" %}
-                value
+                value.into()
             {% elif style_type == "_ptr" %}
                 value.into()
             {% endif %}

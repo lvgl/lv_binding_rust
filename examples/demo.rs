@@ -49,10 +49,6 @@ fn main() -> Result<(), String> {
     time.set_height(240);
 
     let mut bt = Label::new(&mut screen);
-    let mut style_bt = Style::default();
-    //style_bt.set_text_font(font_roboto_28);
-    let style_power = style_bt.clone();
-    bt.add_style(ObjPart::Main, style_bt);
     bt.set_width(50);
     bt.set_height(80);
     bt.set_recolor(true);
@@ -61,7 +57,6 @@ fn main() -> Result<(), String> {
     bt.set_align(&mut screen, Align::InTopLeft, 0, 0);
 
     let mut power = Label::new(&mut screen);
-    power.add_style(ObjPart::Main, style_power);
     power.set_recolor(true);
     power.set_width(80);
     power.set_height(20);
