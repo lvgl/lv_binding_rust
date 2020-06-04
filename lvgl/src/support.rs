@@ -82,34 +82,11 @@ pub trait Object: NativeObject {
     where
         C: NativeObject,
     {
-        let align = match align {
-            Align::Center => lvgl_sys::LV_ALIGN_CENTER,
-            Align::InTopLeft => lvgl_sys::LV_ALIGN_IN_TOP_LEFT,
-            Align::InTopMid => lvgl_sys::LV_ALIGN_IN_TOP_MID,
-            Align::InTopRight => lvgl_sys::LV_ALIGN_IN_TOP_RIGHT,
-            Align::InBottomLeft => lvgl_sys::LV_ALIGN_IN_BOTTOM_LEFT,
-            Align::InBottomMid => lvgl_sys::LV_ALIGN_IN_BOTTOM_MID,
-            Align::InBottomRight => lvgl_sys::LV_ALIGN_IN_BOTTOM_RIGHT,
-            Align::InLeftMid => lvgl_sys::LV_ALIGN_IN_LEFT_MID,
-            Align::InRightMid => lvgl_sys::LV_ALIGN_IN_RIGHT_MID,
-            Align::OutTopLeft => lvgl_sys::LV_ALIGN_OUT_TOP_LEFT,
-            Align::OutTopMid => lvgl_sys::LV_ALIGN_OUT_TOP_MID,
-            Align::OutTopRight => lvgl_sys::LV_ALIGN_OUT_TOP_RIGHT,
-            Align::OutBottomLeft => lvgl_sys::LV_ALIGN_OUT_BOTTOM_LEFT,
-            Align::OutBottomMid => lvgl_sys::LV_ALIGN_OUT_BOTTOM_MID,
-            Align::OutBottomRight => lvgl_sys::LV_ALIGN_OUT_BOTTOM_RIGHT,
-            Align::OutLeftTop => lvgl_sys::LV_ALIGN_OUT_LEFT_TOP,
-            Align::OutLeftMid => lvgl_sys::LV_ALIGN_OUT_LEFT_MID,
-            Align::OutLeftBottom => lvgl_sys::LV_ALIGN_OUT_LEFT_BOTTOM,
-            Align::OutRightTop => lvgl_sys::LV_ALIGN_OUT_RIGHT_TOP,
-            Align::OutRightMid => lvgl_sys::LV_ALIGN_OUT_RIGHT_MID,
-            Align::OutRightBottom => lvgl_sys::LV_ALIGN_OUT_RIGHT_BOTTOM,
-        } as lvgl_sys::lv_align_t;
         unsafe {
             lvgl_sys::lv_obj_align(
                 self.raw().as_mut(),
                 base.raw().as_mut(),
-                align,
+                align.into(),
                 x_mod as lvgl_sys::lv_coord_t,
                 y_mod as lvgl_sys::lv_coord_t,
             );
@@ -380,6 +357,35 @@ pub enum Align {
     OutRightTop,
     OutRightMid,
     OutRightBottom,
+}
+
+impl Into<u8> for Align {
+    fn into(self) -> u8 {
+        let native = match self {
+            Align::Center => lvgl_sys::LV_ALIGN_CENTER,
+            Align::InTopLeft => lvgl_sys::LV_ALIGN_IN_TOP_LEFT,
+            Align::InTopMid => lvgl_sys::LV_ALIGN_IN_TOP_MID,
+            Align::InTopRight => lvgl_sys::LV_ALIGN_IN_TOP_RIGHT,
+            Align::InBottomLeft => lvgl_sys::LV_ALIGN_IN_BOTTOM_LEFT,
+            Align::InBottomMid => lvgl_sys::LV_ALIGN_IN_BOTTOM_MID,
+            Align::InBottomRight => lvgl_sys::LV_ALIGN_IN_BOTTOM_RIGHT,
+            Align::InLeftMid => lvgl_sys::LV_ALIGN_IN_LEFT_MID,
+            Align::InRightMid => lvgl_sys::LV_ALIGN_IN_RIGHT_MID,
+            Align::OutTopLeft => lvgl_sys::LV_ALIGN_OUT_TOP_LEFT,
+            Align::OutTopMid => lvgl_sys::LV_ALIGN_OUT_TOP_MID,
+            Align::OutTopRight => lvgl_sys::LV_ALIGN_OUT_TOP_RIGHT,
+            Align::OutBottomLeft => lvgl_sys::LV_ALIGN_OUT_BOTTOM_LEFT,
+            Align::OutBottomMid => lvgl_sys::LV_ALIGN_OUT_BOTTOM_MID,
+            Align::OutBottomRight => lvgl_sys::LV_ALIGN_OUT_BOTTOM_RIGHT,
+            Align::OutLeftTop => lvgl_sys::LV_ALIGN_OUT_LEFT_TOP,
+            Align::OutLeftMid => lvgl_sys::LV_ALIGN_OUT_LEFT_MID,
+            Align::OutLeftBottom => lvgl_sys::LV_ALIGN_OUT_LEFT_BOTTOM,
+            Align::OutRightTop => lvgl_sys::LV_ALIGN_OUT_RIGHT_TOP,
+            Align::OutRightMid => lvgl_sys::LV_ALIGN_OUT_RIGHT_MID,
+            Align::OutRightBottom => lvgl_sys::LV_ALIGN_OUT_RIGHT_BOTTOM,
+        };
+        native as u8
+    }
 }
 
 pub enum Animation {
