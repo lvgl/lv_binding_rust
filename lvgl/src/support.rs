@@ -1,7 +1,6 @@
 use crate::lv_core::style::Style;
 use alloc::boxed::Box;
 use core::convert::{TryFrom, TryInto};
-use core::mem;
 use core::ptr;
 use core::ptr::NonNull;
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
@@ -32,6 +31,7 @@ impl NativeObject for GenericObject {
 /// A wrapper for all LittlevGL common operations on generic objects.
 pub trait Object: NativeObject {
     type SpecialEvent;
+    type Part: Into<u8>;
 
     /// Construct an instance of the object from a raw pointer.
     ///
@@ -39,6 +39,12 @@ pub trait Object: NativeObject {
     /// Provided the LVGL library can allocate memory this should be safe.
     ///
     unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
+
+    fn add_style(&mut self, part: Self::Part, style: Style) {
+        unsafe {
+            lvgl_sys::lv_obj_add_style(self.raw().as_mut(), part.into(), Box::into_raw(style.raw));
+        };
+    }
 
     fn set_pos(&mut self, x: i16, y: i16) {
         unsafe {
@@ -109,23 +115,28 @@ pub trait Object: NativeObject {
             );
         }
     }
-
-    fn add_style(&mut self, style: Style) {
-        unsafe {
-            lvgl_sys::lv_obj_add_style(
-                self.raw().as_mut(),
-                lvgl_sys::LV_OBJ_PART_MAIN as u8,
-                Box::into_raw(style.raw),
-            );
-        };
-    }
 }
 
 impl Object for GenericObject {
     type SpecialEvent = ();
+    type Part = ObjPart;
 
     unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
         Self { raw: raw.as_ptr() }
+    }
+}
+
+pub enum ObjPart {
+    Main,
+    All,
+}
+
+impl Into<u8> for ObjPart {
+    fn into(self) -> u8 {
+        match self {
+            ObjPart::Main => lvgl_sys::LV_OBJ_PART_MAIN as u8,
+            ObjPart::All => lvgl_sys::LV_OBJ_PART_ALL as u8,
+        }
     }
 }
 
@@ -139,48 +150,18 @@ impl Default for GenericObject {
 
 macro_rules! define_object {
     ($item:ident) => {
-        pub struct $item {
-            core: $crate::support::GenericObject,
-        }
-
-        impl $item {
-            pub fn on_event<F>(&mut self, f: F)
-            where
-                F: FnMut(
-                    Self,
-                    $crate::support::Event<<Self as $crate::support::Object>::SpecialEvent>,
-                ),
-            {
-                unsafe {
-                    let mut raw = self.raw();
-                    let obj = raw.as_mut();
-                    let user_closure = alloc::boxed::Box::new(f);
-                    obj.user_data = alloc::boxed::Box::into_raw(user_closure) as *mut cty::c_void;
-                    lvgl_sys::lv_obj_set_event_cb(
-                        obj,
-                        lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),
-                    );
-                }
-            }
-        }
-
-        impl $crate::support::NativeObject for $item {
-            fn raw(&self) -> core::ptr::NonNull<lvgl_sys::lv_obj_t> {
-                self.core.raw()
-            }
-        }
-
-        impl $crate::support::Object for $item {
-            type SpecialEvent = ();
-
-            unsafe fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
-                Self {
-                    core: $crate::support::GenericObject::from_raw(raw_pointer),
-                }
-            }
-        }
+        define_object!($item, event = (), part = $crate::support::ObjPart);
     };
-    ($item:ident, $event_type:ident) => {
+    ($item:ident, event = $event_type:ty) => {
+        define_object!($item, event = $event_type, part = $crate::support::ObjPart);
+    };
+    ($item:ident, part = $part_type:ty) => {
+        define_object!($item, event = (), part = $part_type);
+    };
+    ($item:ident, part = $part_type:ty, event = $event_type:ty) => {
+        define_object!($item, event = $event_type, part = $part_type);
+    };
+    ($item:ident, event = $event_type:ty, part = $part_type:ty) => {
         pub struct $item {
             core: $crate::support::GenericObject,
         }
@@ -214,6 +195,7 @@ macro_rules! define_object {
 
         impl $crate::support::Object for $item {
             type SpecialEvent = $event_type;
+            type Part = $part_type;
 
             unsafe fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
                 Self {
