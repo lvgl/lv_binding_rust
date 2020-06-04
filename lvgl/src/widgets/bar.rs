@@ -1,10 +1,8 @@
-use crate::style::Style;
 use crate::support::{Animation, GenericObject, NativeObject};
 use crate::Object;
-use alloc::boxed::Box;
 use core::ptr;
 
-define_object!(Bar);
+define_object!(Bar, part = BarPart);
 
 impl Bar {
     pub fn new<C>(parent: &mut C) -> Self
@@ -32,22 +30,10 @@ impl Bar {
             lvgl_sys::lv_bar_set_value(self.core.raw().as_mut(), value, anim.into());
         }
     }
-
-    /// Set the style, for the given `BarComponent`
-    pub fn set_bar_style(&mut self, style: Style) {
-        let boxed = style.raw;
-        unsafe {
-            lvgl_sys::lv_obj_add_style(
-                self.core.raw().as_mut(),
-                lvgl_sys::LV_OBJ_PART_MAIN as u8,
-                Box::into_raw(boxed),
-            );
-        }
-    }
 }
 
-/// The different components, of a bar object.
-pub enum BarComponent {
+/// The different parts, of a bar object.
+pub enum BarPart {
     /// The background of the bar.
     Background,
     /// The indicator of the bar.
@@ -55,11 +41,11 @@ pub enum BarComponent {
     Indicator,
 }
 
-impl From<BarComponent> for lvgl_sys::lv_bar_style_t {
-    fn from(component: BarComponent) -> Self {
+impl From<BarPart> for u8 {
+    fn from(component: BarPart) -> Self {
         match component {
-            BarComponent::Background => lvgl_sys::LV_BAR_STYLE_BG as u8,
-            BarComponent::Indicator => lvgl_sys::LV_BAR_STYLE_INDIC as u8,
+            BarPart::Background => lvgl_sys::LV_BAR_PART_BG as u8,
+            BarPart::Indicator => lvgl_sys::LV_BAR_PART_INDIC as u8,
         }
     }
 }

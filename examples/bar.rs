@@ -3,8 +3,9 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::widgets::{Bar, BarComponent, Label, LabelAlign};
-use lvgl::{self, Align, Animation, Border, Color, DisplayDriver, Event, Object, Style, UI};
+use lvgl::style::{State, Style};
+use lvgl::widgets::{Bar, BarPart, Label, LabelAlign};
+use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, ObjPart, Object, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
@@ -29,32 +30,20 @@ fn main() -> Result<(), String> {
     let mut screen = ui.scr_act();
 
     let mut screen_style = Style::default();
-    screen_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
-    screen_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
-    screen_style.set_body_radius(0);
-    screen.set_style(screen_style);
+    screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
+    screen_style.set_radius(State::DEFAULT, 0);
+    screen.add_style(ObjPart::Main, screen_style);
 
     // Create the bar object
     let mut bar = Bar::new(&mut screen);
-    bar.set_size(175, 50);
-    bar.set_align(&mut screen, Align::Center, 0, 20);
+    bar.set_size(175, 20);
+    bar.set_align(&mut screen, Align::Center, 0, 10);
     bar.set_range(0, 100);
-    bar.set_value(0, Animation::OFF);
 
-    // Set the indicator style for the bar object
+    // // Set the indicator style for the bar object
     let mut ind_style = Style::default();
-    ind_style.set_body_main_color(Color::from_rgb((100, 245, 0)));
-    ind_style.set_body_grad_color(Color::from_rgb((100, 245, 0)));
-    bar.set_bar_style(BarComponent::Indicator, ind_style);
-
-    // Set the background style for the bar object
-    let mut bg_style = Style::default();
-    bg_style.set_body_grad_color(Color::from_rgb((255, 255, 255)));
-    bg_style.set_body_main_color(Color::from_rgb((255, 255, 255)));
-    bg_style.set_body_radius(0);
-    bg_style.set_body_border_part(Border::TOP);
-    bg_style.set_body_border_width(1);
-    bar.set_bar_style(BarComponent::Background, bg_style);
+    ind_style.set_bg_color(State::DEFAULT, Color::from_rgb((100, 245, 100)));
+    bar.add_style(BarPart::Indicator, ind_style);
 
     let mut loading_lbl = Label::new(&mut screen);
     loading_lbl.set_text("Loading...");
@@ -62,8 +51,8 @@ fn main() -> Result<(), String> {
     loading_lbl.set_label_align(LabelAlign::Center);
 
     let mut loading_style = Style::default();
-    loading_style.set_text_color(Color::from_rgb((0, 0, 0)));
-    loading_lbl.set_style(loading_style);
+    loading_style.set_text_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
+    loading_lbl.add_style(ObjPart::Main, loading_style);
 
     let threaded_ui = Arc::new(Mutex::new(ui));
 

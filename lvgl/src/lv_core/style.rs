@@ -1,6 +1,5 @@
 use crate::Color;
 use alloc::boxed::Box;
-use core::borrow::BorrowMut;
 use core::mem;
 use cstr_core::CString;
 use lvgl_sys;
