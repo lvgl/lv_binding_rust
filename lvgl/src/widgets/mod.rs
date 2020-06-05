@@ -1,9 +1,11 @@
+mod arc;
 mod bar;
 mod btn;
 mod gauge;
 mod label;
 
-pub use self::bar::*;
-pub use self::btn::*;
-pub use self::gauge::*;
-pub use self::label::*;
+pub use arc::*;
+pub use bar::*;
+pub use btn::*;
+pub use gauge::*;
+pub use label::*;

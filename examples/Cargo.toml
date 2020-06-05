@@ -26,3 +26,7 @@ path = "button_click.rs"
 [[example]]
 name = "gauge"
 path = "gauge.rs"
+
+[[example]]
+name = "arc"
+path = "arc.rs"
