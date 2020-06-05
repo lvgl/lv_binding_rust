@@ -1,5 +1,4 @@
-use crate::{GenericObject, NativeObject, Object};
-use core::ptr;
+use crate::NativeObject;
 
 define_object!(Gauge, lv_gauge_create, part = GaugePart);
 

@@ -14,20 +14,20 @@ pub trait NativeObject {
 /// Generic LVGL object.
 ///
 /// This is the parent object of all widget types. It stores the native LVGL raw pointer.
-pub struct GenericObject {
+pub struct Obj {
     // We use a raw pointer here because we do not control this memory address, it is controlled
     // by LVGL's global state.
     raw: *mut lvgl_sys::lv_obj_t,
 }
 
-impl NativeObject for GenericObject {
+impl NativeObject for Obj {
     fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
         ptr::NonNull::new(self.raw).expect(PANIC_MESSAGE)
     }
 }
 
 /// A wrapper for all LittlevGL common operations on generic objects.
-pub trait Object: NativeObject {
+pub trait Widget: NativeObject {
     type SpecialEvent;
     type Part: Into<u8>;
 
@@ -92,7 +92,7 @@ pub trait Object: NativeObject {
     }
 }
 
-impl Object for GenericObject {
+impl Widget for Obj {
     type SpecialEvent = ();
     type Part = Part;
 
@@ -101,7 +101,7 @@ impl Object for GenericObject {
     }
 }
 
-impl Default for GenericObject {
+impl Default for Obj {
     fn default() -> Self {
         Self {
             raw: unsafe { lvgl_sys::lv_obj_create(ptr::null_mut(), ptr::null_mut()) },
@@ -124,26 +124,27 @@ macro_rules! define_object {
     };
     ($item:ident, $create_fn:ident, event = $event_type:ty, part = $part_type:ty) => {
         pub struct $item {
-            core: $crate::GenericObject,
+            core: $crate::Obj,
         }
 
         impl $item {
             pub fn new<C>(parent: &mut C) -> Self
             where
-                C: NativeObject,
+                C: $crate::NativeObject,
             {
                 unsafe {
-                    let ptr = lvgl_sys::$create_fn(parent.raw().as_mut(), ptr::null_mut());
-                    let raw = ptr::NonNull::new_unchecked(ptr);
-                    let core = GenericObject::from_raw(raw);
+                    let ptr = lvgl_sys::$create_fn(parent.raw().as_mut(), core::ptr::null_mut());
+                    let raw = core::ptr::NonNull::new_unchecked(ptr);
+                    let core = <$crate::Obj as $crate::Widget>::from_raw(raw);
                     Self { core }
                 }
             }
 
             pub fn on_event<F>(&mut self, f: F)
             where
-                F: FnMut(Self, $crate::support::Event<<Self as $crate::Object>::SpecialEvent>),
+                F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget>::SpecialEvent>),
             {
+                use $crate::NativeObject;
                 unsafe {
                     let mut raw = self.raw();
                     let obj = raw.as_mut();
@@ -163,13 +164,13 @@ macro_rules! define_object {
             }
         }
 
-        impl $crate::Object for $item {
+        impl $crate::Widget for $item {
             type SpecialEvent = $event_type;
             type Part = $part_type;
 
             unsafe fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
                 Self {
-                    core: $crate::GenericObject::from_raw(raw_pointer),
+                    core: $crate::Obj::from_raw(raw_pointer),
                 }
             }
         }

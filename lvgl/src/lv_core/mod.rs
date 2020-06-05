@@ -1,5 +1,5 @@
 #[macro_use]
-mod object;
+mod obj;
 pub mod style;
 
-pub use object::*;
+pub use obj::*;

@@ -5,7 +5,7 @@ use embedded_graphics_simulator::{
 };
 use lvgl::style::Style;
 use lvgl::widgets::{Bar, BarPart, Label, LabelAlign};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Object, Part, State, UI};
+use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;

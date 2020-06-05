@@ -102,7 +102,7 @@ List of LVGL features that impacts the library usage in general.
 - [ ] Container (lv_cont)
 - [ ] Color picker (lv_cpicker)
 - [ ] Drop-down list (lv_dropdown)
-- [ ] Gauge (lv_gauge)
+- [x] Gauge (lv_gauge)
 - [ ] Image (lv_img)
 - [ ] Image button (lv_imgbtn)
 - [ ] Keyboard (lv_keyboard)
@@ -123,7 +123,7 @@ List of LVGL features that impacts the library usage in general.
 - [ ] Tabview (lv_tabview)
 - [ ] Text area (lv_textarea)
 - [ ] Tile view (lv_tileview)
-- [ ] Window (lv_wn- [ ]
+- [ ] Window (lv_win)
 
 Widgets currently implemented might have some missing features. If the widget you want to use is not exposed or
 is missing a feature you want to make use, please send a Pull Request or open an issue.

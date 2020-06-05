@@ -5,7 +5,7 @@ use embedded_graphics_simulator::{
 };
 use lvgl::style::{Opacity, Style};
 use lvgl::widgets::{Gauge, GaugePart};
-use lvgl::{self, Align, Color, DisplayDriver, Object, Part, State, UI};
+use lvgl::{self, Align, Color, DisplayDriver, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;

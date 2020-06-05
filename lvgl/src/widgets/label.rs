@@ -1,5 +1,4 @@
-use crate::{GenericObject, NativeObject, Object};
-use core::ptr;
+use crate::NativeObject;
 use cstr_core::CString;
 
 define_object!(Label, lv_label_create);

@@ -6,7 +6,7 @@ use embedded_graphics_simulator::{
 use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Label, LabelAlign};
-use lvgl::{Align, Color, Object, Part, State, UI};
+use lvgl::{Align, Color, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;

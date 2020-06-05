@@ -1,4 +1,4 @@
-use crate::Object;
+use crate::Widget;
 use core::convert::{TryFrom, TryInto};
 use core::ptr::NonNull;
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
@@ -140,7 +140,7 @@ pub(crate) unsafe extern "C" fn event_callback<T, F>(
     obj: *mut lvgl_sys::lv_obj_t,
     event: lvgl_sys::lv_event_t,
 ) where
-    T: Object + Sized,
+    T: Widget + Sized,
     F: FnMut(T, Event<T::SpecialEvent>),
 {
     // convert the lv_event_t to lvgl-rs Event type

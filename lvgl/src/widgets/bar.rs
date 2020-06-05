@@ -1,6 +1,5 @@
 use crate::support::Animation;
-use crate::{GenericObject, NativeObject, Object};
-use core::ptr;
+use crate::NativeObject;
 
 define_object!(Bar, lv_bar_create, part = BarPart);
 
