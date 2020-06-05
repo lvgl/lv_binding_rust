@@ -1,4 +1,4 @@
 use crate::{GenericObject, NativeObject, Object};
 use core::ptr;
 
-define_object!(Button, lv_btn_create);
+define_object!(Btn, lv_btn_create);

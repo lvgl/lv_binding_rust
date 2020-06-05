@@ -4,7 +4,7 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::style::Style;
-use lvgl::widgets::{Button, Label};
+use lvgl::widgets::{Btn, Label};
 use lvgl::{self, Align, Color, DisplayDriver, Event, Object, Part, State, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
@@ -34,7 +34,7 @@ fn main() -> Result<(), String> {
     screen.add_style(Part::Main, screen_style);
 
     // Create the button
-    let mut button = Button::new(&mut screen);
+    let mut button = Btn::new(&mut screen);
     button.set_align(&mut screen, Align::InLeftMid, 30, 0);
     button.set_size(180, 80);
     let mut btn_lbl = Label::new(&mut button);
