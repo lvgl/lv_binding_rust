@@ -2,21 +2,9 @@ use crate::support::Animation;
 use crate::{GenericObject, NativeObject, Object};
 use core::ptr;
 
-define_object!(Bar, part = BarPart);
+define_object!(Bar, lv_bar_create, part = BarPart);
 
 impl Bar {
-    pub fn new<C>(parent: &mut C) -> Self
-    where
-        C: NativeObject,
-    {
-        unsafe {
-            let ptr = lvgl_sys::lv_bar_create(parent.raw().as_mut(), ptr::null_mut());
-            let raw = ptr::NonNull::new_unchecked(ptr);
-            let core = GenericObject::from_raw(raw);
-            Self { core }
-        }
-    }
-
     /// Set minimum and the maximum values of the bar
     pub fn set_range(&mut self, min: i16, max: i16) {
         unsafe {

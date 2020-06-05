@@ -2,28 +2,9 @@ use crate::{GenericObject, NativeObject, Object};
 use core::ptr;
 use cstr_core::CString;
 
-pub enum LabelAlign {
-    Left,
-    Center,
-    Right,
-    Auto,
-}
-
-define_object!(Label);
+define_object!(Label, lv_label_create);
 
 impl Label {
-    pub fn new<C>(parent: &mut C) -> Self
-    where
-        C: NativeObject,
-    {
-        unsafe {
-            let ptr = lvgl_sys::lv_label_create(parent.raw().as_mut(), ptr::null_mut());
-            let raw = ptr::NonNull::new_unchecked(ptr);
-            let core = GenericObject::from_raw(raw);
-            Self { core }
-        }
-    }
-
     pub fn set_text(&mut self, text: &str) {
         let text = CString::new(text).unwrap();
         unsafe {
@@ -48,4 +29,11 @@ impl Label {
             lvgl_sys::lv_label_set_recolor(self.core.raw().as_mut(), recolor);
         }
     }
+}
+
+pub enum LabelAlign {
+    Left,
+    Center,
+    Right,
+    Auto,
 }

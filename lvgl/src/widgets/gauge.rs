@@ -1,21 +1,9 @@
 use crate::{GenericObject, NativeObject, Object};
 use core::ptr;
 
-define_object!(Gauge, part = GaugePart);
+define_object!(Gauge, lv_gauge_create, part = GaugePart);
 
 impl Gauge {
-    pub fn new<C>(parent: &mut C) -> Self
-    where
-        C: NativeObject,
-    {
-        unsafe {
-            let ptr = lvgl_sys::lv_gauge_create(parent.raw().as_mut(), ptr::null_mut());
-            let raw = ptr::NonNull::new_unchecked(ptr);
-            let core = GenericObject::from_raw(raw);
-            Self { core }
-        }
-    }
-
     /// Set a new value on the gauge
     pub fn set_value(&mut self, needle_id: u8, value: i32) {
         unsafe {

@@ -110,24 +110,36 @@ impl Default for GenericObject {
 }
 
 macro_rules! define_object {
-    ($item:ident) => {
-        define_object!($item, event = (), part = $crate::Part);
+    ($item:ident, $create_fn:ident) => {
+        define_object!($item, $create_fn, event = (), part = $crate::Part);
     };
-    ($item:ident, event = $event_type:ty) => {
-        define_object!($item, event = $event_type, part = $crate::Part);
+    ($item:ident, $create_fn:ident, event = $event_type:ty) => {
+        define_object!($item, $create_fn, event = $event_type, part = $crate::Part);
     };
-    ($item:ident, part = $part_type:ty) => {
-        define_object!($item, event = (), part = $part_type);
+    ($item:ident, $create_fn:ident, part = $part_type:ty) => {
+        define_object!($item, $create_fn, event = (), part = $part_type);
     };
-    ($item:ident, part = $part_type:ty, event = $event_type:ty) => {
-        define_object!($item, event = $event_type, part = $part_type);
+    ($item:ident, $create_fn:ident, part = $part_type:ty, event = $event_type:ty) => {
+        define_object!($item, $create_fn, event = $event_type, part = $part_type);
     };
-    ($item:ident, event = $event_type:ty, part = $part_type:ty) => {
+    ($item:ident, $create_fn:ident, event = $event_type:ty, part = $part_type:ty) => {
         pub struct $item {
             core: $crate::GenericObject,
         }
 
         impl $item {
+            pub fn new<C>(parent: &mut C) -> Self
+            where
+                C: NativeObject,
+            {
+                unsafe {
+                    let ptr = lvgl_sys::$create_fn(parent.raw().as_mut(), ptr::null_mut());
+                    let raw = ptr::NonNull::new_unchecked(ptr);
+                    let core = GenericObject::from_raw(raw);
+                    Self { core }
+                }
+            }
+
             pub fn on_event<F>(&mut self, f: F)
             where
                 F: FnMut(Self, $crate::support::Event<<Self as $crate::Object>::SpecialEvent>),
