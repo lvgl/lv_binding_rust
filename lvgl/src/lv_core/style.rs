@@ -1,4 +1,4 @@
-use crate::{Color, State};
+use crate::{Color, LvResult, State};
 use alloc::boxed::Box;
 use core::mem;
 use cstr_core::CString;
@@ -12,9 +12,9 @@ pub struct Style {
 }
 
 impl Style {
-    pub fn set_value_str(&mut self, state: State, value: &str) {
+    pub fn set_value_str(&mut self, state: State, value: &str) -> LvResult<()> {
         let native_state: u32 = state.get_bits();
-        let string = CString::new(value).unwrap();
+        let string = CString::new(value)?;
         unsafe {
             lvgl_sys::_lv_style_set_ptr(
                 self.raw.as_mut(),
@@ -23,19 +23,7 @@ impl Style {
                 string.into_raw() as *mut cty::c_void,
             );
         }
-    }
-
-    pub fn set_font(&mut self, state: State, value: &str) {
-        let native_state: u32 = state.get_bits();
-        let string = CString::new(value).unwrap();
-        unsafe {
-            lvgl_sys::_lv_style_set_ptr(
-                self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_STR
-                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                string.into_raw() as *mut cty::c_void,
-            );
-        }
+        Ok(())
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::{DisplayDriver, Event, Obj, Widget};
+use crate::{DisplayDriver, Event, LvError, LvResult, Obj, Widget};
 use alloc::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr;
@@ -9,12 +9,6 @@ use core::time::Duration;
 // There can only be a single reference to LittlevGL library.
 static LVGL_IN_USE: AtomicBool = AtomicBool::new(false);
 
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
-pub enum LvError {
-    Uninitialized,
-    AlreadyInUse,
-}
-
 pub struct UI {
     // LittlevGL is not thread-safe by default.
     _not_sync: PhantomData<*mut ()>,
@@ -24,7 +18,7 @@ pub struct UI {
 unsafe impl Send for UI {}
 
 impl UI {
-    pub fn init() -> Result<Self, LvError> {
+    pub fn init() -> LvResult<Self> {
         if !LVGL_IN_USE.compare_and_swap(false, true, Ordering::SeqCst) {
             unsafe {
                 lvgl_sys::lv_init();
@@ -47,20 +41,21 @@ impl UI {
         }
     }
 
-    pub fn scr_act(&self) -> Obj {
+    pub fn scr_act(&self) -> LvResult<Obj> {
         unsafe {
             let screen = lvgl_sys::lv_disp_get_scr_act(ptr::null_mut());
-            Obj::from_raw(NonNull::new_unchecked(screen))
+            Ok(Obj::from_raw(NonNull::new(screen)?))
         }
     }
 
-    pub fn event_send<T>(&mut self, obj: &mut T, event: Event<T::SpecialEvent>)
+    pub fn event_send<T>(&mut self, obj: &mut T, event: Event<T::SpecialEvent>) -> LvResult<()>
     where
         T: Widget,
     {
         unsafe {
-            lvgl_sys::lv_event_send(obj.raw().as_mut(), event.into(), ptr::null_mut());
+            lvgl_sys::lv_event_send(obj.raw()?.as_mut(), event.into(), ptr::null_mut());
         }
+        Ok(())
     }
 
     pub fn tick_inc(&mut self, tick_period: Duration) {

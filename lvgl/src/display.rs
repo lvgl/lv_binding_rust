@@ -20,6 +20,7 @@ impl DisplayDriver {
             let mut display_buffer = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
 
             // Declare a buffer for the refresh rate
+            // TODO: Make this an external configuration
             const REFRESH_BUFFER_LEN: usize = 2;
             let refresh_buffer1 = Box::new(
                 MaybeUninit::<
@@ -94,13 +95,15 @@ unsafe extern "C" fn display_callback_wrapper<T, C>(
     // have an standard unwinding mechanism to rely upon.
     let display_driver = *disp_drv;
     // Rust code closure reference
-    let device = &mut *(display_driver.user_data as *mut T);
-    let x1 = (*area).x1;
-    let x2 = (*area).x2;
-    let y1 = (*area).y1;
-    let y2 = (*area).y2;
-    // TODO: Can we do anything when there is a error while flushing?
-    let _ = display_flush(device, (x1, x2), (y1, y2), color_p);
+    if !display_driver.user_data.is_null() {
+        let device = &mut *(display_driver.user_data as *mut T);
+        let x1 = (*area).x1;
+        let x2 = (*area).x2;
+        let y1 = (*area).y1;
+        let y2 = (*area).y2;
+        // TODO: Can we do anything when there is a error while flushing?
+        let _ = display_flush(device, (x1, x2), (y1, y2), color_p);
+    }
     // Indicate to LittlevGL that we are ready with the flushing
     lvgl_sys::lv_disp_flush_ready(disp_drv);
 }
@@ -136,6 +139,5 @@ where
         })
         .flatten();
 
-    // TODO: Maybe find a way to use `draw_image` method on the device instance.
     Ok(display.draw_iter(pixels)?)
 }

@@ -1,3 +1,4 @@
+#![feature(try_trait)]
 #![no_std]
 
 extern crate alloc;
@@ -12,6 +13,6 @@ mod lv_core;
 pub mod widgets;
 
 pub use display::DisplayDriver;
-pub use global::{LvError, UI};
+pub use global::UI;
 pub use lv_core::*;
 pub use support::*;

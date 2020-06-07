@@ -5,14 +5,14 @@ use embedded_graphics_simulator::{
 };
 use lvgl::style::Style;
 use lvgl::widgets::{Arc, ArcPart, Label, LabelAlign};
-use lvgl::Widget;
-use lvgl::{self, Align, Color, DisplayDriver, Event, Part, State, UI};
+use lvgl::{self, Align, Color, DisplayDriver, Part, State, UI};
+use lvgl::{LvError, Widget};
 use lvgl_sys;
 use std::sync::{mpsc, Arc as StdArc, Mutex};
 use std::thread::sleep;
 use std::time::Duration;
 
-fn main() -> Result<(), String> {
+fn main() -> Result<(), LvError> {
     let mut display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
@@ -21,35 +21,35 @@ fn main() -> Result<(), String> {
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Arc Example", &output_settings);
 
-    let mut ui = UI::init().unwrap();
+    let mut ui = UI::init()?;
 
     // Implement and register your display:
     let display_driver = DisplayDriver::new(&mut display);
     ui.disp_drv_register(display_driver);
 
     // Create screen and widgets
-    let mut screen = ui.scr_act();
+    let mut screen = ui.scr_act()?;
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
     screen_style.set_radius(State::DEFAULT, 0);
-    screen.add_style(Part::Main, screen_style);
+    screen.add_style(Part::Main, screen_style)?;
 
     // Create the arc object
-    let mut arc = Arc::new(&mut screen);
-    arc.set_size(150, 150);
-    arc.set_align(&mut screen, Align::Center, 0, 10);
-    arc.set_start_angle(135, ArcPart::Indicator);
-    arc.set_end_angle(135, ArcPart::Indicator);
+    let mut arc = Arc::new(&mut screen)?;
+    arc.set_size(150, 150)?;
+    arc.set_align(&mut screen, Align::Center, 0, 10)?;
+    arc.set_start_angle(135, ArcPart::Indicator)?;
+    arc.set_end_angle(135, ArcPart::Indicator)?;
 
-    let mut loading_lbl = Label::new(&mut screen);
-    loading_lbl.set_text("Loading...");
-    loading_lbl.set_align(&mut arc, Align::OutTopMid, 0, -10);
-    loading_lbl.set_label_align(LabelAlign::Center);
+    let mut loading_lbl = Label::new(&mut screen)?;
+    loading_lbl.set_text("Loading...")?;
+    loading_lbl.set_align(&mut arc, Align::OutTopMid, 0, -10)?;
+    loading_lbl.set_label_align(LabelAlign::Center)?;
 
     let mut loading_style = Style::default();
     loading_style.set_text_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
-    loading_lbl.add_style(Part::Main, loading_style);
+    loading_lbl.add_style(Part::Main, loading_style)?;
 
     let threaded_ui = StdArc::new(Mutex::new(ui));
 
@@ -73,13 +73,9 @@ fn main() -> Result<(), String> {
         if i > 270 {
             forward = if forward { false } else { true };
             i = 1;
-            threaded_ui
-                .lock()
-                .unwrap()
-                .event_send(&mut loading_lbl, Event::Clicked)
         }
         angle = if forward { angle + 1 } else { angle - 1 };
-        arc.set_end_angle(angle + 135, ArcPart::Indicator);
+        arc.set_end_angle(angle + 135, ArcPart::Indicator)?;
         i += 1;
 
         sleep(Duration::from_millis(10));
