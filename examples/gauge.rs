@@ -5,13 +5,13 @@ use embedded_graphics_simulator::{
 };
 use lvgl::style::{Opacity, Style};
 use lvgl::widgets::{Gauge, GaugePart};
-use lvgl::{self, Align, Color, DisplayDriver, Part, State, Widget, UI};
+use lvgl::{self, Align, Color, DisplayDriver, LvError, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
 use std::time::Duration;
 
-fn main() -> Result<(), String> {
+fn main() -> Result<(), LvError> {
     let mut display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
@@ -20,18 +20,18 @@ fn main() -> Result<(), String> {
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Gauge Example", &output_settings);
 
-    let mut ui = UI::init().unwrap();
+    let mut ui = UI::init()?;
 
     // Implement and register your display:
     let display_driver = DisplayDriver::new(&mut display);
     ui.disp_drv_register(display_driver);
 
     // Create screen and widgets
-    let mut screen = ui.scr_act();
+    let mut screen = ui.scr_act()?;
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
-    screen.add_style(Part::Main, screen_style);
+    screen.add_style(Part::Main, screen_style)?;
 
     // Create the gauge
     let mut gauge_style = Style::default();
@@ -52,10 +52,10 @@ fn main() -> Result<(), String> {
     gauge_style.set_scale_end_line_width(State::DEFAULT, 4);
     gauge_style.set_scale_end_border_width(State::DEFAULT, 4);
 
-    let mut gauge = Gauge::new(&mut screen);
-    gauge.add_style(GaugePart::Main, gauge_style);
-    gauge.set_align(&mut screen, Align::Center, 0, 0);
-    gauge.set_value(0, 50);
+    let mut gauge = Gauge::new(&mut screen)?;
+    gauge.add_style(GaugePart::Main, gauge_style)?;
+    gauge.set_align(&mut screen, Align::Center, 0, 0)?;
+    gauge.set_value(0, 50)?;
 
     let threaded_ui = Arc::new(Mutex::new(ui));
 
@@ -92,7 +92,7 @@ fn main() -> Result<(), String> {
         }
 
         sleep(Duration::from_millis(25));
-        gauge.set_value(0, i);
+        gauge.set_value(0, i)?;
 
         if i > 99 {
             i = 0;
