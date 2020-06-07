@@ -1,21 +1,23 @@
 use crate::support::Animation;
-use crate::NativeObject;
+use crate::{LvResult, NativeObject};
 
 define_object!(Bar, lv_bar_create, part = BarPart);
 
 impl Bar {
     /// Set minimum and the maximum values of the bar
-    pub fn set_range(&mut self, min: i16, max: i16) {
+    pub fn set_range(&mut self, min: i16, max: i16) -> LvResult<()> {
         unsafe {
-            lvgl_sys::lv_bar_set_range(self.core.raw().as_mut(), min, max);
+            lvgl_sys::lv_bar_set_range(self.core.raw()?.as_mut(), min, max);
         }
+        Ok(())
     }
 
     /// Set a new value on the bar
-    pub fn set_value(&mut self, value: i16, anim: Animation) {
+    pub fn set_value(&mut self, value: i16, anim: Animation) -> LvResult<()> {
         unsafe {
-            lvgl_sys::lv_bar_set_value(self.core.raw().as_mut(), value, anim.into());
+            lvgl_sys::lv_bar_set_value(self.core.raw()?.as_mut(), value, anim.into());
         }
+        Ok(())
     }
 }
 

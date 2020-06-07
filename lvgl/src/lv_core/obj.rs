@@ -1,14 +1,12 @@
 use crate::lv_core::style::Style;
-use crate::Align;
+use crate::{Align, LvError, LvResult};
 use alloc::boxed::Box;
 use core::ptr;
-
-const PANIC_MESSAGE: &str = "Value was dropped by LittlevGL";
 
 /// Represents a native LittlevGL object
 pub trait NativeObject {
     /// Provide common way to access to the underlying native object pointer.
-    fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t>;
+    fn raw(&self) -> LvResult<ptr::NonNull<lvgl_sys::lv_obj_t>>;
 }
 
 /// Generic LVGL object.
@@ -21,8 +19,12 @@ pub struct Obj {
 }
 
 impl NativeObject for Obj {
-    fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
-        ptr::NonNull::new(self.raw).expect(PANIC_MESSAGE)
+    fn raw(&self) -> LvResult<ptr::NonNull<lvgl_sys::lv_obj_t>> {
+        if let Some(non_null_ptr) = ptr::NonNull::new(self.raw) {
+            Ok(non_null_ptr)
+        } else {
+            Err(LvError::InvalidReference)
+        }
     }
 }
 
@@ -38,57 +40,63 @@ pub trait Widget: NativeObject {
     ///
     unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
 
-    fn add_style(&mut self, part: Self::Part, style: Style) {
+    fn add_style(&mut self, part: Self::Part, style: Style) -> LvResult<()> {
         unsafe {
-            lvgl_sys::lv_obj_add_style(self.raw().as_mut(), part.into(), Box::into_raw(style.raw));
+            lvgl_sys::lv_obj_add_style(self.raw()?.as_mut(), part.into(), Box::into_raw(style.raw));
         };
+        Ok(())
     }
 
-    fn set_pos(&mut self, x: i16, y: i16) {
+    fn set_pos(&mut self, x: i16, y: i16) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_set_pos(
-                self.raw().as_mut(),
+                self.raw()?.as_mut(),
                 x as lvgl_sys::lv_coord_t,
                 y as lvgl_sys::lv_coord_t,
             );
         }
+        Ok(())
     }
 
-    fn set_size(&mut self, w: i16, h: i16) {
+    fn set_size(&mut self, w: i16, h: i16) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_set_size(
-                self.raw().as_mut(),
+                self.raw()?.as_mut(),
                 w as lvgl_sys::lv_coord_t,
                 h as lvgl_sys::lv_coord_t,
             );
         }
+        Ok(())
     }
 
-    fn set_width(&mut self, w: u32) {
+    fn set_width(&mut self, w: u32) -> LvResult<()> {
         unsafe {
-            lvgl_sys::lv_obj_set_width(self.raw().as_mut(), w as lvgl_sys::lv_coord_t);
+            lvgl_sys::lv_obj_set_width(self.raw()?.as_mut(), w as lvgl_sys::lv_coord_t);
         }
+        Ok(())
     }
 
-    fn set_height(&mut self, h: u32) {
+    fn set_height(&mut self, h: u32) -> LvResult<()> {
         unsafe {
-            lvgl_sys::lv_obj_set_height(self.raw().as_mut(), h as lvgl_sys::lv_coord_t);
+            lvgl_sys::lv_obj_set_height(self.raw()?.as_mut(), h as lvgl_sys::lv_coord_t);
         }
+        Ok(())
     }
 
-    fn set_align<C>(&mut self, base: &mut C, align: Align, x_mod: i32, y_mod: i32)
+    fn set_align<C>(&mut self, base: &mut C, align: Align, x_mod: i32, y_mod: i32) -> LvResult<()>
     where
         C: NativeObject,
     {
         unsafe {
             lvgl_sys::lv_obj_align(
-                self.raw().as_mut(),
-                base.raw().as_mut(),
+                self.raw()?.as_mut(),
+                base.raw()?.as_mut(),
                 align.into(),
                 x_mod as lvgl_sys::lv_coord_t,
                 y_mod as lvgl_sys::lv_coord_t,
             );
         }
+        Ok(())
     }
 }
 
@@ -128,25 +136,25 @@ macro_rules! define_object {
         }
 
         impl $item {
-            pub fn new<C>(parent: &mut C) -> Self
+            pub fn new<C>(parent: &mut C) -> $crate::LvResult<Self>
             where
                 C: $crate::NativeObject,
             {
                 unsafe {
-                    let ptr = lvgl_sys::$create_fn(parent.raw().as_mut(), core::ptr::null_mut());
-                    let raw = core::ptr::NonNull::new_unchecked(ptr);
+                    let ptr = lvgl_sys::$create_fn(parent.raw()?.as_mut(), core::ptr::null_mut());
+                    let raw = core::ptr::NonNull::new(ptr)?;
                     let core = <$crate::Obj as $crate::Widget>::from_raw(raw);
-                    Self { core }
+                    Ok(Self { core })
                 }
             }
 
-            pub fn on_event<F>(&mut self, f: F)
+            pub fn on_event<F>(&mut self, f: F) -> $crate::LvResult<()>
             where
                 F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget>::SpecialEvent>),
             {
                 use $crate::NativeObject;
                 unsafe {
-                    let mut raw = self.raw();
+                    let mut raw = self.raw()?;
                     let obj = raw.as_mut();
                     let user_closure = alloc::boxed::Box::new(f);
                     obj.user_data = alloc::boxed::Box::into_raw(user_closure) as *mut cty::c_void;
@@ -155,11 +163,12 @@ macro_rules! define_object {
                         lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),
                     );
                 }
+                Ok(())
             }
         }
 
         impl $crate::NativeObject for $item {
-            fn raw(&self) -> core::ptr::NonNull<lvgl_sys::lv_obj_t> {
+            fn raw(&self) -> $crate::LvResult<core::ptr::NonNull<lvgl_sys::lv_obj_t>> {
                 self.core.raw()
             }
         }

@@ -1,7 +1,31 @@
 use crate::Widget;
+use bitflags::_core::option::NoneError;
 use core::convert::{TryFrom, TryInto};
 use core::ptr::NonNull;
+use cstr_core::NulError;
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
+
+pub type LvResult<T> = Result<T, LvError>;
+
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
+pub enum LvError {
+    InvalidReference,
+    Uninitialized,
+    InvalidNulByteString,
+    AlreadyInUse,
+}
+
+impl From<NoneError> for LvError {
+    fn from(_: NoneError) -> Self {
+        LvError::InvalidReference
+    }
+}
+
+impl From<NulError> for LvError {
+    fn from(_: NulError) -> Self {
+        LvError::InvalidNulByteString
+    }
+}
 
 #[derive(Clone)]
 pub struct Color {
