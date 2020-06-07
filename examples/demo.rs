@@ -6,13 +6,13 @@ use embedded_graphics_simulator::{
 use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Label, LabelAlign};
-use lvgl::{Align, Color, Part, State, Widget, UI};
+use lvgl::{Align, Color, LvError, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
 use std::time::Duration;
 
-fn main() -> Result<(), String> {
+fn main() -> Result<(), LvError> {
     let mut display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
@@ -21,14 +21,14 @@ fn main() -> Result<(), String> {
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("PineTime", &output_settings);
 
-    let mut ui = UI::init().unwrap();
+    let mut ui = UI::init()?;
 
     // Implement and register your display:
     let display_driver = lvgl::DisplayDriver::new(&mut display);
     ui.disp_drv_register(display_driver);
 
     // Create screen and widgets
-    let mut screen = ui.scr_act();
+    let mut screen = ui.scr_act()?;
 
     let font_roboto_28 = unsafe { &lvgl_sys::lv_theme_get_font_normal() };
     let font_noto_sans_numeric_28 = unsafe { &noto_sans_numeric_80 };
@@ -36,33 +36,33 @@ fn main() -> Result<(), String> {
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
     screen_style.set_radius(State::DEFAULT, 0);
-    screen.add_style(Part::Main, screen_style);
+    screen.add_style(Part::Main, screen_style)?;
 
-    let mut time = Label::new(&mut screen);
+    let mut time = Label::new(&mut screen)?;
     let mut style_time = Style::default();
     //style_time.set_text_font(font_noto_sans_numeric_28);
     style_time.set_text_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
-    time.add_style(Part::Main, style_time);
-    time.set_align(&mut screen, Align::Center, 0, 0);
-    time.set_text("20:46");
-    time.set_width(240);
-    time.set_height(240);
+    time.add_style(Part::Main, style_time)?;
+    time.set_align(&mut screen, Align::Center, 0, 0)?;
+    time.set_text("20:46")?;
+    time.set_width(240)?;
+    time.set_height(240)?;
 
-    let mut bt = Label::new(&mut screen);
-    bt.set_width(50);
-    bt.set_height(80);
-    bt.set_recolor(true);
-    bt.set_text("#5794f2 \u{F293}#");
-    bt.set_label_align(LabelAlign::Left);
-    bt.set_align(&mut screen, Align::InTopLeft, 0, 0);
+    let mut bt = Label::new(&mut screen)?;
+    bt.set_width(50)?;
+    bt.set_height(80)?;
+    bt.set_recolor(true)?;
+    bt.set_text("#5794f2 \u{F293}#")?;
+    bt.set_label_align(LabelAlign::Left)?;
+    bt.set_align(&mut screen, Align::InTopLeft, 0, 0)?;
 
-    let mut power = Label::new(&mut screen);
-    power.set_recolor(true);
-    power.set_width(80);
-    power.set_height(20);
-    power.set_text("#fade2a 20%#");
-    power.set_label_align(LabelAlign::Right);
-    power.set_align(&mut screen, Align::InTopRight, 0, 0);
+    let mut power = Label::new(&mut screen)?;
+    power.set_recolor(true)?;
+    power.set_width(80)?;
+    power.set_height(20)?;
+    power.set_text("#fade2a 20%#")?;
+    power.set_label_align(LabelAlign::Right)?;
+    power.set_align(&mut screen, Align::InTopRight, 0, 0)?;
 
     let threaded_ui = Arc::new(Mutex::new(ui));
 
@@ -83,7 +83,7 @@ fn main() -> Result<(), String> {
         if i > 59 {
             i = 0;
         }
-        time.set_text(format!("21:{:02}", i).as_str());
+        time.set_text(format!("21:{:02}", i).as_str())?;
         i = 1 + i;
 
         sleep(Duration::from_secs(1));
