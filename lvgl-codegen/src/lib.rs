@@ -48,7 +48,13 @@ impl Rusty for LvWidget {
 
     fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
         let widget_name = format_ident!("{}", to_pascal_case(self.name.as_str()));
-        let methods: Vec<TokenStream> = self.methods.iter().flat_map(|m| m.code(self)).collect();
+        let methods: Vec<TokenStream> = self
+            .methods
+            .iter()
+            .take(1)
+            .into_iter()
+            .flat_map(|m| m.code(self))
+            .collect();
         Ok(quote! {
             define_object!(#widget_name);
 

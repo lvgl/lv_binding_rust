@@ -118,36 +118,26 @@ impl Default for Obj {
 }
 
 macro_rules! define_object {
-    ($item:ident, $create_fn:ident) => {
-        define_object!($item, $create_fn, event = (), part = $crate::Part);
+    ($item:ident) => {
+        define_object!($item, event = (), part = $crate::Part);
     };
-    ($item:ident, $create_fn:ident, event = $event_type:ty) => {
-        define_object!($item, $create_fn, event = $event_type, part = $crate::Part);
+    ($item:ident, event = $event_type:ty) => {
+        define_object!($item, event = $event_type, part = $crate::Part);
     };
-    ($item:ident, $create_fn:ident, part = $part_type:ty) => {
-        define_object!($item, $create_fn, event = (), part = $part_type);
+    ($item:ident, part = $part_type:ty) => {
+        define_object!($item, event = (), part = $part_type);
     };
-    ($item:ident, $create_fn:ident, part = $part_type:ty, event = $event_type:ty) => {
-        define_object!($item, $create_fn, event = $event_type, part = $part_type);
+    ($item:ident, part = $part_type:ty, event = $event_type:ty) => {
+        define_object!($item, event = $event_type, part = $part_type);
     };
-    ($item:ident, $create_fn:ident, event = $event_type:ty, part = $part_type:ty) => {
+    ($item:ident, event = $event_type:ty, part = $part_type:ty) => {
         pub struct $item {
             core: $crate::Obj,
         }
 
-        impl $item {
-            pub fn new<C>(parent: &mut C) -> $crate::LvResult<Self>
-            where
-                C: $crate::NativeObject,
-            {
-                unsafe {
-                    let ptr = lvgl_sys::$create_fn(parent.raw()?.as_mut(), core::ptr::null_mut());
-                    let raw = core::ptr::NonNull::new(ptr)?;
-                    let core = <$crate::Obj as $crate::Widget>::from_raw(raw);
-                    Ok(Self { core })
-                }
-            }
+        unsafe impl Send for $item {}
 
+        impl $item {
             pub fn on_event<F>(&mut self, f: F) -> $crate::LvResult<()>
             where
                 F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget>::SpecialEvent>),

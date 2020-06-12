@@ -1,6 +1,7 @@
 #![feature(try_trait)]
 #![no_std]
 
+#[macro_use]
 extern crate alloc;
 #[macro_use]
 extern crate bitflags;

@@ -21,4 +21,4 @@ cty = "0.2.1"
 
 [build-dependencies]
 cc = "1.0.50"
-bindgen = "0.53.2"
+bindgen = "0.54.0"
