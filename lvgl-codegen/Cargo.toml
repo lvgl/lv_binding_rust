@@ -17,6 +17,7 @@ name = "lvgl_codegen"
 regex = "1.3.9"
 quote = "1.0.7"
 lazy_static = "1.4.0"
+clang = { path = "../../clang-rs" }
 itertools = "0.9.0"
 proc-macro2 = "1.0.18"
 Inflector = "0.11.4"

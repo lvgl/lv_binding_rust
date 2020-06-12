@@ -1,7 +1,6 @@
 use crate::support::Animation;
+use crate::widgets::Bar;
 use crate::{LvResult, NativeObject};
-
-define_object!(Bar, lv_bar_create, part = BarPart);
 
 impl Bar {
     /// Set minimum and the maximum values of the bar
