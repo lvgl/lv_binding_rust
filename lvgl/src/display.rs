@@ -1,6 +1,7 @@
 use crate::Color;
 use alloc::boxed::Box;
 use core::mem::MaybeUninit;
+use core::ptr;
 use embedded_graphics::prelude::*;
 use embedded_graphics::{drawable, DrawTarget};
 
@@ -16,32 +17,26 @@ impl DisplayDriver {
         C: PixelColor + From<Color>,
     {
         let disp_drv = unsafe {
-            // Create a display buffer for LittlevGL
-            let mut display_buffer = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
-
             // Declare a buffer for the refresh rate
             // TODO: Make this an external configuration
             const REFRESH_BUFFER_LEN: usize = 2;
-            let refresh_buffer1 = Box::new(
-                MaybeUninit::<
-                    [MaybeUninit<lvgl_sys::lv_color_t>;
-                        lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN],
-                >::uninit()
-                .assume_init(),
-            );
-            let refresh_buffer2 = Box::new(
-                MaybeUninit::<
-                    [MaybeUninit<lvgl_sys::lv_color_t>;
-                        lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN],
-                >::uninit()
-                .assume_init(),
-            );
+            let refresh_buffer1 = vec![
+                Color::from_rgb((0, 0, 0)).raw;
+                lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN
+            ];
 
+            let refresh_buffer2 = vec![
+                Color::from_rgb((0, 0, 0)).raw;
+                lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN
+            ];
+
+            // Create a display buffer for LittlevGL
+            let mut display_buffer = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
             // Initialize the display buffer
             lvgl_sys::lv_disp_buf_init(
                 display_buffer.as_mut_ptr(),
-                Box::into_raw(refresh_buffer1) as *mut cty::c_void,
-                Box::into_raw(refresh_buffer2) as *mut cty::c_void,
+                Box::into_raw(refresh_buffer1.into_boxed_slice()) as *mut cty::c_void,
+                Box::into_raw(refresh_buffer2.into_boxed_slice()) as *mut cty::c_void,
                 lvgl_sys::LV_HOR_RES_MAX * REFRESH_BUFFER_LEN as u32,
             );
             let display_buffer = Box::new(display_buffer.assume_init());
@@ -55,6 +50,7 @@ impl DisplayDriver {
             // Set your driver function
             disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
             // TODO: DrawHandler type here
+            // Safety: `user_data` is set to NULL in C code.
             disp_drv.user_data = device as *mut _ as *mut cty::c_void;
             disp_drv
         };
