@@ -1,4 +1,4 @@
-use clang::{Availability, Clang, Entity, EntityKind, Index, Linkage, Type};
+use clang::{Clang, Entity, EntityKind, Index, Linkage, Type};
 use inflector::cases::pascalcase::to_pascal_case;
 use lazy_static::lazy_static;
 use proc_macro2::{Ident, TokenStream};
@@ -17,7 +17,8 @@ lazy_static! {
         ("uint16_t", "u16"),
         ("int32_t", "i32"),
         ("uint8_t", "u8"),
-        ("bool", "bool")
+        ("bool", "bool"),
+        ("const char *", "&str"),
     ]
     .iter()
     .cloned()
@@ -111,13 +112,14 @@ impl Rusty for LvFunc {
             });
         }
 
-        // Make sure all argumets can be generated, skip the first arg (self)!
-        for arg in self.args.iter().skip(1) {
-            arg.code(self)?;
-        }
         // We don't deal with methods that return types yet
         if self.ret.is_some() {
             return Err(WrapperError::Skip);
+        }
+
+        // Make sure all arguments can be generated, skip the first arg (self)!
+        for arg in self.args.iter().skip(1) {
+            arg.code(self)?;
         }
 
         let args_decl = self
@@ -155,7 +157,7 @@ impl Rusty for LvFunc {
                 let next_arg = if i == 0 {
                     quote!(self.core.raw()?.as_mut())
                 } else {
-                    let var = arg.get_name_ident();
+                    let var = arg.get_value_usage();
                     quote!(#var)
                 };
                 if args.is_empty() {
@@ -213,7 +215,21 @@ impl LvArg {
     }
 
     pub fn get_name_ident(&self) -> Ident {
-        format_ident!("r#{}", self.name)
+        syn::parse_str::<syn::Ident>(self.name.as_str())
+            .unwrap_or_else(|_| format_ident!("r#{}", self.name.as_str()))
+    }
+
+    pub fn get_value_usage(&self) -> TokenStream {
+        let ident = self.get_name_ident();
+        if self.typ.is_str() {
+            quote! {
+                cstr_core::CString::new(#ident).unwrap().into_raw()
+            }
+        } else {
+            quote! {
+                #ident
+            }
+        }
     }
 
     pub fn get_type(&self) -> &LvType {
@@ -255,6 +271,10 @@ impl LvType {
     pub fn is_const(&self) -> bool {
         self.typ.starts_with("const ")
     }
+
+    pub fn is_str(&self) -> bool {
+        self.typ.ends_with("char *")
+    }
 }
 
 impl Rusty for LvType {
@@ -263,9 +283,14 @@ impl Rusty for LvType {
     fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
         match TYPE_MAPPINGS.get(self.typ.as_str()) {
             Some(name) => {
-                let ident = format_ident!("{}", name);
+                let val = if self.is_str() {
+                    quote!(&str)
+                } else {
+                    let ident = format_ident!("{}", name);
+                    quote!(#ident)
+                };
                 Ok(quote! {
-                    #ident
+                    #val
                 })
             }
             None => Err(WrapperError::Skip),
@@ -444,9 +469,41 @@ mod test {
 
         let code = arc_set_bg_end_angle.code(&arc_widget).unwrap();
         let expected_code = quote! {
-            pub fn set_bg_end_angle(&mut self, end: u16) -> LvResult<()> {
+            pub fn set_bg_end_angle(&mut self, end: u16) -> crate::LvResult<()> {
                 unsafe {
                     lvgl_sys::lv_arc_set_bg_end_angle(self.core.raw()?.as_mut(), end);
+                }
+                Ok(())
+            }
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_method_wrapper_for_str_types_as_argument() {
+        // void lv_label_set_text(lv_obj_t * label, const char * text)
+        let label_set_text = LvFunc::new(
+            "lv_label_set_text".to_string(),
+            vec![
+                LvArg::new("label".to_string(), LvType::new("lv_obj_t *".to_string())),
+                LvArg::new("text".to_string(), LvType::new("const char *".to_string())),
+            ],
+            None,
+        );
+        let parent_widget = LvWidget {
+            name: "label".to_string(),
+            methods: vec![],
+        };
+
+        let code = label_set_text.code(&parent_widget).unwrap();
+        let expected_code = quote! {
+            pub fn set_text(&mut self, text: &str) -> crate::LvResult<()> {
+                unsafe {
+                    lvgl_sys::lv_label_set_text(
+                        self.core.raw()?.as_mut(),
+                        cstr_core::CString::new(text).unwrap().into_raw()
+                    );
                 }
                 Ok(())
             }

@@ -17,6 +17,7 @@ itertools = "0.9.0"
 proc-macro2 = "1.0.18"
 Inflector = "0.11.4"
 lang-c = "0.8.1"
+syn = "1.0.31"
 
 [build-dependencies]
 cc = "1.0.50"
