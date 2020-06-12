@@ -62,6 +62,14 @@ $ git submodule init
 $ git submodule update 
 ```
 
+Some parts of `lvgl-rs` are auto-generated. The package `lvgl-codegen` is responsible for the generated code.
+When building from source, we need to first compile the `lvgl-codegen` tool. The `lvgl-codegen` tool is used
+automatically in the [`lvgl` package build](./lvgl/build.rs).
+
+```bash
+$ DEP_LV_CONFIG_PATH=`pwd`/examples/include cargo build --package lvgl-codegen
+```
+
 Then run the `demo` example:
 
 ```shell
@@ -80,7 +88,7 @@ List of LVGL features that impacts the library usage in general.
       draw to the display. You can use `lvgl-rs` with any of the
       [`embedded_graphics` supported displays](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/#supported-displays).
 - [x] Events: You can listen and trigger events in widget objects.
-- [x] Styles: You can set styles in any exposed object. We are still missing the possibility of defining base styles.
+- [x] Styles: You can set styles in any exposed object. We are still missing the possibility of defining global base styles.
 - [ ] Input Devices
 - [ ] Fonts
 - [ ] Images
@@ -89,41 +97,6 @@ List of LVGL features that impacts the library usage in general.
 - [ ] Tasks
 
 ### Widgets
-
-- [x] Base object (lv_obj)
-- [ ] Arc (lv_arc)
-- [x] Bar (lv_bar)
-- [x] Button (lv_btn)
-- [ ] Button matrix (lv_btnmatrix)
-- [ ] Calendar (lv_calendar)
-- [ ] Canvas (lv_canvas)
-- [ ] Checkbox (lv_cb)
-- [ ] Chart (lv_chart)
-- [ ] Container (lv_cont)
-- [ ] Color picker (lv_cpicker)
-- [ ] Drop-down list (lv_dropdown)
-- [x] Gauge (lv_gauge)
-- [ ] Image (lv_img)
-- [ ] Image button (lv_imgbtn)
-- [ ] Keyboard (lv_keyboard)
-- [x] Label (lv_label)
-- [ ] LED (lv_led)
-- [ ] Line (lv_line)
-- [ ] List (lv_list)
-- [ ] Line meter (lv_lmeter)
-- [ ] Message box (lv_msdbox)
-- [ ] Object mask (lv_objmask)
-- [ ] Page (lv_page)
-- [ ] Roller (lv_roller)
-- [ ] Slider (lv_slider)
-- [ ] Spinbox (lv_spinbox)
-- [ ] Spinner (lv_spinner)
-- [ ] Switch (lv_switch)
-- [ ] Table (lv_table)
-- [ ] Tabview (lv_tabview)
-- [ ] Text area (lv_textarea)
-- [ ] Tile view (lv_tileview)
-- [ ] Window (lv_win)
 
 Widgets currently implemented might have some missing features. If the widget you want to use is not exposed or
 is missing a feature you want to make use, please send a Pull Request or open an issue.
