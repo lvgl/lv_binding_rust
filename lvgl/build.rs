@@ -5,9 +5,14 @@ use std::process::Command;
 fn main() {
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let widgets_rs_path = manifest_dir.join("src/widgets/generated.rs");
-    let codegen_bin = manifest_dir.join("../target/debug/lvgl-codegen");
-
-    println!("rerun-if-changed={}", codegen_bin.to_string_lossy());
+    let codegen_bin = manifest_dir
+        .join("..")
+        .join("target")
+        .join("debug")
+        .join("lvgl-codegen")
+        .canonicalize()
+        .unwrap();
+    println!("cargo:rerun-if-changed={}", codegen_bin.to_string_lossy());
 
     if env::var("LVGL_FORCE_CODEGEN").is_ok() || !widgets_rs_path.exists() {
         println!("Generating `src/widgets/generated.rs`");

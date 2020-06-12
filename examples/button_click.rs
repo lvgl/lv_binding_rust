@@ -4,7 +4,7 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::style::Style;
-use lvgl::widgets::{Btn, Label, Msgbox, Spinbox};
+use lvgl::widgets::{Btn, Label};
 use lvgl::{self, Align, Color, DisplayDriver, Event, LvError, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
@@ -39,9 +39,18 @@ fn main() -> Result<(), LvError> {
     button.set_size(180, 80)?;
     let mut btn_lbl = Label::new(&mut button)?;
     btn_lbl.set_text("Click me!")?;
-    button.on_event(|_, event| {
+
+    let mut btn_state = false;
+    button.on_event(|mut btn, event| {
         if let lvgl::Event::Clicked = event {
+            if btn_state {
+                btn_lbl.set_text("Click me!").unwrap();
+            } else {
+                btn_lbl.set_text("Clicked!").unwrap();
+            }
+            btn_state = !btn_state;
             println!("Clicked!");
+            btn.toggle().unwrap();
         }
     })?;
 
