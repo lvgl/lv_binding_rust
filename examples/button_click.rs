@@ -4,7 +4,7 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::style::Style;
-use lvgl::widgets::{Btn, Label};
+use lvgl::widgets::{Btn, Label, Msgbox, Spinbox};
 use lvgl::{self, Align, Color, DisplayDriver, Event, LvError, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};

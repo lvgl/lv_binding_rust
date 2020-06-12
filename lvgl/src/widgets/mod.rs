@@ -5,7 +5,7 @@ mod label;
 
 include!("generated.rs");
 
-use crate::Widget;
+use crate::{NativeObject, Widget};
 pub use arc::*;
 pub use bar::*;
 pub use gauge::*;
