@@ -13,3 +13,4 @@ examples/demo/target/
 lvgl-sys/target/
 lvgl/target/
 lvgl-sys/src/bindings.rs
+lvgl/src/widgets/generated.rs

@@ -3,8 +3,9 @@ mod bar;
 mod gauge;
 mod label;
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+include!("generated.rs");
 
+use crate::Widget;
 pub use arc::*;
 pub use bar::*;
 pub use gauge::*;
