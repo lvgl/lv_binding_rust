@@ -1,5 +1,3 @@
-use crate::{LvResult, NativeObject};
-
 pub enum GaugePart {
     Main,
     Major,

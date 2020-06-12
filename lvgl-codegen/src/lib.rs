@@ -1,7 +1,7 @@
-use clang::{Clang, Entity, EntityKind, Index, Type};
+use clang::{Availability, Clang, Entity, EntityKind, Index, Linkage, Type};
 use inflector::cases::pascalcase::to_pascal_case;
 use lazy_static::lazy_static;
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use quote::format_ident;
 use quote::quote;
 use regex::Regex;
@@ -47,14 +47,13 @@ impl Rusty for LvWidget {
     type Parent = ();
 
     fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
+        // We don't generate for the generic Obj
+        if self.name.eq("obj") {
+            return Err(WrapperError::Skip);
+        }
+
         let widget_name = format_ident!("{}", to_pascal_case(self.name.as_str()));
-        let methods: Vec<TokenStream> = self
-            .methods
-            .iter()
-            .take(1)
-            .into_iter()
-            .flat_map(|m| m.code(self))
-            .collect();
+        let methods: Vec<TokenStream> = self.methods.iter().flat_map(|m| m.code(self)).collect();
         Ok(quote! {
             define_object!(#widget_name);
 
@@ -75,6 +74,14 @@ pub struct LvFunc {
 impl LvFunc {
     pub fn new(name: String, args: Vec<LvArg>, ret: Option<LvType>) -> Self {
         Self { name, args, ret }
+    }
+
+    pub fn is_method(&self) -> bool {
+        if self.args.len() > 0 {
+            let first_arg = &self.args[0];
+            return first_arg.typ.typ.contains("lv_obj_t");
+        }
+        false
     }
 }
 
@@ -107,6 +114,10 @@ impl Rusty for LvFunc {
         // Make sure all argumets can be generated, skip the first arg (self)!
         for arg in self.args.iter().skip(1) {
             arg.code(self)?;
+        }
+        // We don't deal with methods that return types yet
+        if self.ret.is_some() {
+            return Err(WrapperError::Skip);
         }
 
         let args_decl = self
@@ -144,7 +155,7 @@ impl Rusty for LvFunc {
                 let next_arg = if i == 0 {
                     quote!(self.core.raw()?.as_mut())
                 } else {
-                    let var = format_ident!("{}", arg.name.as_str());
+                    let var = arg.get_name_ident();
                     quote!(#var)
                 };
                 if args.is_empty() {
@@ -160,7 +171,7 @@ impl Rusty for LvFunc {
 
         // TODO: Handle methods that return types
         Ok(quote! {
-            pub fn #func_name(#args_decl) -> LvResult<()> {
+            pub fn #func_name(#args_decl) -> crate::LvResult<()> {
                 unsafe {
                     lvgl_sys::#original_func_name(#args_call);
                 }
@@ -201,6 +212,10 @@ impl LvArg {
         Self { name, typ }
     }
 
+    pub fn get_name_ident(&self) -> Ident {
+        format_ident!("r#{}", self.name)
+    }
+
     pub fn get_type(&self) -> &LvType {
         &self.typ
     }
@@ -210,7 +225,7 @@ impl Rusty for LvArg {
     type Parent = LvFunc;
 
     fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
-        let name = format_ident!("{}", self.name.as_str());
+        let name = self.get_name_ident();
         let typ = self.typ.code(self)?;
         Ok(quote! {
             #name: #typ
@@ -287,6 +302,7 @@ impl CodeGen {
             for widget_name in &widget_names {
                 if f.name
                     .starts_with(format!("{}{}", LIB_PREFIX, widget_name).as_str())
+                    && f.is_method()
                 {
                     ws.entry(widget_name.clone())
                         .or_insert_with(|| LvWidget {
@@ -335,6 +351,7 @@ impl CodeGen {
             .into_iter()
             .filter(|e| e.get_kind() == EntityKind::FunctionDecl)
             .filter(|e| e.get_name().is_some())
+            .filter(|e| e.get_linkage().unwrap() != Linkage::Internal)
             .map(|e| e.into())
             .filter(|e: &LvFunc| e.name.starts_with(LIB_PREFIX))
             .collect::<Vec<_>>();

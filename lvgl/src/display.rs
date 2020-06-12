@@ -1,7 +1,6 @@
 use crate::Color;
 use alloc::boxed::Box;
 use core::mem::MaybeUninit;
-use core::ptr;
 use embedded_graphics::prelude::*;
 use embedded_graphics::{drawable, DrawTarget};
 
