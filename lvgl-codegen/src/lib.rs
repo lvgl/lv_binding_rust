@@ -1,4 +1,5 @@
 use clang::{Clang, Entity, EntityKind, Index, Type};
+use inflector::cases::pascalcase::to_pascal_case;
 use lazy_static::lazy_static;
 use proc_macro2::TokenStream;
 use quote::format_ident;
@@ -42,6 +43,22 @@ pub struct LvWidget {
     methods: Vec<LvFunc>,
 }
 
+impl Rusty for LvWidget {
+    type Parent = ();
+
+    fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
+        let widget_name = format_ident!("{}", to_pascal_case(self.name.as_str()));
+        let methods: Vec<TokenStream> = self.methods.iter().flat_map(|m| m.code(self)).collect();
+        Ok(quote! {
+            define_object!(#widget_name);
+
+            impl #widget_name {
+                #(#methods)*
+            }
+        })
+    }
+}
+
 #[derive(Clone, Eq, PartialEq)]
 pub struct LvFunc {
     name: String,
@@ -64,6 +81,23 @@ impl Rusty for LvFunc {
         let func_name = format_ident!("{}", new_name);
         let original_func_name = format_ident!("{}", self.name.as_str());
 
+        // generate constructor
+        if new_name.eq("create") {
+            return Ok(quote! {
+                pub fn new<C>(parent: &mut C) -> crate::LvResult<Self>
+                where
+                    C: crate::NativeObject,
+                {
+                    unsafe {
+                        let ptr = lvgl_sys::#original_func_name(parent.raw()?.as_mut(), core::ptr::null_mut());
+                        let raw = core::ptr::NonNull::new(ptr)?;
+                        let core = <crate::Obj as crate::Widget>::from_raw(raw);
+                        Ok(Self { core })
+                    }
+                }
+            });
+        }
+
         // Make sure all argumets can be generated, skip the first arg (self)!
         for arg in self.args.iter().skip(1) {
             arg.code(self)?;
@@ -73,7 +107,7 @@ impl Rusty for LvFunc {
             .args
             .iter()
             .enumerate()
-            .fold(quote!(), |mut args, (i, arg)| {
+            .fold(quote!(), |args, (i, arg)| {
                 // if first arg is `const`, then it should be immutable
                 let next_arg = if i == 0 {
                     if arg.get_type().is_const() {
@@ -99,7 +133,7 @@ impl Rusty for LvFunc {
             .args
             .iter()
             .enumerate()
-            .fold(quote!(), |mut args, (i, arg)| {
+            .fold(quote!(), |args, (i, arg)| {
                 // if first arg is `const`, then it should be immutable
                 let next_arg = if i == 0 {
                     quote!(self.core.raw()?.as_mut())
@@ -169,7 +203,7 @@ impl LvArg {
 impl Rusty for LvArg {
     type Parent = LvFunc;
 
-    fn code(&self, parent: &Self::Parent) -> WrapperResult<TokenStream> {
+    fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
         let name = format_ident!("{}", self.name.as_str());
         let typ = self.typ.code(self)?;
         Ok(quote! {
@@ -234,6 +268,10 @@ impl CodeGen {
         let functions = Self::load_function_definitions()?;
         let widgets = Self::extract_widgets(&functions)?;
         Ok(Self { functions, widgets })
+    }
+
+    pub fn get_widgets(&self) -> &Vec<LvWidget> {
+        &self.widgets
     }
 
     fn extract_widgets(functions: &Vec<LvFunc>) -> CGResult<Vec<LvWidget>> {
@@ -388,6 +426,67 @@ mod test {
                     lvgl_sys::lv_arc_set_bg_end_angle(self.core.raw()?.as_mut(), end);
                 }
                 Ok(())
+            }
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_basic_widget_code() {
+        let arc_widget = LvWidget {
+            name: "arc".to_string(),
+            methods: vec![],
+        };
+
+        let code = arc_widget.code(&()).unwrap();
+        let expected_code = quote! {
+            define_object!(Arc);
+
+            impl Arc {
+
+            }
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_widget_with_constructor_code() {
+        // lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy);
+        let arc_create = LvFunc::new(
+            "lv_arc_create".to_string(),
+            vec![
+                LvArg::new("par".to_string(), LvType::new("lv_obj_t *".to_string())),
+                LvArg::new(
+                    "copy".to_string(),
+                    LvType::new("const lv_obj_t *".to_string()),
+                ),
+            ],
+            Some(LvType::new("lv_obj_t *".to_string())),
+        );
+
+        let arc_widget = LvWidget {
+            name: "arc".to_string(),
+            methods: vec![arc_create],
+        };
+
+        let code = arc_widget.code(&()).unwrap();
+        let expected_code = quote! {
+            define_object!(Arc);
+
+            impl Arc {
+                pub fn new<C>(parent: &mut C) -> crate::LvResult<Self>
+                where
+                    C: crate::NativeObject,
+                {
+                    unsafe {
+                        let ptr = lvgl_sys::lv_arc_create(parent.raw()?.as_mut(), core::ptr::null_mut());
+                        let raw = core::ptr::NonNull::new(ptr)?;
+                        let core = <crate::Obj as crate::Widget>::from_raw(raw);
+                        Ok(Self { core })
+                    }
+                }
             }
         };
 
