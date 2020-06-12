@@ -1,5 +1,6 @@
 use cc::Build;
-use std::process::Command;
+use std::ffi::OsStr;
+use std::process::{Command, Stdio};
 use std::{env, fs, path::Path, path::PathBuf};
 
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
