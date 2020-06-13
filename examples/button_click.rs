@@ -92,7 +92,7 @@ fn main() -> Result<(), LvError> {
             }
         }
 
-        sleep(Duration::from_millis(25));
+        sleep(Duration::from_millis(5));
     }
 
     stop_ch.send(true).unwrap();

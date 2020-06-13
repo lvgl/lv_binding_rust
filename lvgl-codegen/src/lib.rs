@@ -18,6 +18,7 @@ lazy_static! {
         ("int32_t", "i32"),
         ("uint8_t", "u8"),
         ("bool", "bool"),
+        ("_Bool", "bool"),
         ("const char *", "&str"),
     ]
     .iter()
@@ -148,6 +149,30 @@ impl Rusty for LvFunc {
                 }
             });
 
+        let args_processing = self
+            .args
+            .iter()
+            .enumerate()
+            .fold(quote!(), |args, (i, arg)| {
+                // if first arg is `const`, then it should be immutable
+                let next_arg = if i == 0 {
+                    quote!()
+                } else {
+                    let var = arg.get_processing();
+                    quote!(#var)
+                };
+                if args.is_empty() {
+                    quote! {
+                        #next_arg
+                    }
+                } else {
+                    quote! {
+                        #args
+                        #next_arg
+                    }
+                }
+            });
+
         let args_call = self
             .args
             .iter()
@@ -174,6 +199,7 @@ impl Rusty for LvFunc {
         // TODO: Handle methods that return types
         Ok(quote! {
             pub fn #func_name(#args_decl) -> crate::LvResult<()> {
+                #args_processing
                 unsafe {
                     lvgl_sys::#original_func_name(#args_call);
                 }
@@ -215,15 +241,30 @@ impl LvArg {
     }
 
     pub fn get_name_ident(&self) -> Ident {
+        // Filter Rust language keywords
         syn::parse_str::<syn::Ident>(self.name.as_str())
             .unwrap_or_else(|_| format_ident!("r#{}", self.name.as_str()))
+    }
+
+    pub fn get_processing(&self) -> TokenStream {
+        let ident = self.get_name_ident();
+        // TODO: A better way to handle this, instead of `is_sometype()`, is using the Rust
+        //       type system itself.
+        if self.typ.is_str() {
+            quote! {
+                let #ident = cstr_core::CString::new(#ident)?;
+            }
+        } else {
+            // No need to pre-process this type of argument
+            quote! {}
+        }
     }
 
     pub fn get_value_usage(&self) -> TokenStream {
         let ident = self.get_name_ident();
         if self.typ.is_str() {
             quote! {
-                cstr_core::CString::new(#ident).unwrap().into_raw()
+                #ident.as_ptr()
             }
         } else {
             quote! {
@@ -499,10 +540,11 @@ mod test {
         let code = label_set_text.code(&parent_widget).unwrap();
         let expected_code = quote! {
             pub fn set_text(&mut self, text: &str) -> crate::LvResult<()> {
+                let text = cstr_core::CString::new(text)?;
                 unsafe {
                     lvgl_sys::lv_label_set_text(
                         self.core.raw()?.as_mut(),
-                        cstr_core::CString::new(text).unwrap().into_raw()
+                        text.as_ptr()
                     );
                 }
                 Ok(())
