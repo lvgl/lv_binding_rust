@@ -58,7 +58,6 @@ fn main() {
     cfg.define("LV_CONF_INCLUDE_SIMPLE", Some("1"))
         .include(&vendor_src)
         .include(&vendor)
-        .file("string.c")
         .warnings(false)
         .include(&lv_config_dir)
         .compile("lvgl");
