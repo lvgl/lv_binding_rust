@@ -9,7 +9,6 @@ license = "MIT"
 readme = "../README.md"
 categories = ["api-bindings", "embedded", "gui", "no-std"]
 keywords = ["littlevgl", "lvgl", "graphical_interfaces"]
-include = ["Cargo.toml", "src/**/*", "src/widgets/generated.rs"]
 build = "build.rs"
 
 [dependencies]
