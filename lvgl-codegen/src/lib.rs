@@ -1,4 +1,3 @@
-use clang::{Clang, Entity, EntityKind, Index, Linkage, Type};
 use inflector::cases::pascalcase::to_pascal_case;
 use lazy_static::lazy_static;
 use proc_macro2::{Ident, TokenStream};
@@ -7,6 +6,8 @@ use quote::quote;
 use regex::Regex;
 use std::collections::HashMap;
 use std::error::Error;
+use syn::export::ToTokens;
+use syn::{FnArg, ForeignItem, ForeignItemFn, Item, ReturnType};
 
 type CGResult<T> = Result<T, Box<dyn Error>>;
 
@@ -39,7 +40,7 @@ pub trait Rusty {
     fn code(&self, parent: &Self::Parent) -> WrapperResult<TokenStream>;
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone)]
 pub struct LvWidget {
     name: String,
     methods: Vec<LvFunc>,
@@ -66,7 +67,7 @@ impl Rusty for LvWidget {
     }
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone)]
 pub struct LvFunc {
     name: String,
     args: Vec<LvArg>,
@@ -81,7 +82,7 @@ impl LvFunc {
     pub fn is_method(&self) -> bool {
         if self.args.len() > 0 {
             let first_arg = &self.args[0];
-            return first_arg.typ.typ.contains("lv_obj_t");
+            return first_arg.typ.literal_name.contains("lv_obj_t");
         }
         false
     }
@@ -209,30 +210,42 @@ impl Rusty for LvFunc {
     }
 }
 
-impl From<Entity<'_>> for LvFunc {
-    fn from(entity: Entity) -> Self {
-        let result = entity.get_result_type().unwrap().get_display_name();
-        let ret_type = match result.as_str() {
-            "void" => None,
-            _ => Some(LvType::new(result)),
+impl From<ForeignItemFn> for LvFunc {
+    fn from(ffi: ForeignItemFn) -> Self {
+        let ret = match ffi.sig.output {
+            ReturnType::Default => None,
+            ReturnType::Type(_, typ) => Some(typ.into()),
         };
         Self::new(
-            entity.get_name().unwrap(),
-            entity
-                .get_arguments()
-                .unwrap()
+            ffi.sig.ident.to_string(),
+            ffi.sig
+                .inputs
                 .iter()
-                .map(|e| e.into())
+                .filter_map(|fa| {
+                    // Since we know those are foreign functions, we only care about typed arguments
+                    if let FnArg::Typed(tya) = fa {
+                        Some(tya)
+                    } else {
+                        None
+                    }
+                })
+                .map(|a| a.clone().into())
                 .collect::<Vec<LvArg>>(),
-            ret_type,
+            ret,
         )
     }
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone)]
 pub struct LvArg {
     name: String,
     typ: LvType,
+}
+
+impl From<syn::PatType> for LvArg {
+    fn from(fa: syn::PatType) -> Self {
+        Self::new(fa.pat.to_token_stream().to_string(), fa.ty.into())
+    }
 }
 
 impl LvArg {
@@ -290,31 +303,33 @@ impl Rusty for LvArg {
     }
 }
 
-impl From<&Entity<'_>> for LvArg {
-    fn from(entity: &Entity) -> Self {
-        Self::new(
-            entity.get_name().unwrap(),
-            entity.get_type().unwrap().into(),
-        )
-    }
-}
-
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone)]
 pub struct LvType {
-    typ: String,
+    literal_name: String,
+    r_type: Option<Box<syn::Type>>,
 }
 
 impl LvType {
-    pub fn new(typ: String) -> Self {
-        Self { typ }
+    pub fn new(literal_name: String) -> Self {
+        Self {
+            literal_name,
+            r_type: None,
+        }
+    }
+
+    pub fn from(r_type: Box<syn::Type>) -> Self {
+        Self {
+            literal_name: r_type.to_token_stream().to_string(),
+            r_type: Some(r_type),
+        }
     }
 
     pub fn is_const(&self) -> bool {
-        self.typ.starts_with("const ")
+        self.literal_name.starts_with("const ")
     }
 
     pub fn is_str(&self) -> bool {
-        self.typ.ends_with("char *")
+        self.literal_name.ends_with("char *")
     }
 }
 
@@ -322,7 +337,7 @@ impl Rusty for LvType {
     type Parent = LvArg;
 
     fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
-        match TYPE_MAPPINGS.get(self.typ.as_str()) {
+        match TYPE_MAPPINGS.get(self.literal_name.as_str()) {
             Some(name) => {
                 let val = if self.is_str() {
                     quote!(&str)
@@ -339,9 +354,9 @@ impl Rusty for LvType {
     }
 }
 
-impl From<Type<'_>> for LvType {
-    fn from(ty: Type) -> Self {
-        Self::new(ty.get_display_name())
+impl From<Box<syn::Type>> for LvType {
+    fn from(t: Box<syn::Type>) -> Self {
+        Self::from(t)
     }
 }
 
@@ -351,8 +366,8 @@ pub struct CodeGen {
 }
 
 impl CodeGen {
-    pub fn new() -> CGResult<Self> {
-        let functions = Self::load_function_definitions()?;
+    pub fn from(code: &str) -> CGResult<Self> {
+        let functions = Self::load_func_defs(code)?;
         let widgets = Self::extract_widgets(&functions)?;
         Ok(Self { functions, widgets })
     }
@@ -405,23 +420,31 @@ impl CodeGen {
             .collect::<Vec<_>>()
     }
 
-    pub fn load_function_definitions() -> CGResult<Vec<LvFunc>> {
-        let clang = Clang::new()?;
-        let index = Index::new(&clang, false, false);
-        let tu = index
-            .parser(concat!(env!("OUT_DIR"), "/lvgl_full.c"))
-            .parse()?;
-        let entities = tu
-            .get_entity()
-            .get_children()
+    pub fn load_func_defs(bindgen_code: &str) -> CGResult<Vec<LvFunc>> {
+        let ast: syn::File = syn::parse_str(bindgen_code)?;
+        let fns = ast
+            .items
             .into_iter()
-            .filter(|e| e.get_kind() == EntityKind::FunctionDecl)
-            .filter(|e| e.get_name().is_some())
-            .filter(|e| e.get_linkage().unwrap() != Linkage::Internal)
-            .map(|e| e.into())
-            .filter(|e: &LvFunc| e.name.starts_with(LIB_PREFIX))
-            .collect::<Vec<_>>();
-        Ok(entities)
+            .filter_map(|e| {
+                if let Item::ForeignMod(fm) = e {
+                    Some(fm)
+                } else {
+                    None
+                }
+            })
+            .flat_map(|e| {
+                e.items.into_iter().filter_map(|it| {
+                    if let ForeignItem::Fn(f) = it {
+                        Some(f)
+                    } else {
+                        None
+                    }
+                })
+            })
+            .filter(|ff| ff.sig.ident.to_string().starts_with(LIB_PREFIX))
+            .map(|ff| ff.into())
+            .collect::<Vec<LvFunc>>();
+        Ok(fns)
     }
 
     pub fn get_function_names(&self) -> CGResult<Vec<String>> {
@@ -435,11 +458,21 @@ mod test {
     use quote::quote;
 
     #[test]
-    fn can_list_functions() {
-        let lv = CodeGen::new().unwrap();
-        let func = String::from("lv_obj_create");
-        let func_names = lv.get_function_names().unwrap();
-        assert!(func_names.contains(&func));
+    fn can_load_bindgen_fns() {
+        let bindgen_code = quote! {
+            extern "C" {
+                #[doc = " Return with the screen of an object"]
+                #[doc = " @param obj pointer to an object"]
+                #[doc = " @return pointer to a screen"]
+                pub fn lv_obj_get_screen(obj: *const lv_obj_t) -> *mut lv_obj_t;
+            }
+        };
+
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let ffn = cg.get(0).unwrap();
+        assert_eq!(ffn.name, "lv_obj_get_screen");
+        assert_eq!(ffn.args[0].name, "obj");
     }
 
     #[test]
