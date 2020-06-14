@@ -62,14 +62,6 @@ $ git submodule init
 $ git submodule update 
 ```
 
-Some parts of `lvgl-rs` are auto-generated. The package `lvgl-codegen` is responsible for the generated code.
-When building from source, we need to first compile the `lvgl-codegen` tool. The `lvgl-codegen` tool is used
-automatically in the [`lvgl` package build](./lvgl/build.rs).
-
-```bash
-$ DEP_LV_CONFIG_PATH=`pwd`/examples/include cargo build --package lvgl-codegen
-```
-
 Then run the `demo` example:
 
 ```shell
