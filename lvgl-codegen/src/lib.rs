@@ -15,12 +15,11 @@ const LIB_PREFIX: &str = "lv_";
 
 lazy_static! {
     static ref TYPE_MAPPINGS: HashMap<&'static str, &'static str> = [
-        ("uint16_t", "u16"),
-        ("int32_t", "i32"),
-        ("uint8_t", "u8"),
+        ("u16", "u16"),
+        ("i32", "i32"),
+        ("u8", "u8"),
         ("bool", "bool"),
-        ("_Bool", "bool"),
-        ("const char *", "&str"),
+        ("* const cty :: c_char", "&str"),
     ]
     .iter()
     .cloned()
@@ -329,7 +328,7 @@ impl LvType {
     }
 
     pub fn is_str(&self) -> bool {
-        self.literal_name.ends_with("char *")
+        self.literal_name.ends_with("* const cty :: c_char")
     }
 }
 
@@ -527,12 +526,12 @@ mod test {
 
     #[test]
     fn generate_method_wrapper() {
-        // void lv_arc_set_bg_end_angle(lv_obj_t * arc, uint16_t end);
+        // pub fn lv_arc_set_bg_end_angle(arc: *mut lv_obj_t, end: u16);
         let arc_set_bg_end_angle = LvFunc::new(
             "lv_arc_set_bg_end_angle".to_string(),
             vec![
-                LvArg::new("arc".to_string(), LvType::new("lv_obj_t *".to_string())),
-                LvArg::new("end".to_string(), LvType::new("uint16_t".to_string())),
+                LvArg::new("arc".to_string(), LvType::new("*mut lv_obj_t".to_string())),
+                LvArg::new("end".to_string(), LvType::new("u16".to_string())),
             ],
             None,
         );
@@ -556,15 +555,17 @@ mod test {
 
     #[test]
     fn generate_method_wrapper_for_str_types_as_argument() {
-        // void lv_label_set_text(lv_obj_t * label, const char * text)
-        let label_set_text = LvFunc::new(
-            "lv_label_set_text".to_string(),
-            vec![
-                LvArg::new("label".to_string(), LvType::new("lv_obj_t *".to_string())),
-                LvArg::new("text".to_string(), LvType::new("const char *".to_string())),
-            ],
-            None,
-        );
+        let bindgen_code = quote! {
+            extern "C" {
+                #[doc = " Set a new text for a label. Memory will be allocated to store the text by the label."]
+                #[doc = " @param label pointer to a label object"]
+                #[doc = " @param text '\\0' terminated character string. NULL to refresh with the current text."]
+                pub fn lv_label_set_text(label: *mut lv_obj_t, text: *const cty::c_char);
+            }
+        };
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let label_set_text = cg.get(0).unwrap().clone();
         let parent_widget = LvWidget {
             name: "label".to_string(),
             methods: vec![],
@@ -608,17 +609,17 @@ mod test {
 
     #[test]
     fn generate_widget_with_constructor_code() {
-        // lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy);
+        // pub fn lv_arc_create(par: *mut lv_obj_t, copy: *const lv_obj_t) -> *mut lv_obj_t;
         let arc_create = LvFunc::new(
             "lv_arc_create".to_string(),
             vec![
-                LvArg::new("par".to_string(), LvType::new("lv_obj_t *".to_string())),
+                LvArg::new("par".to_string(), LvType::new("*mut lv_obj_t".to_string())),
                 LvArg::new(
                     "copy".to_string(),
-                    LvType::new("const lv_obj_t *".to_string()),
+                    LvType::new("*const lv_obj_t".to_string()),
                 ),
             ],
-            Some(LvType::new("lv_obj_t *".to_string())),
+            Some(LvType::new("*mut lv_obj_t".to_string())),
         );
 
         let arc_widget = LvWidget {
