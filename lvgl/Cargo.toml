@@ -18,3 +18,9 @@ embedded-graphics = "0.6.2"
 cstr_core = { version = "0.2.0", default-features = false, features = ["alloc"] }
 bitflags = "1.2.1"
 
+[build-dependencies]
+quote = "1.0.7"
+proc-macro2 = "1.0.18"
+lvgl-codegen = { version = "0.1.0", path = "../lvgl-codegen" }
+lvgl-sys = { path = "../lvgl-sys", version = "0.2.0" }
+
