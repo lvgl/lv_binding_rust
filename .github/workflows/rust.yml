@@ -8,7 +8,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  DEP_LV_CONFIG_PATH: examples/include
+  DEP_LV_CONFIG_PATH: ./examples/include
 
 jobs:
   build:
