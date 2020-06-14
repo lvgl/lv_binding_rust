@@ -53,7 +53,7 @@ fn main() -> Result<(), LvError> {
     gauge_style.set_scale_end_border_width(State::DEFAULT, 4);
 
     let mut gauge = Gauge::new(&mut screen)?;
-    gauge.add_style(GaugePart::Main, gauge_style)?;
+    gauge.add_style(Part::Main, gauge_style)?;
     gauge.set_align(&mut screen, Align::Center, 0, 0)?;
     gauge.set_value(0, 50)?;
 

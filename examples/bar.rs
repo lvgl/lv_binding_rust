@@ -43,7 +43,7 @@ fn main() -> Result<(), LvError> {
     // // Set the indicator style for the bar object
     let mut ind_style = Style::default();
     ind_style.set_bg_color(State::DEFAULT, Color::from_rgb((100, 245, 100)));
-    bar.add_style(BarPart::Indicator, ind_style)?;
+    bar.add_style(Part::All, ind_style)?;
 
     let mut loading_lbl = Label::new(&mut screen)?;
     loading_lbl.set_text("Loading...")?;

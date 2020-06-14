@@ -39,8 +39,8 @@ fn main() -> Result<(), LvError> {
     let mut arc = Arc::new(&mut screen)?;
     arc.set_size(150, 150)?;
     arc.set_align(&mut screen, Align::Center, 0, 10)?;
-    arc.set_start_angle(135, ArcPart::Indicator)?;
-    arc.set_end_angle(135, ArcPart::Indicator)?;
+    arc.set_start_angle(135)?;
+    arc.set_end_angle(135)?;
 
     let mut loading_lbl = Label::new(&mut screen)?;
     loading_lbl.set_text("Loading...")?;
@@ -75,7 +75,7 @@ fn main() -> Result<(), LvError> {
             i = 1;
         }
         angle = if forward { angle + 1 } else { angle - 1 };
-        arc.set_end_angle(angle + 135, ArcPart::Indicator)?;
+        arc.set_end_angle(angle + 135)?;
         i += 1;
 
         sleep(Duration::from_millis(10));

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use core::{mem, ptr, slice, usize};
+use core::{ptr, usize};
 use cty::*;
 
 #[no_mangle]
@@ -147,37 +147,13 @@ pub unsafe extern "C" fn strncpy(dst: *mut c_char, src: *const c_char, n: size_t
 #[no_mangle]
 pub unsafe extern "C" fn strrchr(s: *const c_char, c: c_int) -> *mut c_char {
     let len = strlen(s) as isize;
-    let c = c as i8;
+    let c = c as c_char;
     let mut i = len - 1;
     while i >= 0 {
         if *s.offset(i) == c {
             return s.offset(i) as *mut c_char;
         }
         i -= 1;
-    }
-    ptr::null_mut()
-}
-
-unsafe fn inner_strstr(
-    mut haystack: *const c_char,
-    needle: *const c_char,
-    mask: c_char,
-) -> *mut c_char {
-    while *haystack != 0 {
-        let mut i = 0;
-        loop {
-            if *needle.offset(i) == 0 {
-                // We reached the end of the needle, everything matches this far
-                return haystack as *mut c_char;
-            }
-            if *haystack.offset(i) & mask != *needle.offset(i) & mask {
-                break;
-            }
-
-            i += 1;
-        }
-
-        haystack = haystack.offset(1);
     }
     ptr::null_mut()
 }
