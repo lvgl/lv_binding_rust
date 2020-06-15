@@ -19,7 +19,7 @@ lazy_static! {
         ("i32", "i32"),
         ("u8", "u8"),
         ("bool", "bool"),
-        ("* const cty :: c_char", "&str"),
+        ("* const cty :: c_char", "_"),
     ]
     .iter()
     .cloned()
@@ -259,17 +259,11 @@ impl LvArg {
     }
 
     pub fn get_processing(&self) -> TokenStream {
-        let ident = self.get_name_ident();
         // TODO: A better way to handle this, instead of `is_sometype()`, is using the Rust
         //       type system itself.
-        if self.typ.is_str() {
-            quote! {
-                let #ident = cstr_core::CString::new(#ident)?;
-            }
-        } else {
-            // No need to pre-process this type of argument
-            quote! {}
-        }
+
+        // No need to pre-process this type of argument
+        quote! {}
     }
 
     pub fn get_value_usage(&self) -> TokenStream {
@@ -339,7 +333,7 @@ impl Rusty for LvType {
         match TYPE_MAPPINGS.get(self.literal_name.as_str()) {
             Some(name) => {
                 let val = if self.is_str() {
-                    quote!(&str)
+                    quote!(&cstr_core::CStr)
                 } else {
                     let ident = format_ident!("{}", name);
                     quote!(#ident)
@@ -573,8 +567,8 @@ mod test {
 
         let code = label_set_text.code(&parent_widget).unwrap();
         let expected_code = quote! {
-            pub fn set_text(&mut self, text: &str) -> crate::LvResult<()> {
-                let text = cstr_core::CString::new(text)?;
+
+            pub fn set_text(&mut self, text: &cstr_core::CStr) -> crate::LvResult<()> {
                 unsafe {
                     lvgl_sys::lv_label_set_text(
                         self.core.raw()?.as_mut(),
@@ -583,6 +577,7 @@ mod test {
                 }
                 Ok(())
             }
+
         };
 
         assert_eq!(code.to_string(), expected_code.to_string());

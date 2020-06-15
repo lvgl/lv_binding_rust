@@ -12,6 +12,8 @@ pub enum LvError {
     InvalidReference,
     Uninitialized,
     InvalidNulByteString,
+    StringSizeTooShort,
+    StringCannotAppendNulByte,
     AlreadyInUse,
 }
 

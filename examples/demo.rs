@@ -1,3 +1,4 @@
+use cstr_core::{CStr, CString};
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
@@ -44,7 +45,7 @@ fn main() -> Result<(), LvError> {
     style_time.set_text_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
     time.add_style(Part::Main, style_time)?;
     time.set_align(&mut screen, Align::Center, 0, 0)?;
-    time.set_text("20:46")?;
+    time.set_text(CString::new("20:46").unwrap().as_c_str())?;
     time.set_width(240)?;
     time.set_height(240)?;
 
@@ -52,15 +53,29 @@ fn main() -> Result<(), LvError> {
     bt.set_width(50)?;
     bt.set_height(80)?;
     bt.set_recolor(true)?;
-    bt.set_text("#5794f2 \u{F293}#")?;
+    bt.set_text(CString::new("#5794f2 \u{F293}#").unwrap().as_c_str())?;
     bt.set_label_align(LabelAlign::Left)?;
     bt.set_align(&mut screen, Align::InTopLeft, 0, 0)?;
+
+    fn set_text<S>(text: S) -> Result<(), ()>
+    where
+        S: AsRef<cstr_core::CStr>,
+    {
+        let _v: *const i8 = text.as_ref().as_ptr();
+        Ok(())
+    }
+
+    let mut t: heapless::String<heapless::consts::U8> = heapless::String::from("test");
+    t.push('\0').unwrap();
+    set_text(CStr::from_bytes_with_nul(t.as_bytes()).unwrap()).unwrap();
+    set_text(CStr::from_bytes_with_nul("test\0".as_bytes()).unwrap()).unwrap();
+    set_text(cstr_core::CString::new("test").unwrap().as_c_str()).unwrap();
 
     let mut power = Label::new(&mut screen)?;
     power.set_recolor(true)?;
     power.set_width(80)?;
     power.set_height(20)?;
-    power.set_text("#fade2a 20%#")?;
+    power.set_text(CString::new("#fade2a 20%#").unwrap().as_c_str())?;
     power.set_label_align(LabelAlign::Right)?;
     power.set_align(&mut screen, Align::InTopRight, 0, 0)?;
 
@@ -83,7 +98,8 @@ fn main() -> Result<(), LvError> {
         if i > 59 {
             i = 0;
         }
-        time.set_text(format!("21:{:02}", i).as_str())?;
+        let val = format!("21:{:02}", i);
+        time.set_text(CString::new(val.as_str()).unwrap().as_c_str())?;
         i = 1 + i;
 
         sleep(Duration::from_secs(1));
