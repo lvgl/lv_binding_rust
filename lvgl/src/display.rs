@@ -19,23 +19,21 @@ impl DisplayDriver {
             // Declare a buffer for the refresh rate
             // TODO: Make this an external configuration
             const REFRESH_BUFFER_LEN: usize = 2;
-            let refresh_buffer1 = vec![
-                Color::from_rgb((0, 0, 0)).raw;
-                lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN
-            ];
+            const BUF_SIZE: usize = lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN;
 
-            let refresh_buffer2 = vec![
-                Color::from_rgb((0, 0, 0)).raw;
-                lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN
-            ];
+            let refresh_buffer1: [lvgl_sys::lv_color_t; BUF_SIZE] =
+                [Color::from_rgb((0, 0, 0)).raw; BUF_SIZE];
+
+            let refresh_buffer2: [lvgl_sys::lv_color_t; BUF_SIZE] =
+                [Color::from_rgb((0, 0, 0)).raw; BUF_SIZE];
 
             // Create a display buffer for LittlevGL
             let mut display_buffer = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
             // Initialize the display buffer
             lvgl_sys::lv_disp_buf_init(
                 display_buffer.as_mut_ptr(),
-                Box::into_raw(refresh_buffer1.into_boxed_slice()) as *mut cty::c_void,
-                Box::into_raw(refresh_buffer2.into_boxed_slice()) as *mut cty::c_void,
+                Box::into_raw(Box::new(refresh_buffer1)) as *mut cty::c_void,
+                Box::into_raw(Box::new(refresh_buffer2)) as *mut cty::c_void,
                 lvgl_sys::LV_HOR_RES_MAX * REFRESH_BUFFER_LEN as u32,
             );
             let display_buffer = Box::new(display_buffer.assume_init());

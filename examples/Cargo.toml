@@ -10,6 +10,9 @@ lvgl = { path = "../lvgl" }
 lvgl-sys = { path = "../lvgl-sys" }
 embedded-graphics = "0.6"
 embedded-graphics-simulator = "0.2.0"
+heapless = "0.5.5"
+cstr_core = { version = "0.2.0" }
+typenum = "1.12.0"
 
 [[example]]
 name = "demo"

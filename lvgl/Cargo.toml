@@ -17,6 +17,8 @@ cty = "0.2.1"
 embedded-graphics = "0.6.2"
 cstr_core = { version = "0.2.0", default-features = false, features = ["alloc"] }
 bitflags = "1.2.1"
+heapless = "0.5.5"
+typenum = "1.12.0"
 
 [build-dependencies]
 quote = "1.0.7"
