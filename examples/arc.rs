@@ -1,11 +1,12 @@
+use cstr_core::CString;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::style::Style;
-use lvgl::widgets::{Arc, ArcPart, Label, LabelAlign};
-use lvgl::{self, Align, Color, DisplayDriver, Part, State, UI};
+use lvgl::widgets::{Arc, Label, LabelAlign};
+use lvgl::{self, Align, Color, Part, State, UI};
 use lvgl::{LvError, Widget};
 use lvgl_sys;
 use std::sync::{mpsc, Arc as StdArc, Mutex};
@@ -13,7 +14,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 fn main() -> Result<(), LvError> {
-    let mut display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
+    let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
     ));
@@ -24,8 +25,7 @@ fn main() -> Result<(), LvError> {
     let mut ui = UI::init()?;
 
     // Implement and register your display:
-    let display_driver = DisplayDriver::new(&mut display);
-    ui.disp_drv_register(display_driver);
+    ui.disp_drv_register(display)?;
 
     // Create screen and widgets
     let mut screen = ui.scr_act()?;
@@ -43,7 +43,7 @@ fn main() -> Result<(), LvError> {
     arc.set_end_angle(135)?;
 
     let mut loading_lbl = Label::new(&mut screen)?;
-    loading_lbl.set_text("Loading...")?;
+    loading_lbl.set_text(CString::new("Loading...").unwrap().as_c_str())?;
     loading_lbl.set_align(&mut arc, Align::OutTopMid, 0, -10)?;
     loading_lbl.set_label_align(LabelAlign::Center)?;
 
@@ -78,11 +78,13 @@ fn main() -> Result<(), LvError> {
         arc.set_end_angle(angle + 135)?;
         i += 1;
 
-        sleep(Duration::from_millis(10));
+        sleep(Duration::from_millis(50));
 
-        threaded_ui.lock().unwrap().task_handler();
-
-        window.update(&display);
+        let mut ui = threaded_ui.lock().unwrap();
+        ui.task_handler();
+        if let Some(disp) = ui.get_display_ref() {
+            window.update(disp);
+        }
 
         for event in window.events() {
             match event {

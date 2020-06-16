@@ -4,15 +4,15 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::style::{Opacity, Style};
-use lvgl::widgets::{Gauge, GaugePart};
-use lvgl::{self, Align, Color, DisplayDriver, LvError, Part, State, Widget, UI};
+use lvgl::widgets::Gauge;
+use lvgl::{self, Align, Color, LvError, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
 use std::time::Duration;
 
 fn main() -> Result<(), LvError> {
-    let mut display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
+    let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
     ));
@@ -23,8 +23,7 @@ fn main() -> Result<(), LvError> {
     let mut ui = UI::init()?;
 
     // Implement and register your display:
-    let display_driver = DisplayDriver::new(&mut display);
-    ui.disp_drv_register(display_driver);
+    ui.disp_drv_register(display)?;
 
     // Create screen and widgets
     let mut screen = ui.scr_act()?;
@@ -75,9 +74,12 @@ fn main() -> Result<(), LvError> {
 
     let mut i = 0;
     'running: loop {
-        threaded_ui.lock().unwrap().task_handler();
+        let mut ui = threaded_ui.lock().unwrap();
+        ui.task_handler();
+        if let Some(disp) = ui.get_display_ref() {
+            window.update(disp);
+        }
 
-        window.update(&display);
         for event in window.events() {
             match event {
                 SimulatorEvent::MouseButtonUp {
