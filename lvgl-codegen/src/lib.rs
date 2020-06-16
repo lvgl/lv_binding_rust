@@ -99,6 +99,7 @@ impl Rusty for LvFunc {
         // generate constructor
         if new_name.as_str().eq("create") {
             return Ok(quote! {
+
                 pub fn new<C>(parent: &mut C) -> crate::LvResult<Self>
                 where
                     C: crate::NativeObject,
@@ -113,6 +114,7 @@ impl Rusty for LvFunc {
                         }
                     }
                 }
+
             });
         }
 
