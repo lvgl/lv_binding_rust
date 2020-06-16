@@ -5,7 +5,7 @@ mod label;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
-use crate::{NativeObject, Widget};
+use crate::NativeObject;
 pub use arc::*;
 pub use bar::*;
 pub use gauge::*;

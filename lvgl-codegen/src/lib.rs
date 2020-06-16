@@ -50,7 +50,7 @@ impl Rusty for LvWidget {
 
     fn code(&self, _parent: &Self::Parent) -> WrapperResult<TokenStream> {
         // We don't generate for the generic Obj
-        if self.name.eq("obj") {
+        if self.name.as_str().eq("obj") {
             return Err(WrapperError::Skip);
         }
 
@@ -97,7 +97,7 @@ impl Rusty for LvFunc {
         let original_func_name = format_ident!("{}", self.name.as_str());
 
         // generate constructor
-        if new_name.eq("create") {
+        if new_name.as_str().eq("create") {
             return Ok(quote! {
                 pub fn new<C>(parent: &mut C) -> crate::LvResult<Self>
                 where
@@ -105,9 +105,12 @@ impl Rusty for LvFunc {
                 {
                     unsafe {
                         let ptr = lvgl_sys::#original_func_name(parent.raw()?.as_mut(), core::ptr::null_mut());
-                        let raw = core::ptr::NonNull::new(ptr)?;
-                        let core = <crate::Obj as crate::Widget>::from_raw(raw);
-                        Ok(Self { core })
+                        if let Some(raw) = core::ptr::NonNull::new(ptr) {
+                            let core = <crate::Obj as crate::Widget>::from_raw(raw);
+                            Ok(Self { core })
+                        } else {
+                            Err(crate::LvError::InvalidReference)
+                        }
                     }
                 }
             });
@@ -631,11 +634,15 @@ mod test {
                 where
                     C: crate::NativeObject,
                 {
+
                     unsafe {
                         let ptr = lvgl_sys::lv_arc_create(parent.raw()?.as_mut(), core::ptr::null_mut());
-                        let raw = core::ptr::NonNull::new(ptr)?;
-                        let core = <crate::Obj as crate::Widget>::from_raw(raw);
-                        Ok(Self { core })
+                        if let Some(raw) = core::ptr::NonNull::new(ptr) {
+                            let core = <crate::Obj as crate::Widget>::from_raw(raw);
+                            Ok(Self { core })
+                        } else {
+                            Err(crate::LvError::InvalidReference)
+                        }
                     }
                 }
             }

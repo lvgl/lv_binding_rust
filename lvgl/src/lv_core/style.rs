@@ -1,7 +1,7 @@
+use crate::mem::Box;
 use crate::{Color, LvResult, State};
-use alloc::boxed::Box;
 use core::mem;
-use cstr_core::CString;
+use cstr_core::CStr;
 
 pub enum Themes {
     Pretty,
@@ -12,15 +12,14 @@ pub struct Style {
 }
 
 impl Style {
-    pub fn set_value_str(&mut self, state: State, value: &str) -> LvResult<()> {
+    pub fn set_value_str(&mut self, state: State, value: &CStr) -> LvResult<()> {
         let native_state: u32 = state.get_bits();
-        let string = CString::new(value)?;
         unsafe {
             lvgl_sys::_lv_style_set_ptr(
                 self.raw.as_mut(),
                 (lvgl_sys::LV_STYLE_VALUE_STR
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
-                string.into_raw() as *mut cty::c_void,
+                value.as_ptr() as *mut cty::c_void,
             );
         }
         Ok(())
@@ -32,7 +31,7 @@ impl Default for Style {
         let raw = unsafe {
             let mut style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
             lvgl_sys::lv_style_init(style.as_mut_ptr());
-            Box::new(style.assume_init())
+            Box::new(style.assume_init()).unwrap()
         };
         Self { raw }
     }

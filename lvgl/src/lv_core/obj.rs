@@ -1,6 +1,6 @@
 use crate::lv_core::style::Style;
+use crate::mem::Box;
 use crate::{Align, LvError, LvResult};
-use alloc::boxed::Box;
 use core::ptr;
 
 /// Represents a native LittlevGL object
@@ -40,7 +40,7 @@ pub trait Widget: NativeObject {
     ///
     unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
 
-    fn add_style(&mut self, part: Self::Part, style: Style) -> LvResult<()> {
+    fn add_style(&self, part: Self::Part, style: Style) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_add_style(self.raw()?.as_mut(), part.into(), Box::into_raw(style.raw));
         };
@@ -146,8 +146,8 @@ macro_rules! define_object {
                 unsafe {
                     let mut raw = self.raw()?;
                     let obj = raw.as_mut();
-                    let user_closure = alloc::boxed::Box::new(f);
-                    obj.user_data = alloc::boxed::Box::into_raw(user_closure) as *mut cty::c_void;
+                    let user_closure = $crate::mem::Box::new(f)?;
+                    obj.user_data = $crate::mem::Box::into_raw(user_closure) as *mut cty::c_void;
                     lvgl_sys::lv_obj_set_event_cb(
                         obj,
                         lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),

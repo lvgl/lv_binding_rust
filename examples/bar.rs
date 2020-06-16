@@ -1,18 +1,19 @@
+use cstr_core::CString;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl::style::Style;
-use lvgl::widgets::{Bar, BarPart, Label, LabelAlign};
-use lvgl::{self, Align, Animation, Color, DisplayDriver, Event, LvError, Part, State, Widget, UI};
+use lvgl::widgets::{Bar, Label, LabelAlign};
+use lvgl::{self, Align, Animation, Color, Event, LvError, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
 use std::time::Duration;
 
 fn main() -> Result<(), LvError> {
-    let mut display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
+    let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
     ));
@@ -23,8 +24,7 @@ fn main() -> Result<(), LvError> {
     let mut ui = UI::init()?;
 
     // Implement and register your display:
-    let display_driver = DisplayDriver::new(&mut display);
-    ui.disp_drv_register(display_driver);
+    ui.disp_drv_register(display).unwrap();
 
     // Create screen and widgets
     let mut screen = ui.scr_act()?;
@@ -39,6 +39,9 @@ fn main() -> Result<(), LvError> {
     bar.set_size(175, 20)?;
     bar.set_align(&mut screen, Align::Center, 0, 10)?;
     bar.set_range(0, 100)?;
+    bar.on_event(|_b, _e| {
+        println!("received");
+    })?;
 
     // // Set the indicator style for the bar object
     let mut ind_style = Style::default();
@@ -46,7 +49,7 @@ fn main() -> Result<(), LvError> {
     bar.add_style(Part::All, ind_style)?;
 
     let mut loading_lbl = Label::new(&mut screen)?;
-    loading_lbl.set_text("Loading...")?;
+    loading_lbl.set_text(CString::new("Loading...").unwrap().as_c_str())?;
     loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10)?;
     loading_lbl.set_label_align(LabelAlign::Center)?;
 
@@ -75,16 +78,18 @@ fn main() -> Result<(), LvError> {
             threaded_ui
                 .lock()
                 .unwrap()
-                .event_send(&mut loading_lbl, Event::Clicked)?
+                .event_send(&mut bar, Event::Clicked)?
         }
         bar.set_value(i, Animation::OFF)?;
         i += 1;
 
-        sleep(Duration::from_millis(25));
+        sleep(Duration::from_millis(50));
 
-        threaded_ui.lock().unwrap().task_handler();
-
-        window.update(&display);
+        let mut ui = threaded_ui.lock().unwrap();
+        ui.task_handler();
+        if let Some(disp) = ui.get_display_ref() {
+            window.update(disp);
+        }
 
         for event in window.events() {
             match event {
