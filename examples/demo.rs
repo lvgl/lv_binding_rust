@@ -12,43 +12,6 @@ use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
 use std::time::Duration;
-//
-// struct MyApp {
-//     time: Label,
-//     bt_label: Label,
-// }
-//
-// impl MyApp {
-//     fn initialize(screen: &Obj) -> Result<Self, ()> {
-//         let mut screen_style = Style::default();
-//         screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
-//         screen_style.set_radius(State::DEFAULT, 0);
-//
-//         let mut style_time = Style::default();
-//         style_time.set_text_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
-//
-//         let time = screen.create_label()?;
-//         time.set_align(&screen, Align::Center, 0, 0)?;
-//         time.set_text(CString::new("20:46").unwrap().as_c_str())?;
-//         time.set_width(240)?;
-//         time.set_height(240)?;
-//
-//         let bt = screen.create_label()?;
-//         bt.set_height(80)?;
-//         bt.set_recolor(true)?;
-//         bt.set_height(80)?;
-//         bt.set_recolor(true)?;
-//         bt.set_text(CString::new("#5794f2 \u{F293}#").unwrap().as_c_str())?;
-//         bt.set_label_align(LabelAlign::Left)?;
-//         bt.set_align(&screen, Align::InTopLeft, 0, 0)?;
-//
-//         // attach styles
-//         screen.add_style(Part::Main, screen_style)?;
-//         time.add_style(Part::Main, style_time)?;
-//
-//         Ok(MyApp { time, bt_label: bt })
-//     }
-// }
 
 fn main() -> Result<(), LvError> {
     let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
@@ -100,8 +63,9 @@ fn main() -> Result<(), LvError> {
 
     let mut t: heapless::String<heapless::consts::U8> = heapless::String::from("test");
     t.push('\0').unwrap();
+    CStr::from_bytes_with_nul_unchecked();
     set_text(CStr::from_bytes_with_nul(t.as_bytes()).unwrap()).unwrap();
-    set_text(CStr::from_bytes_with_nul(("test\0").as_bytes()).unwrap()).unwrap();
+    set_text(cstr_core::CStr::from_bytes_with_nul("test\0".as_bytes()).unwrap()).unwrap();
     set_text(cstr_core::CString::new("test").unwrap().as_c_str()).unwrap();
 
     let mut power = Label::new(&mut screen)?;

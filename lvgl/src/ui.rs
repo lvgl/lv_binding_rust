@@ -62,14 +62,13 @@ where
             phantom: PhantomData,
         });
 
+        let refresh_buffer1 = [Color::from_rgb((0, 0, 0)).raw; BUF_SIZE];
+        let refresh_buffer2 = [Color::from_rgb((0, 0, 0)).raw; BUF_SIZE];
+
+        let mut disp_buf = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
+
         unsafe {
-            // Create a display buffer for LittlevGL
             // Initialize the display buffer
-            let refresh_buffer1 = [Color::from_rgb((0, 0, 0)).raw; BUF_SIZE];
-            let refresh_buffer2 = [Color::from_rgb((0, 0, 0)).raw; BUF_SIZE];
-
-            let mut disp_buf = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
-
             lvgl_sys::lv_disp_buf_init(
                 disp_buf.as_mut_ptr(),
                 Box::into_raw(Box::new(refresh_buffer1)?) as *mut cty::c_void,
@@ -87,8 +86,6 @@ where
             disp_drv.buffer = Box::into_raw(disp_buf);
             // Set your driver function
             disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
-            // TODO: DrawHandler type here
-            // Safety: `user_data` is set to NULL in C code.
             disp_drv.user_data = &mut self.display_data as *mut _ as *mut cty::c_void;
             lvgl_sys::lv_disp_drv_register(
                 &mut ManuallyDrop::take(&mut disp_drv) as *mut lvgl_sys::lv_disp_drv_t
