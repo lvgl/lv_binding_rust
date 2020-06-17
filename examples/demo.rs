@@ -63,7 +63,6 @@ fn main() -> Result<(), LvError> {
 
     let mut t: heapless::String<heapless::consts::U8> = heapless::String::from("test");
     t.push('\0').unwrap();
-    CStr::from_bytes_with_nul_unchecked();
     set_text(CStr::from_bytes_with_nul(t.as_bytes()).unwrap()).unwrap();
     set_text(cstr_core::CStr::from_bytes_with_nul("test\0".as_bytes()).unwrap()).unwrap();
     set_text(cstr_core::CString::new("test").unwrap().as_c_str()).unwrap();
