@@ -5,16 +5,16 @@ use core::ptr;
 use core::ptr::NonNull;
 
 /// Places `T` into LVGL memory.
-pub struct Box<T: Sized>(NonNull<T>);
+pub struct Box<T>(NonNull<T>);
 
-impl<T: Sized> Box<T> {
+impl<T> Box<T> {
     pub fn new(inner: T) -> LvResult<Box<T>> {
         let layout = mem::size_of::<T>();
         let inner = unsafe {
             let ptr = lvgl_sys::lv_mem_alloc(layout as lvgl_sys::size_t) as *mut T;
             match NonNull::new(ptr) {
                 Some(v) => {
-                    // Place value in new mem
+                    // Move `T` to LVGL managed memory
                     ptr::write(ptr, inner);
                     Ok(v)
                 }
@@ -30,7 +30,7 @@ impl<T: Sized> Box<T> {
     }
 }
 
-impl<T: Sized> Drop for Box<T> {
+impl<T> Drop for Box<T> {
     fn drop(&mut self) {
         unsafe {
             lvgl_sys::lv_mem_free(self.0.as_ptr() as *const cty::c_void);
@@ -38,7 +38,7 @@ impl<T: Sized> Drop for Box<T> {
     }
 }
 
-impl<T: Sized> Deref for Box<T> {
+impl<T> Deref for Box<T> {
     type Target = T;
 
     fn deref(&self) -> &T {
@@ -46,13 +46,13 @@ impl<T: Sized> Deref for Box<T> {
     }
 }
 
-impl<T: Sized> DerefMut for Box<T> {
+impl<T> DerefMut for Box<T> {
     fn deref_mut(&mut self) -> &mut T {
         unsafe { self.0.as_mut() }
     }
 }
 
-impl<T: Sized> AsMut<T> for Box<T> {
+impl<T> AsMut<T> for Box<T> {
     fn as_mut(&mut self) -> &mut T {
         unsafe { self.0.as_mut() }
     }

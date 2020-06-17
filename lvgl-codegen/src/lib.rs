@@ -79,7 +79,7 @@ impl LvFunc {
     }
 
     pub fn is_method(&self) -> bool {
-        if self.args.len() > 0 {
+        if !self.args.is_empty() {
             let first_arg = &self.args[0];
             return first_arg.typ.literal_name.contains("lv_obj_t");
         }
@@ -374,7 +374,7 @@ impl CodeGen {
         &self.widgets
     }
 
-    fn extract_widgets(functions: &Vec<LvFunc>) -> CGResult<Vec<LvWidget>> {
+    fn extract_widgets(functions: &[LvFunc]) -> CGResult<Vec<LvWidget>> {
         let widget_names = Self::get_widget_names(functions);
 
         let widgets = functions.iter().fold(HashMap::new(), |mut ws, f| {
@@ -395,25 +395,25 @@ impl CodeGen {
             ws
         });
 
-        Ok(widgets.values().map(|v| v.clone()).collect())
+        Ok(widgets.values().cloned().collect())
     }
 
-    fn get_widget_names(functions: &Vec<LvFunc>) -> Vec<String> {
+    fn get_widget_names(functions: &[LvFunc]) -> Vec<String> {
         let reg = format!("^{}([^_]+)_create$", LIB_PREFIX);
         let create_func = Regex::new(reg.as_str()).unwrap();
 
         functions
             .iter()
             .filter(|e| create_func.is_match(e.name.as_str()) && e.args.len() == 2)
-            .filter_map(|f| {
-                Some(String::from(
+            .map(|f| {
+                String::from(
                     create_func
                         .captures(f.name.as_str())
                         .unwrap()
                         .get(1)
                         .unwrap()
                         .as_str(),
-                ))
+                )
             })
             .collect::<Vec<_>>()
     }
