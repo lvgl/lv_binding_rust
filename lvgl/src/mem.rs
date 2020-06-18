@@ -1,5 +1,6 @@
 use crate::{LvError, LvResult};
 use core::mem;
+use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
 
 /// Places `T` into LVGL memory.
@@ -42,6 +43,20 @@ impl<T> Drop for Box<T> {
         unsafe {
             lvgl_sys::lv_mem_free(self.0.as_ptr() as *const cty::c_void);
         }
+    }
+}
+
+impl<T> DerefMut for Box<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut()
+    }
+}
+
+impl<T> Deref for Box<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { self.0.as_ref() }
     }
 }
 

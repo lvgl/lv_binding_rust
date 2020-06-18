@@ -1,7 +1,7 @@
 use crate::mem::Box;
 use crate::{Color, Event, LvError, LvResult, Obj, Widget};
 use core::marker::PhantomData;
-use core::mem::{ManuallyDrop, MaybeUninit};
+use core::mem::MaybeUninit;
 use core::ptr;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -81,15 +81,13 @@ where
             let mut disp_drv = MaybeUninit::<lvgl_sys::lv_disp_drv_t>::uninit();
             lvgl_sys::lv_disp_drv_init(disp_drv.as_mut_ptr());
             // Since this is C managed memory, we don't want to drop it using Rust, thus `ManuallyDrop` wrapping.
-            let mut disp_drv = ManuallyDrop::new(disp_drv.assume_init());
+            let mut disp_drv = Box::new(disp_drv.assume_init())?;
             // Assign the buffer to the display
             disp_drv.buffer = Box::into_raw(disp_buf);
             // Set your driver function
             disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
             disp_drv.user_data = &mut self.display_data as *mut _ as *mut cty::c_void;
-            lvgl_sys::lv_disp_drv_register(
-                &mut ManuallyDrop::take(&mut disp_drv) as *mut lvgl_sys::lv_disp_drv_t
-            );
+            lvgl_sys::lv_disp_drv_register(Box::into_raw(disp_drv));
         };
 
         Ok(())
