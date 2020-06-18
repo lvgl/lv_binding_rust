@@ -1,9 +1,9 @@
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 #[macro_use]
 extern crate bitflags;
 
-pub mod mem;
+pub(crate) mod mem;
 mod support;
 mod ui;
 #[macro_use]

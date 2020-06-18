@@ -22,11 +22,11 @@ mod tests {
         unsafe {
             lv_init();
 
-            let horizontal_resolution = lv_disp_get_hor_res(std::ptr::null_mut());
-            assert_eq!(horizontal_resolution, 480);
+            let horizontal_resolution = lv_disp_get_hor_res(core::ptr::null_mut());
+            assert_eq!(horizontal_resolution, 240);
 
-            let vertical_resolution = lv_disp_get_ver_res(std::ptr::null_mut());
-            assert_eq!(vertical_resolution, 320);
+            let vertical_resolution = lv_disp_get_ver_res(core::ptr::null_mut());
+            assert_eq!(vertical_resolution, 240);
         }
     }
 }

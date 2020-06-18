@@ -44,16 +44,14 @@ fn main() -> Result<(), LvError> {
     button.on_event(|mut btn, event| {
         if let lvgl::Event::Clicked = event {
             if btn_state {
-                btn_lbl
-                    .set_text(CString::new("Click me!").unwrap().as_c_str())
-                    .unwrap();
+                let nt = CString::new("Click me!").unwrap();
+                btn_lbl.set_text(nt.as_c_str()).unwrap();
             } else {
-                btn_lbl
-                    .set_text(CString::new("Clicked!").unwrap().as_c_str())
-                    .unwrap();
+                let nt = CString::new("Clicked!").unwrap();
+                btn_lbl.set_text(nt.as_c_str()).unwrap();
             }
             btn_state = !btn_state;
-            println!("Clicked!");
+            println!("Clicked! Inner..");
             btn.toggle().unwrap();
         }
     })?;

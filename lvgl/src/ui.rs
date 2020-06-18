@@ -16,7 +16,7 @@ static LVGL_IN_USE: AtomicBool = AtomicBool::new(false);
 // TODO: Make this an external configuration
 const REFRESH_BUFFER_LEN: usize = 2;
 // Declare a buffer for the refresh rate
-const BUF_SIZE: usize = lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN;
+pub(crate) const BUF_SIZE: usize = lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_BUFFER_LEN;
 
 pub struct UI<T, C>
 where
