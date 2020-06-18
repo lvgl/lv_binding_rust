@@ -74,6 +74,8 @@ fn main() -> Result<(), LvError> {
 
     let mut i = 0;
     'running: loop {
+        gauge.set_value(0, i)?;
+
         let mut ui = threaded_ui.lock().unwrap();
         ui.task_handler();
         if let Some(disp) = ui.get_display_ref() {
@@ -93,8 +95,7 @@ fn main() -> Result<(), LvError> {
             }
         }
 
-        sleep(Duration::from_millis(25));
-        gauge.set_value(0, i)?;
+        sleep(Duration::from_millis(50));
 
         if i > 99 {
             i = 0;
