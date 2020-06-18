@@ -7,13 +7,11 @@ pub(crate) struct Box<T>(NonNull<T>);
 
 impl<T> Box<T> {
     pub fn new(inner: T) -> LvResult<Box<T>> {
-        assert_ne!(mem::size_of::<T>(), 0, "We don't handle ZSTs");
-
         let size = mem::size_of::<T>();
         let inner = unsafe {
-            // LVGL already aligns the memory address for us
             let ptr = lvgl_sys::lv_mem_alloc(size as lvgl_sys::size_t) as *mut T;
 
+            // LVGL should align the memory address for us!
             assert_eq!(
                 ptr as usize % mem::align_of::<T>(),
                 0,
