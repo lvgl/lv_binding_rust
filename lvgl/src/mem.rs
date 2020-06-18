@@ -1,21 +1,30 @@
 use crate::{LvError, LvResult};
 use core::mem;
-use core::ops::{Deref, DerefMut};
-use core::ptr;
 use core::ptr::NonNull;
 
 /// Places `T` into LVGL memory.
-pub struct Box<T>(NonNull<T>);
+pub(crate) struct Box<T>(NonNull<T>);
 
 impl<T> Box<T> {
     pub fn new(inner: T) -> LvResult<Box<T>> {
-        let layout = mem::size_of::<T>();
+        assert_ne!(mem::size_of::<T>(), 0, "We don't handle ZSTs");
+
+        let size = mem::size_of::<T>();
         let inner = unsafe {
-            let ptr = lvgl_sys::lv_mem_alloc(layout as lvgl_sys::size_t) as *mut T;
+            // LVGL already aligns the memory address for us
+            let ptr = lvgl_sys::lv_mem_alloc(size as lvgl_sys::size_t) as *mut T;
+
+            assert_eq!(
+                ptr as usize % mem::align_of::<T>(),
+                0,
+                "Memory address not aligned!"
+            );
+
             match NonNull::new(ptr) {
                 Some(v) => {
                     // Move `T` to LVGL managed memory
-                    ptr::write(ptr, inner);
+                    // It will panic if LVGL memory is not aligned
+                    ptr.write(inner);
                     Ok(v)
                 }
                 None => Err(LvError::LvOOMemory),
@@ -24,8 +33,8 @@ impl<T> Box<T> {
         Ok(Box(inner?))
     }
 
-    pub fn into_raw(b: Box<T>) -> *mut T {
-        let b = mem::ManuallyDrop::new(b);
+    pub fn into_raw(self) -> *mut T {
+        let b = mem::ManuallyDrop::new(self);
         b.0.as_ptr()
     }
 }
@@ -38,20 +47,6 @@ impl<T> Drop for Box<T> {
     }
 }
 
-impl<T> Deref for Box<T> {
-    type Target = T;
-
-    fn deref(&self) -> &T {
-        unsafe { self.0.as_ref() }
-    }
-}
-
-impl<T> DerefMut for Box<T> {
-    fn deref_mut(&mut self) -> &mut T {
-        unsafe { self.0.as_mut() }
-    }
-}
-
 impl<T> AsMut<T> for Box<T> {
     fn as_mut(&mut self) -> &mut T {
         unsafe { self.0.as_mut() }
@@ -61,12 +56,23 @@ impl<T> AsMut<T> for Box<T> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use core::mem::MaybeUninit;
+    use std::sync::Once;
+
+    static INIT_LVGL: Once = Once::new();
+
+    fn init() {
+        INIT_LVGL.call_once(|| {
+            unsafe {
+                lvgl_sys::lv_init();
+            };
+        });
+    }
 
     #[test]
     fn place_value_in_lv_mem() {
-        unsafe {
-            lvgl_sys::_lv_mem_init();
-        };
+        init();
+
         let v = Box::new(5).unwrap();
         drop(v);
         let v = Box::new(10).unwrap();
@@ -75,26 +81,51 @@ mod test {
 
     #[test]
     fn place_complex_value_in_lv_mem() {
-        unsafe {
-            lvgl_sys::_lv_mem_init();
-        };
+        init();
 
+        #[repr(C)]
+        #[derive(Debug)]
         struct Point {
             x: u64,
-            y: u64,
+            y: i8,
+            t: i32,
             disp: i32,
         }
 
-        let p = Point {
-            x: 32,
-            y: 240,
-            disp: -100,
-        };
+        for i in 0..100 {
+            let p = Point {
+                x: i,
+                y: 42,
+                t: 0,
+                disp: -100,
+            };
 
-        let b = Box::new(p).unwrap();
+            println!("{:?}", p);
+            let mut b = Box::new(p).unwrap_or_else(|_| {
+                print_mem_info();
+                panic!("OOM");
+            });
 
-        assert_eq!(b.x, 32);
-        assert_eq!(b.y, 240);
-        assert_eq!(b.disp, -100);
+            println!("memory address is {:p}", b.as_mut());
+
+            let point = b.as_mut();
+            if point.x != i {
+                print_mem_info();
+
+                println!("{:?}", point);
+            }
+            assert_eq!(point.x, i);
+        }
+    }
+
+    fn print_mem_info() {
+        let mut info = MaybeUninit::uninit();
+        unsafe {
+            lvgl_sys::lv_mem_monitor(info.as_mut_ptr());
+        }
+        if !info.as_ptr().is_null() {
+            let info = unsafe { info.assume_init() };
+            println!("mem info: {:?}", info);
+        }
     }
 }
