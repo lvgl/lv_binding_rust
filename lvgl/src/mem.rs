@@ -79,6 +79,19 @@ impl<T: Clone> Clone for Box<T> {
 mod test {
     use super::*;
     use std::vec::Vec;
+    use core::mem::MaybeUninit;
+
+    fn init() {
+        unsafe {
+            lvgl_sys::lv_init();
+        };
+    }
+
+    fn teardown() {
+        unsafe {
+            lvgl_sys::lv_deinit();
+        }
+    }
 
     #[test]
     fn place_value_in_lv_mem() {
@@ -88,6 +101,8 @@ mod test {
         drop(v);
         let v = Box::new(10);
         drop(v);
+
+        teardown();
     }
 
     #[test]
@@ -139,7 +154,9 @@ mod test {
         println!("mem info: {:?}", &final_info);
 
         // If this fails, we are leaking memory! BOOM! \o/
-        assert_eq!(initial_mem_info.free_size, final_info.free_size)
+        assert_eq!(initial_mem_info.free_size, final_info.free_size);
+
+        teardown();
     }
 
     #[test]

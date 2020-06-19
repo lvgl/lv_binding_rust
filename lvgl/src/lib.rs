@@ -31,6 +31,8 @@ use ::alloc::boxed::Box;
 #[cfg(feature = "lvgl_alloc")]
 mod allocator;
 
+pub mod input_device;
+pub(crate) mod mem;
 mod support;
 mod ui;
 #[macro_use]

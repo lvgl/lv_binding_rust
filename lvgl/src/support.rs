@@ -73,6 +73,7 @@ impl From<Color> for Rgb565 {
 ///
 /// All objects (such as Buttons/Labels/Sliders etc.) receive these generic events
 /// regardless of their type.
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum Event<T> {
     /// The object has been pressed
     Pressed,
@@ -154,6 +155,7 @@ impl<S> From<Event<S>> for lvgl_sys::lv_event_t {
 }
 
 /// These events are sent only by pointer-like input devices (E.g. mouse or touchpad)
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum PointerEvent {
     DragBegin,
     DragEnd,
