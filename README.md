@@ -45,13 +45,6 @@ for `no_std`, so we need to use a workaround to build "lvgl-rs". The mainstrem i
 $ DEP_LV_CONFIG_PATH=`pwd` cargo build -Zfeatures=build_dep
 ```
 
-#### Requirements / Limitations
-
-LittlevGL C libary do allocate memory dynamically and we need to allocate memory on the heap in the Rust side as well
-([`Box`](https://doc.rust-lang.org/beta/alloc/boxed/struct.Box.html)).
-That is required, so we can safely provide Rust pointers through FFI. For that reason, we do require
-[`alloc`](https://doc.rust-lang.org/alloc/) module to be available.
-
 ## Running the demo
 
 [This project contains examples that can run in a desktop simulator.](./examples)
