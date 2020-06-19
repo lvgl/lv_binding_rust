@@ -8,9 +8,7 @@ use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
 use lvgl::{self, Align, Color, Event, LvError, Part, State, Widget, UI};
 use lvgl_sys;
-use std::sync::{mpsc, Arc, Mutex};
-use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 fn main() -> Result<(), LvError> {
     let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
@@ -56,30 +54,11 @@ fn main() -> Result<(), LvError> {
         }
     })?;
 
-    let threaded_ui = Arc::new(Mutex::new(ui));
-
-    let (stop_ch, read_ch) = mpsc::channel();
-    let closure_ui = threaded_ui.clone();
     let mut loop_started = Instant::now();
-    let tick_thr = std::thread::spawn(move || loop {
-        // Needs to be called periodically for LittlevGL internal timing calculations.
-        {
-            let mut ui = closure_ui.lock().unwrap();
-            ui.tick_inc(loop_started.elapsed());
-        }
-
-        sleep(Duration::from_millis(5));
-        if read_ch.try_recv().is_ok() {
-            break;
-        }
-        loop_started = Instant::now();
-    });
-
     'running: loop {
-        threaded_ui.lock().unwrap().task_handler();
-        if let Some(disp) = threaded_ui.lock().unwrap().get_display_ref() {
-            window.update(disp);
-        }
+        ui.task_handler();
+        window.update(ui.get_display_ref().unwrap());
+
         for event in window.events() {
             match event {
                 SimulatorEvent::MouseButtonUp {
@@ -88,21 +67,16 @@ fn main() -> Result<(), LvError> {
                 } => {
                     println!("Clicked on: {:?}", point);
                     // Send a event to the button directly
-                    threaded_ui
-                        .lock()
-                        .unwrap()
-                        .event_send(&mut button, Event::Clicked)?;
+                    ui.event_send(&mut button, Event::Clicked)?;
                 }
                 SimulatorEvent::Quit => break 'running,
                 _ => {}
             }
         }
 
-        sleep(Duration::from_millis(5));
+        ui.tick_inc(loop_started.elapsed());
+        loop_started = Instant::now();
     }
-
-    stop_ch.send(true).unwrap();
-    tick_thr.join().unwrap();
 
     Ok(())
 }

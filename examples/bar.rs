@@ -8,8 +8,7 @@ use lvgl::style::Style;
 use lvgl::widgets::{Bar, Label, LabelAlign};
 use lvgl::{self, Align, Animation, Color, Event, LvError, Part, State, Widget, UI};
 use lvgl_sys;
-use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 fn main() -> Result<(), LvError> {
     let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
@@ -75,8 +74,6 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-
-        sleep(Duration::from_millis(50));
 
         ui.tick_inc(loop_started.elapsed());
         loop_started = Instant::now();

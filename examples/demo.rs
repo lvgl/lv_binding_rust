@@ -9,7 +9,6 @@ use lvgl::style::Style;
 use lvgl::widgets::{Label, LabelAlign};
 use lvgl::{Align, Color, LvError, Part, State, Widget, UI};
 use lvgl_sys;
-use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
@@ -75,26 +74,8 @@ fn main() -> Result<(), LvError> {
     power.set_label_align(LabelAlign::Right)?;
     power.set_align(&mut screen, Align::InTopRight, 0, 0)?;
 
-    let threaded_ui = Arc::new(Mutex::new(ui));
-
-    let (stop_ch, read_ch) = mpsc::channel();
-    let closure_ui = threaded_ui.clone();
-    let mut loop_started = Instant::now();
-    let tick_thr = std::thread::spawn(move || loop {
-        // Needs to be called periodically for LittlevGL internal timing calculations.
-        {
-            let mut ui = closure_ui.lock().unwrap();
-            ui.tick_inc(loop_started.elapsed());
-        }
-
-        sleep(Duration::from_millis(5));
-        if read_ch.try_recv().is_ok() {
-            break;
-        }
-        loop_started = Instant::now();
-    });
-
     let mut i = 0;
+    let mut loop_started = Instant::now();
     'running: loop {
         if i > 59 {
             i = 0;
@@ -103,12 +84,8 @@ fn main() -> Result<(), LvError> {
         time.set_text(CString::new(val.as_str()).unwrap().as_c_str())?;
         i = 1 + i;
 
-        sleep(Duration::from_secs(1));
-
-        threaded_ui.lock().unwrap().task_handler();
-        if let Some(disp) = threaded_ui.lock().unwrap().get_display_ref() {
-            window.update(disp);
-        }
+        ui.task_handler();
+        window.update(ui.get_display_ref().unwrap());
 
         for event in window.events() {
             match event {
@@ -116,10 +93,11 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-    }
+        sleep(Duration::from_secs(1));
 
-    stop_ch.send(true).unwrap();
-    tick_thr.join().unwrap();
+        ui.tick_inc(loop_started.elapsed());
+        loop_started = Instant::now();
+    }
 
     Ok(())
 }
