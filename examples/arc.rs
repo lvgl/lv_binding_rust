@@ -9,9 +9,7 @@ use lvgl::widgets::{Arc, Label, LabelAlign};
 use lvgl::{self, Align, Color, Part, State, UI};
 use lvgl::{LvError, Widget};
 use lvgl_sys;
-use std::sync::{mpsc, Arc as StdArc, Mutex};
-use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 fn main() -> Result<(), LvError> {
     let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
@@ -51,29 +49,11 @@ fn main() -> Result<(), LvError> {
     loading_style.set_text_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
     loading_lbl.add_style(Part::Main, loading_style)?;
 
-    let threaded_ui = StdArc::new(Mutex::new(ui));
-
-    let (stop_ch, read_ch) = mpsc::channel();
-    let closure_ui = threaded_ui.clone();
-    let mut loop_started = Instant::now();
-    let tick_thr = std::thread::spawn(move || loop {
-        // Needs to be called periodically for LittlevGL internal timing calculations.
-        {
-            let mut ui = closure_ui.lock().unwrap();
-            ui.tick_inc(loop_started.elapsed());
-        }
-
-        sleep(Duration::from_millis(5));
-        if read_ch.try_recv().is_ok() {
-            break;
-        }
-        loop_started = Instant::now();
-    });
-
     let mut angle = 0;
     let mut forward = true;
-
     let mut i = 0;
+
+    let mut loop_started = Instant::now();
     'running: loop {
         if i > 270 {
             forward = if forward { false } else { true };
@@ -83,12 +63,8 @@ fn main() -> Result<(), LvError> {
         arc.set_end_angle(angle + 135)?;
         i += 1;
 
-        sleep(Duration::from_millis(50));
-
-        threaded_ui.lock().unwrap().task_handler();
-        if let Some(disp) = threaded_ui.lock().unwrap().get_display_ref() {
-            window.update(disp);
-        }
+        ui.task_handler();
+        window.update(ui.get_display_ref().unwrap());
 
         for event in window.events() {
             match event {
@@ -96,10 +72,10 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-    }
 
-    stop_ch.send(true).unwrap();
-    tick_thr.join().unwrap();
+        ui.tick_inc(loop_started.elapsed());
+        loop_started = Instant::now();
+    }
 
     Ok(())
 }
