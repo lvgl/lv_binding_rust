@@ -53,6 +53,9 @@ pub use ui::*;
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
+pub const HOR_RES_MAX: u32 = lvgl_sys::LV_HOR_RES_MAX;
+pub const VER_RES_MAX: u32 = lvgl_sys::LV_VER_RES_MAX;
+
 // Initialize LVGL only once.
 static LVGL_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
