@@ -13,3 +13,6 @@ pub mod widgets;
 pub use lv_core::*;
 pub use support::*;
 pub use ui::*;
+
+pub const HOR_RES_MAX: u32 = lvgl_sys::LV_HOR_RES_MAX;
+pub const VER_RES_MAX: u32 = lvgl_sys::LV_VER_RES_MAX;
