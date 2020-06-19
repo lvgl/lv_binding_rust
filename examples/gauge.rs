@@ -9,7 +9,7 @@ use lvgl::{self, Align, Color, LvError, Part, State, Widget, UI};
 use lvgl_sys;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread::sleep;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 fn main() -> Result<(), LvError> {
     let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
@@ -60,25 +60,27 @@ fn main() -> Result<(), LvError> {
 
     let (stop_ch, read_ch) = mpsc::channel();
     let closure_ui = threaded_ui.clone();
+    let mut loop_started = Instant::now();
     let tick_thr = std::thread::spawn(move || loop {
-        let period = Duration::from_millis(5);
-
         // Needs to be called periodically for LittlevGL internal timing calculations.
-        closure_ui.lock().unwrap().tick_inc(period);
+        {
+            let mut ui = closure_ui.lock().unwrap();
+            ui.tick_inc(loop_started.elapsed());
+        }
 
-        sleep(period);
+        sleep(Duration::from_millis(5));
         if read_ch.try_recv().is_ok() {
             break;
         }
+        loop_started = Instant::now();
     });
 
     let mut i = 0;
     'running: loop {
         gauge.set_value(0, i)?;
 
-        let mut ui = threaded_ui.lock().unwrap();
-        ui.task_handler();
-        if let Some(disp) = ui.get_display_ref() {
+        threaded_ui.lock().unwrap().task_handler();
+        if let Some(disp) = threaded_ui.lock().unwrap().get_display_ref() {
             window.update(disp);
         }
 
@@ -95,7 +97,7 @@ fn main() -> Result<(), LvError> {
             }
         }
 
-        sleep(Duration::from_millis(50));
+        sleep(Duration::from_millis(15));
 
         if i > 99 {
             i = 0;
