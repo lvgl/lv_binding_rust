@@ -66,6 +66,7 @@ where
         let refresh_buffer2 = [Color::from_rgb((0, 0, 0)).raw; BUF_SIZE];
 
         let mut disp_buf = MaybeUninit::<lvgl_sys::lv_disp_buf_t>::uninit();
+        let mut disp_drv = MaybeUninit::<lvgl_sys::lv_disp_drv_t>::uninit();
 
         unsafe {
             // Initialize the display buffer
@@ -75,14 +76,11 @@ where
                 Box::into_raw(Box::new(refresh_buffer2)?) as *mut cty::c_void,
                 lvgl_sys::LV_HOR_RES_MAX * REFRESH_BUFFER_LEN as u32,
             );
-            let disp_buf = Box::new(disp_buf.assume_init())?;
-
             // Basic initialization of the display driver
-            let mut disp_drv = MaybeUninit::<lvgl_sys::lv_disp_drv_t>::uninit();
             lvgl_sys::lv_disp_drv_init(disp_drv.as_mut_ptr());
             let mut disp_drv = Box::new(disp_drv.assume_init())?;
             // Assign the buffer to the display
-            disp_drv.buffer = Box::into_raw(disp_buf);
+            disp_drv.buffer = Box::into_raw(Box::new(disp_buf.assume_init())?);
             // Set your driver function
             disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
             disp_drv.user_data = &mut self.display_data as *mut _ as *mut cty::c_void;
