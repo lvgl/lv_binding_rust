@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Update APT
+        run: sudo apt-get update
+
       - name: Install SDL2
         run: sudo apt install libsdl2-dev libsdl2-2.0-0
 
