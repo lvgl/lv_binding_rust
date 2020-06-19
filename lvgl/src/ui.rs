@@ -80,13 +80,13 @@ where
             // Basic initialization of the display driver
             let mut disp_drv = MaybeUninit::<lvgl_sys::lv_disp_drv_t>::uninit();
             lvgl_sys::lv_disp_drv_init(disp_drv.as_mut_ptr());
-            // Since this is C managed memory, we don't want to drop it using Rust, thus `ManuallyDrop` wrapping.
             let mut disp_drv = Box::new(disp_drv.assume_init())?;
             // Assign the buffer to the display
             disp_drv.buffer = Box::into_raw(disp_buf);
             // Set your driver function
             disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
             disp_drv.user_data = &mut self.display_data as *mut _ as *mut cty::c_void;
+            // We need to remember to deallocate the `disp_drv` memory when dropping UI
             lvgl_sys::lv_disp_drv_register(Box::into_raw(disp_drv));
         };
 
