@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate bitflags;
 
+pub mod input_device;
 pub(crate) mod mem;
 mod support;
 mod ui;

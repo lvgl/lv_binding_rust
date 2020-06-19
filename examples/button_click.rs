@@ -4,9 +4,12 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
+use lvgl::input_device::{InputData, Pointer};
 use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
-use lvgl::{self, Align, Color, Event, LvError, Part, State, Widget, UI};
+use lvgl::{self, Align, Color, LvError, Part, State, Widget, UI};
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::time::Instant;
 
 fn main() -> Result<(), LvError> {
@@ -20,6 +23,22 @@ fn main() -> Result<(), LvError> {
 
     // Implement and register your display:
     ui.disp_drv_register(display)?;
+
+    // Register the input mode
+    let latest_touch_point: Rc<RefCell<Option<Point>>> = Rc::new(RefCell::new(None));
+    let internal = Rc::clone(&latest_touch_point);
+    let mut touch_screen = Pointer::new(move || {
+        let info = internal.borrow().clone();
+        if info.is_some() {
+            let point = info.unwrap();
+            println!("Changed to {:?}", point);
+            Some(InputData::Touch(point).pressed().once())
+        } else {
+            None
+        }
+    });
+
+    ui.indev_drv_register(&mut touch_screen)?;
 
     // Create screen and widgets
     let mut screen = ui.scr_act()?;
@@ -64,7 +83,7 @@ fn main() -> Result<(), LvError> {
                 } => {
                     println!("Clicked on: {:?}", point);
                     // Send a event to the button directly
-                    ui.event_send(&mut button, Event::Clicked)?;
+                    latest_touch_point.borrow_mut().replace(point);
                 }
                 SimulatorEvent::Quit => break 'running,
                 _ => {}

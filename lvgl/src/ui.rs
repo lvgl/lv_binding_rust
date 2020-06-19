@@ -1,3 +1,4 @@
+use crate::input_device::{BufferStatus, Pointer};
 use crate::mem::Box;
 use crate::{Color, Event, LvError, LvResult, Obj, Widget};
 use core::marker::PhantomData;
@@ -54,6 +55,17 @@ where
         } else {
             Err(LvError::AlreadyInUse)
         }
+    }
+
+    pub fn indev_drv_register<F>(&mut self, input_device: &mut Pointer<F>) -> LvResult<()>
+    where
+        F: Fn() -> Option<BufferStatus>,
+    {
+        unsafe {
+            let descr = lvgl_sys::lv_indev_drv_register(&mut input_device.driver as *mut _);
+            input_device.set_descriptor(descr)?;
+        }
+        Ok(())
     }
 
     pub fn disp_drv_register(&mut self, display: T) -> LvResult<()> {
