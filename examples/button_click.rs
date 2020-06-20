@@ -21,16 +21,15 @@ fn main() -> Result<(), LvError> {
 
     let mut ui = UI::init()?;
 
-    // Implement and register your display:
+    // Register your display:
     ui.disp_drv_register(display)?;
 
-    // Initial state of input
+    // Define the initial state of your input
     let latest_touch_status: Cell<BufferStatus> =
         Cell::new(InputData::Touch(Point::new(0, 0)).released().once());
 
-    // Register the input mode
+    // Register a new input device that's capable of reading the current state of the input
     let mut touch_screen = Pointer::new(|| latest_touch_status.get());
-
     ui.indev_drv_register(&mut touch_screen)?;
 
     // Create screen and widgets
