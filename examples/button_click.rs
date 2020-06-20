@@ -32,11 +32,7 @@ fn main() -> Result<(), LvError> {
 
     // Register the input mode
     let internal = Rc::clone(&latest_touch_status);
-    let mut touch_screen = Pointer::new(move || {
-        let input_status = internal.borrow().clone();
-        //println!("input_status = {:?}", input_status);
-        input_status
-    });
+    let mut touch_screen = Pointer::new(move || internal.borrow().clone());
 
     ui.indev_drv_register(&mut touch_screen)?;
 
@@ -103,7 +99,7 @@ fn main() -> Result<(), LvError> {
             }
         }
 
-        sleep(Duration::from_millis(50));
+        sleep(Duration::from_millis(15));
 
         ui.tick_inc(loop_started.elapsed());
         loop_started = Instant::now();
