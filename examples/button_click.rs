@@ -4,13 +4,14 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::input_device::{InputData, Pointer};
+use lvgl::input_device::{BufferStatus, InputData, Pointer};
 use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
 use lvgl::{self, Align, Color, LvError, Part, State, Widget, UI};
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::time::Instant;
+use std::thread::sleep;
+use std::time::{Duration, Instant};
 
 fn main() -> Result<(), LvError> {
     let display: SimulatorDisplay<Rgb565> =
@@ -24,18 +25,17 @@ fn main() -> Result<(), LvError> {
     // Implement and register your display:
     ui.disp_drv_register(display)?;
 
+    // Initial state of input
+    let latest_touch_status: Rc<RefCell<BufferStatus>> = Rc::new(RefCell::new(
+        InputData::Touch(Point::new(0, 0)).released().once(),
+    ));
+
     // Register the input mode
-    let latest_touch_point: Rc<RefCell<Option<Point>>> = Rc::new(RefCell::new(None));
-    let internal = Rc::clone(&latest_touch_point);
+    let internal = Rc::clone(&latest_touch_status);
     let mut touch_screen = Pointer::new(move || {
-        let info = internal.borrow().clone();
-        if info.is_some() {
-            let point = info.unwrap();
-            println!("Changed to {:?}", point);
-            Some(InputData::Touch(point).pressed().once())
-        } else {
-            None
-        }
+        let input_status = internal.borrow().clone();
+        //println!("input_status = {:?}", input_status);
+        input_status
     });
 
     ui.indev_drv_register(&mut touch_screen)?;
@@ -56,6 +56,7 @@ fn main() -> Result<(), LvError> {
 
     let mut btn_state = false;
     button.on_event(|mut btn, event| {
+        println!("Some event! {:?}", event);
         if let lvgl::Event::Clicked = event {
             if btn_state {
                 let nt = CString::new("Click me!").unwrap();
@@ -71,11 +72,22 @@ fn main() -> Result<(), LvError> {
     })?;
 
     let mut loop_started = Instant::now();
+    let mut latest_touch_point = Point::new(0, 0);
     'running: loop {
         ui.task_handler();
         window.update(ui.get_display_ref().unwrap());
 
-        for event in window.events() {
+        let mut events = window.events().peekable();
+
+        if events.peek().is_none() {
+            latest_touch_status.replace(
+                InputData::Touch(latest_touch_point.clone())
+                    .released()
+                    .once(),
+            );
+        }
+
+        for event in events {
             match event {
                 SimulatorEvent::MouseButtonUp {
                     mouse_btn: _,
@@ -83,12 +95,15 @@ fn main() -> Result<(), LvError> {
                 } => {
                     println!("Clicked on: {:?}", point);
                     // Send a event to the button directly
-                    latest_touch_point.borrow_mut().replace(point);
+                    latest_touch_point = point.clone();
+                    latest_touch_status.replace(InputData::Touch(point).pressed().once());
                 }
                 SimulatorEvent::Quit => break 'running,
                 _ => {}
             }
         }
+
+        sleep(Duration::from_millis(50));
 
         ui.tick_inc(loop_started.elapsed());
         loop_started = Instant::now();

@@ -57,10 +57,7 @@ where
         }
     }
 
-    pub fn indev_drv_register<F>(&mut self, input_device: &mut Pointer<F>) -> LvResult<()>
-    where
-        F: Fn() -> Option<BufferStatus>,
-    {
+    pub fn indev_drv_register(&mut self, input_device: &mut Pointer) -> LvResult<()> {
         unsafe {
             let descr = lvgl_sys::lv_indev_drv_register(&mut input_device.driver as *mut _);
             input_device.set_descriptor(descr)?;

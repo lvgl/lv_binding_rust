@@ -1,3 +1,4 @@
+use crate::mem::Box;
 use crate::LvResult;
 use core::mem::MaybeUninit;
 use embedded_graphics::geometry::Point;
@@ -26,7 +27,7 @@ pub enum InputState {
 
 impl InputState {
     pub fn once(self) -> BufferStatus {
-        BufferStatus::Empty(self)
+        BufferStatus::Once(self)
     }
 
     pub fn and_continued(self) -> BufferStatus {
@@ -36,35 +37,31 @@ impl InputState {
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum BufferStatus {
-    Empty(InputState),
+    Once(InputState),
     Buffered(InputState),
 }
 
-pub struct Pointer<F>
-where
-    F: Fn() -> Option<BufferStatus>,
-{
+pub struct Pointer {
     pub(crate) driver: lvgl_sys::lv_indev_drv_t,
     pub(crate) descriptor: Option<lvgl_sys::lv_indev_t>,
-    handler: F,
 }
 
-impl<F> Pointer<F>
-where
-    F: Fn() -> Option<BufferStatus>,
-{
-    pub fn new(mut handler: F) -> Self {
+impl Pointer {
+    pub fn new<F>(mut handler: F) -> Self
+    where
+        F: Fn() -> BufferStatus,
+    {
         let driver = unsafe {
             let mut indev_drv = MaybeUninit::uninit();
             lvgl_sys::lv_indev_drv_init(indev_drv.as_mut_ptr());
             let mut indev_drv = indev_drv.assume_init();
             indev_drv.type_ = lvgl_sys::LV_INDEV_TYPE_POINTER as lvgl_sys::lv_indev_type_t;
             indev_drv.read_cb = Some(read_input::<F>);
-            indev_drv.user_data = &mut handler as *mut _ as lvgl_sys::lv_indev_drv_user_data_t;
+            indev_drv.user_data = Box::into_raw(Box::new(handler).unwrap()) as *mut _
+                as lvgl_sys::lv_indev_drv_user_data_t;
             indev_drv
         };
         Self {
-            handler,
             driver,
             descriptor: None,
         }
@@ -85,47 +82,42 @@ unsafe extern "C" fn read_input<F>(
     data: *mut lvgl_sys::lv_indev_data_t,
 ) -> bool
 where
-    F: Fn() -> Option<BufferStatus>,
+    F: Fn() -> BufferStatus,
 {
-    let mut data = *data;
     // convert user data to function
     let user_closure = &mut *((*indev_drv).user_data as *mut F);
     // call user data
-    let result: Option<BufferStatus> = user_closure();
-    return if let Some(info) = result {
-        match info {
-            BufferStatus::Empty(InputState::Pressed(InputData::Touch(point))) => {
-                data.point.x = point.x as lvgl_sys::lv_coord_t;
-                data.point.y = point.y as lvgl_sys::lv_coord_t;
-                data.state = lvgl_sys::LV_INDEV_STATE_PR as lvgl_sys::lv_indev_state_t;
-                false
-            }
-            BufferStatus::Empty(InputState::Released(InputData::Touch(point))) => {
-                data.point.x = point.x as lvgl_sys::lv_coord_t;
-                data.point.y = point.y as lvgl_sys::lv_coord_t;
-                data.state = lvgl_sys::LV_INDEV_STATE_REL as lvgl_sys::lv_indev_state_t;
-                false
-            }
-            BufferStatus::Buffered(InputState::Pressed(InputData::Touch(point))) => {
-                data.point.x = point.x as lvgl_sys::lv_coord_t;
-                data.point.y = point.y as lvgl_sys::lv_coord_t;
-                data.state = lvgl_sys::LV_INDEV_STATE_PR as lvgl_sys::lv_indev_state_t;
-                true
-            }
-            BufferStatus::Buffered(InputState::Released(InputData::Touch(point))) => {
-                data.point.x = point.x as lvgl_sys::lv_coord_t;
-                data.point.y = point.y as lvgl_sys::lv_coord_t;
-                data.state = lvgl_sys::LV_INDEV_STATE_REL as lvgl_sys::lv_indev_state_t;
-                true
-            }
-            BufferStatus::Empty(InputState::Released(InputData::Key(_))) => false,
-            BufferStatus::Empty(InputState::Pressed(InputData::Key(_))) => false,
-            BufferStatus::Buffered(InputState::Released(InputData::Key(_))) => true,
-            BufferStatus::Buffered(InputState::Pressed(InputData::Key(_))) => true,
+    let info: BufferStatus = user_closure();
+    match info {
+        BufferStatus::Once(InputState::Pressed(InputData::Touch(point))) => {
+            (*data).point.x = point.x as lvgl_sys::lv_coord_t;
+            (*data).point.y = point.y as lvgl_sys::lv_coord_t;
+            (*data).state = lvgl_sys::LV_INDEV_STATE_PR as lvgl_sys::lv_indev_state_t;
+            false
         }
-    } else {
-        false
-    };
+        BufferStatus::Once(InputState::Released(InputData::Touch(point))) => {
+            (*data).point.x = point.x as lvgl_sys::lv_coord_t;
+            (*data).point.y = point.y as lvgl_sys::lv_coord_t;
+            (*data).state = lvgl_sys::LV_INDEV_STATE_REL as lvgl_sys::lv_indev_state_t;
+            false
+        }
+        BufferStatus::Buffered(InputState::Pressed(InputData::Touch(point))) => {
+            (*data).point.x = point.x as lvgl_sys::lv_coord_t;
+            (*data).point.y = point.y as lvgl_sys::lv_coord_t;
+            (*data).state = lvgl_sys::LV_INDEV_STATE_PR as lvgl_sys::lv_indev_state_t;
+            true
+        }
+        BufferStatus::Buffered(InputState::Released(InputData::Touch(point))) => {
+            (*data).point.x = point.x as lvgl_sys::lv_coord_t;
+            (*data).point.y = point.y as lvgl_sys::lv_coord_t;
+            (*data).state = lvgl_sys::LV_INDEV_STATE_REL as lvgl_sys::lv_indev_state_t;
+            true
+        }
+        BufferStatus::Once(InputState::Released(InputData::Key(_))) => false,
+        BufferStatus::Once(InputState::Pressed(InputData::Key(_))) => false,
+        BufferStatus::Buffered(InputState::Released(InputData::Key(_))) => true,
+        BufferStatus::Buffered(InputState::Pressed(InputData::Key(_))) => true,
+    }
 }
 
 #[cfg(test)]
