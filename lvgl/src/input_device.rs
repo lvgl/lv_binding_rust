@@ -123,7 +123,7 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{Color, UI};
+    use crate::UI;
     use core::marker::PhantomData;
     use embedded_graphics::drawable::Pixel;
     use embedded_graphics::geometry::Size;
@@ -133,14 +133,14 @@ mod test {
 
     struct FakeDisplay<C>
     where
-        C: PixelColor + From<Color>,
+        C: PixelColor,
     {
         p: PhantomData<C>,
     }
 
     impl<C> DrawTarget<C> for FakeDisplay<C>
     where
-        C: PixelColor + From<Color>,
+        C: PixelColor,
     {
         type Error = ();
 
@@ -161,14 +161,13 @@ mod test {
 
         let disp: FakeDisplay<Rgb565> = FakeDisplay { p: PhantomData };
 
-        ui.disp_drv_register(disp);
+        ui.disp_drv_register(disp)?;
 
-        fn read_touchpad_device() -> Point {
-            Point::new(120, 23)
+        fn read_touchpad_device() -> BufferStatus {
+            InputData::Touch(Point::new(120, 23)).pressed().once()
         }
 
-        let mut touch_screen =
-            Pointer::new(|| InputData::Touch(read_touchpad_device()).pressed().once());
+        let mut touch_screen = Pointer::new(|| read_touchpad_device());
 
         ui.indev_drv_register(&mut touch_screen)?;
 

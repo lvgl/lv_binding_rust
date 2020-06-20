@@ -58,6 +58,18 @@ where
     }
 
     pub fn indev_drv_register(&mut self, input_device: &mut Pointer) -> LvResult<()> {
+        if self.display_data.is_none() {
+            // TODO: Better yet would be to create a display struct that one register the
+            // input device in that instance. Represents better the LVGL correct usage. Also it's
+            // inline with unrepresentable invalid states using Rust type system.
+            // ```rust
+            // let disp = ui.disp_drv_register(embed_graph_disp)?;
+            // disp.indev_drv_register(disp);
+            // ...
+            // window.update(&disp)
+            // ```
+            return Err(LvError::Uninitialized);
+        }
         unsafe {
             let descr = lvgl_sys::lv_indev_drv_register(&mut input_device.driver as *mut _);
             input_device.set_descriptor(descr)?;
