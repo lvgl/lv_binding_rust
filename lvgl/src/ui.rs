@@ -1,4 +1,4 @@
-use crate::input_device::{BufferStatus, Pointer};
+use crate::input_device::Pointer;
 use crate::mem::Box;
 use crate::{Color, Event, LvError, LvResult, Obj, Widget};
 use core::marker::PhantomData;

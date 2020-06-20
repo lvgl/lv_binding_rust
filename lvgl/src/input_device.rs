@@ -47,7 +47,7 @@ pub struct Pointer {
 }
 
 impl Pointer {
-    pub fn new<F>(mut handler: F) -> Self
+    pub fn new<F>(handler: F) -> Self
     where
         F: Fn() -> BufferStatus,
     {
