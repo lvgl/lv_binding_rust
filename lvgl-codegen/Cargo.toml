@@ -15,4 +15,3 @@ lazy_static = "1.4.0"
 proc-macro2 = "1.0.18"
 Inflector = "0.11.4"
 syn = { version = "1.0.31", features = ["full"]}
-
