@@ -27,6 +27,24 @@ impl Color {
     pub fn from_raw(raw: lvgl_sys::lv_color_t) -> Self {
         Self { raw }
     }
+
+    pub fn r(&self) -> u8 {
+        unsafe {
+            lvgl_sys::_LV_COLOR_GET_R(self.raw) as u8
+        }
+    }
+
+    pub fn g(&self) -> u8 {
+        unsafe {
+            lvgl_sys::_LV_COLOR_GET_G(self.raw) as u8
+        }
+    }
+
+    pub fn b(&self) -> u8 {
+        unsafe {
+            lvgl_sys::_LV_COLOR_GET_B(self.raw) as u8
+        }
+    }
 }
 
 impl From<Color> for Rgb888 {
@@ -230,6 +248,28 @@ impl From<Animation> for lvgl_sys::lv_anim_enable_t {
         match anim {
             Animation::ON => lvgl_sys::LV_ANIM_ON as u8,
             Animation::OFF => lvgl_sys::LV_ANIM_OFF as u8,
+        }
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use lvgl_sys;
+
+    #[test]
+    fn color_properties_accessible() {
+        let color = Color::from_rgb((206, 51, 255));
+
+        if lvgl_sys::LV_COLOR_DEPTH == 32 {
+            assert_eq!(color.r(), 206);
+            assert_eq!(color.g(), 51);
+            assert_eq!(color.b(), 255);
+        } else if lvgl_sys::LV_COLOR_DEPTH == 16 {
+            assert_eq!(color.r(), 25);
+            assert_eq!(color.g(), 12);
+            assert_eq!(color.b(), 31);
         }
     }
 }
