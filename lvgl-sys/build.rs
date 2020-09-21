@@ -62,25 +62,48 @@ fn main() {
         .include(&lv_config_dir)
         .compile("lvgl");
 
-    let cc_args = [
+    let mut cc_args = vec![
         "-DLV_CONF_INCLUDE_SIMPLE=1",
         "-I",
         lv_config_dir.to_str().unwrap(),
         "-I",
         vendor.to_str().unwrap(),
+        "-fvisibility=default",
     ];
 
+    // Set correct target triple for bindgen when cross-compiling
+    let target = env::var("TARGET").expect("Cargo build scripts always have TARGET");
+    let host = env::var("HOST").expect("Cargo build scripts always have HOST");
+    if target != host {
+        cc_args.push("-target");
+        cc_args.push(target.as_str());
+    }
+
+    let mut additional_args = Vec::new();
+    if target.ends_with("emscripten") {
+        if let Ok(em_path) = env::var("EMSDK") {
+            additional_args.push("-I".to_string());
+            additional_args.push(format!("{}/upstream/emscripten/system/include/libc", em_path));
+            additional_args.push("-I".to_string());
+            additional_args.push(format!("{}/upstream/emscripten/system/lib/libc/musl/arch/emscripten", em_path));
+            additional_args.push("-I".to_string());
+            additional_args.push(format!("{}/upstream/emscripten/system/include/SDL", em_path));
+        }
+    }
+
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    bindgen::Builder::default()
+    let bindings = bindgen::Builder::default()
         .header(shims_dir.join("lvgl_sys.h").to_str().unwrap())
         .layout_tests(false)
         .use_core()
         .rustfmt_bindings(true)
         .ctypes_prefix("cty")
         .clang_args(&cc_args)
+        .clang_args(&additional_args)
         .generate()
-        .expect("Unable to generate bindings")
-        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Unable to generate bindings");
+
+    bindings.write_to_file(out_path.join("bindings.rs"))
         .expect("Can't write bindings!");
 }
 
