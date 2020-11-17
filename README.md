@@ -47,6 +47,12 @@ $ DEP_LV_CONFIG_PATH=`pwd` cargo build -Zfeatures=build_dep
 
 ## Running the demo
 
+**Hint for macOS users**: Before you run the demos you need to make sure you have [libsdl](https://www.libsdl.org) installed on your machine. To install it, use HomeBrew:
+
+```shell
+$ brew install sdl2
+```
+
 [This project contains examples that can run in a desktop simulator.](./examples)
 
 First, make sure to pull `lvgl-rs` submodules:
