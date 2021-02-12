@@ -1,12 +1,11 @@
 use inflector::cases::pascalcase::to_pascal_case;
 use lazy_static::lazy_static;
 use proc_macro2::{Ident, TokenStream};
-use quote::format_ident;
+use quote::{format_ident, ToTokens};
 use quote::quote;
 use regex::Regex;
 use std::collections::HashMap;
 use std::error::Error;
-use syn::export::ToTokens;
 use syn::{FnArg, ForeignItem, ForeignItemFn, Item, ReturnType};
 
 type CGResult<T> = Result<T, Box<dyn Error>>;
