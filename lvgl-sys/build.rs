@@ -12,17 +12,24 @@ fn main() {
     let vendor_src = vendor.join("lvgl").join("src");
 
     let lv_config_dir = {
-        let raw_path = env::var(CONFIG_NAME).unwrap_or_else(|_| {
-            panic!(
-                "The environment variable {} is required to be defined",
-                CONFIG_NAME
-            );
+        let conf_path = env::var(CONFIG_NAME).map(|raw_path| PathBuf::from(raw_path)).unwrap_or_else(|_| {
+                match std::env::var("DOCS_RS") {
+                    Ok(_) => {
+                        // We've detected that we are building for docs.rs
+                        // so let's set the examples `lv_conf.h` file.
+                        project_dir.join("..").join("examples").join("include")
+                    }
+                    Err(_) => panic!(
+                        "The environment variable {} is required to be defined",
+                        CONFIG_NAME
+                    )
+            }
         });
-        let conf_path = PathBuf::from(raw_path);
 
         if !conf_path.exists() {
             panic!(format!(
-                "Directory referenced by {} needs to exist",
+                "Directory {} referenced by {} needs to exist",
+                conf_path.to_string_lossy(),
                 CONFIG_NAME
             ));
         }
