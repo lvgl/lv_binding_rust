@@ -27,6 +27,12 @@ In order to build the `lvgl` project you will need the following system dependen
 $ sudo apt install build-essential llvm clang
 ```
 
+If you want to build the examples, then you will need to install SDL2 as well.
+
+```
+$ sudo apt install libsdl2-dev
+```
+
 ## Usage
 
 Edit your `Cargo.toml` file dependencies with:
