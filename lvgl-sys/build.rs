@@ -101,6 +101,7 @@ fn main() {
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings = bindgen::Builder::default()
         .header(shims_dir.join("lvgl_sys.h").to_str().unwrap())
+        .generate_comments(false)
         .layout_tests(false)
         .use_core()
         .rustfmt_bindings(true)
