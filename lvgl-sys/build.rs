@@ -16,8 +16,8 @@ fn main() {
                 match std::env::var("DOCS_RS") {
                     Ok(_) => {
                         // We've detected that we are building for docs.rs
-                        // so let's set the examples `lv_conf.h` file.
-                        project_dir.join("..").join("examples").join("include")
+                        // so let's use the vendored `lv_conf.h` file.
+                        vendor.clone()
                     }
                     Err(_) => panic!(
                         "The environment variable {} is required to be defined",
@@ -38,7 +38,8 @@ fn main() {
         }
         if !conf_path.join("lv_conf.h").exists() {
             panic!(format!(
-                "Directory referenced by {} needs to contain a file called lv_conf.h",
+                "Directory {} referenced by {} needs to contain a file called lv_conf.h",
+                conf_path.to_string_lossy(),
                 CONFIG_NAME
             ));
         }
