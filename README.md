@@ -19,6 +19,14 @@ LittlevGL is compatible with <samp>#![no_std]</samp> environments by default.
 
 ![Rust bindings usage demo code.](demo.png)
 
+## System Build Dependencies
+
+In order to build the `lvgl` project you will need the following system dependencies to be installed:
+
+```
+$ sudo apt install build-essential llvm clang
+```
+
 ## Usage
 
 Edit your `Cargo.toml` file dependencies with:
