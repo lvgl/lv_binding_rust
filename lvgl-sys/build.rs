@@ -12,7 +12,9 @@ fn main() {
     let vendor_src = vendor.join("lvgl").join("src");
 
     let lv_config_dir = {
-        let conf_path = env::var(CONFIG_NAME).map(|raw_path| PathBuf::from(raw_path)).unwrap_or_else(|_| {
+        let conf_path = env::var(CONFIG_NAME)
+            .map(|raw_path| PathBuf::from(raw_path))
+            .unwrap_or_else(|_| {
                 match std::env::var("DOCS_RS") {
                     Ok(_) => {
                         // We've detected that we are building for docs.rs
@@ -22,9 +24,9 @@ fn main() {
                     Err(_) => panic!(
                         "The environment variable {} is required to be defined",
                         CONFIG_NAME
-                    )
-            }
-        });
+                    ),
+                }
+            });
 
         if !conf_path.exists() {
             panic!(format!(
@@ -91,11 +93,20 @@ fn main() {
     if target.ends_with("emscripten") {
         if let Ok(em_path) = env::var("EMSDK") {
             additional_args.push("-I".to_string());
-            additional_args.push(format!("{}/upstream/emscripten/system/include/libc", em_path));
+            additional_args.push(format!(
+                "{}/upstream/emscripten/system/include/libc",
+                em_path
+            ));
             additional_args.push("-I".to_string());
-            additional_args.push(format!("{}/upstream/emscripten/system/lib/libc/musl/arch/emscripten", em_path));
+            additional_args.push(format!(
+                "{}/upstream/emscripten/system/lib/libc/musl/arch/emscripten",
+                em_path
+            ));
             additional_args.push("-I".to_string());
-            additional_args.push(format!("{}/upstream/emscripten/system/include/SDL", em_path));
+            additional_args.push(format!(
+                "{}/upstream/emscripten/system/include/SDL",
+                em_path
+            ));
         }
     }
 
@@ -112,7 +123,8 @@ fn main() {
         .generate()
         .expect("Unable to generate bindings");
 
-    bindings.write_to_file(out_path.join("bindings.rs"))
+    bindings
+        .write_to_file(out_path.join("bindings.rs"))
         .expect("Can't write bindings!");
 }
 

@@ -29,21 +29,15 @@ impl Color {
     }
 
     pub fn r(&self) -> u8 {
-        unsafe {
-            lvgl_sys::_LV_COLOR_GET_R(self.raw) as u8
-        }
+        unsafe { lvgl_sys::_LV_COLOR_GET_R(self.raw) as u8 }
     }
 
     pub fn g(&self) -> u8 {
-        unsafe {
-            lvgl_sys::_LV_COLOR_GET_G(self.raw) as u8
-        }
+        unsafe { lvgl_sys::_LV_COLOR_GET_G(self.raw) as u8 }
     }
 
     pub fn b(&self) -> u8 {
-        unsafe {
-            lvgl_sys::_LV_COLOR_GET_B(self.raw) as u8
-        }
+        unsafe { lvgl_sys::_LV_COLOR_GET_B(self.raw) as u8 }
     }
 }
 
@@ -249,7 +243,6 @@ impl From<Animation> for lvgl_sys::lv_anim_enable_t {
         }
     }
 }
-
 
 #[cfg(test)]
 mod test {
