@@ -43,7 +43,7 @@ where
     C: PixelColor + From<Color>,
 {
     pub fn init() -> LvResult<Self> {
-        if !LVGL_IN_USE.compare_exchange(false, true, Ordering::SeqCst, Ordering::Relaxed) {
+        if !LVGL_IN_USE.compare_and_swap(false, true, Ordering::SeqCst) {
             unsafe {
                 lvgl_sys::lv_init();
             }
