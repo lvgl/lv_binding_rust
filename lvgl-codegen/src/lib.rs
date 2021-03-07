@@ -1,8 +1,8 @@
 use inflector::cases::pascalcase::to_pascal_case;
 use lazy_static::lazy_static;
 use proc_macro2::{Ident, TokenStream};
-use quote::{format_ident, ToTokens};
 use quote::quote;
+use quote::{format_ident, ToTokens};
 use regex::Regex;
 use std::collections::HashMap;
 use std::error::Error;
