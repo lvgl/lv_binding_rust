@@ -23,10 +23,10 @@ mod tests {
             lv_init();
 
             let horizontal_resolution = lv_disp_get_hor_res(core::ptr::null_mut());
-            assert_eq!(horizontal_resolution, 240);
+            assert_eq!(horizontal_resolution, LV_HOR_RES_MAX as i16);
 
             let vertical_resolution = lv_disp_get_ver_res(core::ptr::null_mut());
-            assert_eq!(vertical_resolution, 240);
+            assert_eq!(vertical_resolution, LV_VER_RES_MAX as i16);
         }
     }
 }
