@@ -19,7 +19,7 @@ fn main() {
                     Ok(_) => {
                         // We've detected that we are building for docs.rs
                         // so let's use the vendored `lv_conf.h` file.
-                        vendor.clone()
+                        vendor.join("include")
                     }
                     Err(_) => panic!(
                         "The environment variable {} is required to be defined",
