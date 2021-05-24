@@ -71,7 +71,6 @@ impl<T> AsMut<T> for Box<T> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use core::mem::MaybeUninit;
     use std::sync::Once;
     use std::vec::Vec;
 
@@ -108,8 +107,7 @@ mod test {
             disp: i32,
         }
 
-        print_mem_info();
-        let total_mem_available_initially = get_mem_info().free_size;
+        let initial_mem_info = mem_info();
 
         let mut keep = Vec::new();
         for i in 0..100 {
@@ -122,7 +120,8 @@ mod test {
 
             println!("{:?}", p);
             let mut b = Box::new(p).unwrap_or_else(|_| {
-                print_mem_info();
+                let info = mem_info();
+                println!("mem info: {:?}", &info);
                 panic!("OOM");
             });
 
@@ -130,40 +129,41 @@ mod test {
 
             let point = b.as_mut();
             if point.x != i {
-                print_mem_info();
-
                 println!("{:?}", point);
             }
             assert_eq!(point.x, i);
 
-            print_mem_info();
+            let info = mem_info();
+            println!("mem info: {:?}", &info);
             keep.push(b);
         }
         drop(keep);
 
-        print_mem_info();
         unsafe {
             lvgl_sys::lv_mem_defrag();
         }
-        print_mem_info();
+
+        let final_info = mem_info();
+        println!("mem info: {:?}", &final_info);
 
         // If this fails, we are leaking memory! BOOM! \o/
-        assert_eq!(total_mem_available_initially, get_mem_info().free_size)
+        assert_eq!(initial_mem_info.free_size, final_info.free_size)
     }
 
-    fn get_mem_info() -> lvgl_sys::lv_mem_monitor_t {
-        let mut info: MaybeUninit<lvgl_sys::lv_mem_monitor_t> = MaybeUninit::uninit();
+    fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
+        let mut info = lvgl_sys::lv_mem_monitor_t {
+            total_size: 0,
+            free_cnt: 0,
+            free_size: 0,
+            free_biggest_size: 0,
+            used_cnt: 0,
+            max_used: 0,
+            used_pct: 0,
+            frag_pct: 0
+        };
         unsafe {
-            lvgl_sys::lv_mem_monitor(info.as_mut_ptr());
+            lvgl_sys::lv_mem_monitor(&mut info as *mut _);
         }
-        if !info.as_ptr().is_null() {
-            unsafe { info.assume_init() }
-        } else {
-            panic!("Could not get memory info from LVGL! :(");
-        }
-    }
-
-    fn print_mem_info() {
-        println!("mem info: {:?}", get_mem_info());
+        info
     }
 }
