@@ -12,7 +12,7 @@ repository = "https://github.com/rafaelcaricio/lvgl-rs"
 regex = "1.4.3"
 quote = "1.0.9"
 lazy_static = "1.4.0"
-proc-macro2 = "1.0.24"
+proc-macro2 = "1.0.27"
 Inflector = "0.11.4"
-syn = { version = "1.0.62", features = ["full"]}
+syn = { version = "1.0.72", features = ["full"]}
 
