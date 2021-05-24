@@ -20,5 +20,5 @@ name = "lvgl_sys"
 cty = "0.2.1"
 
 [build-dependencies]
-cc = "1.0.67"
-bindgen = "0.57.0"
+cc = "1.0.68"
+bindgen = "0.58.1"

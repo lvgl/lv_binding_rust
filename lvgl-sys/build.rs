@@ -29,21 +29,21 @@ fn main() {
             });
 
         if !conf_path.exists() {
-            panic!(format!(
+            panic!(
                 "Directory {} referenced by {} needs to exist",
                 conf_path.to_string_lossy(),
                 CONFIG_NAME
-            ));
+            );
         }
         if !conf_path.is_dir() {
-            panic!(format!("{} needs to be a directory", CONFIG_NAME));
+            panic!("{} needs to be a directory", CONFIG_NAME);
         }
         if !conf_path.join("lv_conf.h").exists() {
-            panic!(format!(
+            panic!(
                 "Directory {} referenced by {} needs to contain a file called lv_conf.h",
                 conf_path.to_string_lossy(),
                 CONFIG_NAME
-            ));
+            );
         }
 
         println!(

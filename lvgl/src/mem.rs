@@ -3,11 +3,16 @@ use core::mem;
 use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
 
-/// Places `T` into LVGL memory.
+/// Places a sized `T` into LVGL memory.
+///
+/// This is useful for cases when we need to allocate memory on Rust side
+/// and handover the management of that memory to LVGL. May also be used in cases we
+/// want to use dynamic memory in the Rust side.
 pub(crate) struct Box<T>(NonNull<T>);
 
 impl<T> Box<T> {
-    pub fn new(inner: T) -> LvResult<Box<T>> {
+    /// Allocate memory using LVGL memory API and place `T` in the LVGL tracked memory.
+    pub fn new(value: T) -> LvResult<Box<T>> {
         let size = mem::size_of::<T>();
         let inner = unsafe {
             let ptr = lvgl_sys::lv_mem_alloc(size as lvgl_sys::size_t) as *mut T;
@@ -19,17 +24,14 @@ impl<T> Box<T> {
                 "Memory address not aligned!"
             );
 
-            match NonNull::new(ptr) {
-                Some(v) => {
-                    // Move `T` to LVGL managed memory
-                    // It will panic if LVGL memory is not aligned
-                    ptr.write(inner);
-                    Ok(v)
-                }
-                None => Err(LvError::LvOOMemory),
-            }
+            NonNull::new(ptr)
+                .map(|p| {
+                    p.as_ptr().write(value);
+                    p
+                })
+                .ok_or(LvError::LvOOMemory)?
         };
-        Ok(Box(inner?))
+        Ok(Box(inner))
     }
 
     pub fn into_raw(self) -> *mut T {
@@ -71,6 +73,7 @@ mod test {
     use super::*;
     use core::mem::MaybeUninit;
     use std::sync::Once;
+    use std::vec::Vec;
 
     static INIT_LVGL: Once = Once::new();
 
@@ -105,6 +108,10 @@ mod test {
             disp: i32,
         }
 
+        print_mem_info();
+        let total_mem_available_initially = get_mem_info().free_size;
+
+        let mut keep = Vec::new();
         for i in 0..100 {
             let p = Point {
                 x: i,
@@ -128,17 +135,35 @@ mod test {
                 println!("{:?}", point);
             }
             assert_eq!(point.x, i);
+
+            print_mem_info();
+            keep.push(b);
         }
+        drop(keep);
+
+        print_mem_info();
+        unsafe {
+            lvgl_sys::lv_mem_defrag();
+        }
+        print_mem_info();
+
+        // If this fails, we are leaking memory! BOOM! \o/
+        assert_eq!(total_mem_available_initially, get_mem_info().free_size)
     }
 
-    fn print_mem_info() {
-        let mut info = MaybeUninit::uninit();
+    fn get_mem_info() -> lvgl_sys::lv_mem_monitor_t {
+        let mut info: MaybeUninit<lvgl_sys::lv_mem_monitor_t> = MaybeUninit::uninit();
         unsafe {
             lvgl_sys::lv_mem_monitor(info.as_mut_ptr());
         }
         if !info.as_ptr().is_null() {
-            let info = unsafe { info.assume_init() };
-            println!("mem info: {:?}", info);
+            unsafe { info.assume_init() }
+        } else {
+            panic!("Could not get memory info from LVGL! :(");
         }
+    }
+
+    fn print_mem_info() {
+        println!("mem info: {:?}", get_mem_info());
     }
 }

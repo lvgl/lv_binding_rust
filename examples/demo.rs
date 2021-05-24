@@ -1,4 +1,4 @@
-use cstr_core::{CStr, CString};
+use cstr_core::CString;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
@@ -52,20 +52,6 @@ fn main() -> Result<(), LvError> {
     bt.set_label_align(LabelAlign::Left)?;
     bt.set_align(&mut screen, Align::InTopLeft, 0, 0)?;
 
-    fn set_text<S>(text: S) -> Result<(), ()>
-    where
-        S: AsRef<cstr_core::CStr>,
-    {
-        let _v: *const i8 = text.as_ref().as_ptr();
-        Ok(())
-    }
-
-    let mut t: heapless::String<heapless::consts::U8> = heapless::String::from("test");
-    t.push('\0').unwrap();
-    set_text(CStr::from_bytes_with_nul(t.as_bytes()).unwrap()).unwrap();
-    set_text(cstr_core::CStr::from_bytes_with_nul("test\0".as_bytes()).unwrap()).unwrap();
-    set_text(cstr_core::CString::new("test").unwrap().as_c_str()).unwrap();
-
     let mut power = Label::new(&mut screen)?;
     power.set_recolor(true)?;
     power.set_width(80)?;
@@ -80,8 +66,8 @@ fn main() -> Result<(), LvError> {
         if i > 59 {
             i = 0;
         }
-        let val = format!("21:{:02}", i);
-        time.set_text(CString::new(val.as_str()).unwrap().as_c_str())?;
+        let val = CString::new(format!("21:{:02}", i)).unwrap();
+        time.set_text(&val)?;
         i = 1 + i;
 
         ui.task_handler();
