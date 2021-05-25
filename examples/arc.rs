@@ -11,7 +11,31 @@ use lvgl::{LvError, Widget};
 use lvgl_sys;
 use std::time::Instant;
 
+fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
+    let mut info = lvgl_sys::lv_mem_monitor_t {
+        total_size: 0,
+        free_cnt: 0,
+        free_size: 0,
+        free_biggest_size: 0,
+        used_cnt: 0,
+        max_used: 0,
+        used_pct: 0,
+        frag_pct: 0,
+    };
+    unsafe {
+        lvgl_sys::lv_mem_monitor(&mut info as *mut _);
+    }
+    info
+}
+
 fn main() -> Result<(), LvError> {
+    println!("meminfo init: {:?}", mem_info());
+    run_arc_demo()?;
+    println!("meminfo end: {:?}", mem_info());
+    Ok(())
+}
+
+fn run_arc_demo() -> Result<(), LvError> {
     let display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(
         lvgl_sys::LV_HOR_RES_MAX,
         lvgl_sys::LV_VER_RES_MAX,
@@ -58,6 +82,7 @@ fn main() -> Result<(), LvError> {
         if i > 270 {
             forward = if forward { false } else { true };
             i = 1;
+            println!("meminfo running: {:?}", mem_info());
         }
         angle = if forward { angle + 1 } else { angle - 1 };
         arc.set_end_angle(angle + 135)?;

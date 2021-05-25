@@ -1,4 +1,4 @@
-use crate::mem::Box;
+use crate::Box;
 use crate::{Color, LvResult, State};
 use core::mem;
 use cstr_core::CStr;
@@ -31,7 +31,7 @@ impl Default for Style {
         let raw = unsafe {
             let mut style = mem::MaybeUninit::<lvgl_sys::lv_style_t>::uninit();
             lvgl_sys::lv_style_init(style.as_mut_ptr());
-            Box::new(style.assume_init()).unwrap()
+            Box::new(style.assume_init())
         };
         Self { raw }
     }

@@ -1,9 +1,9 @@
 use crate::lv_core::style::Style;
-use crate::mem::Box;
+use crate::Box;
 use crate::{Align, LvError, LvResult};
 use core::ptr;
 
-/// Represents a native LittlevGL object
+/// Represents a native LVGL object
 pub trait NativeObject {
     /// Provide common way to access to the underlying native object pointer.
     fn raw(&self) -> LvResult<ptr::NonNull<lvgl_sys::lv_obj_t>>;
@@ -28,7 +28,7 @@ impl NativeObject for Obj {
     }
 }
 
-/// A wrapper for all LittlevGL common operations on generic objects.
+/// A wrapper for all LVGL common operations on generic objects.
 pub trait Widget: NativeObject {
     type SpecialEvent;
     type Part: Into<u8>;
@@ -146,8 +146,8 @@ macro_rules! define_object {
                 unsafe {
                     let mut raw = self.raw()?;
                     let obj = raw.as_mut();
-                    let user_closure = $crate::mem::Box::new(f)?;
-                    obj.user_data = $crate::mem::Box::into_raw(user_closure) as *mut cty::c_void;
+                    let user_closure = $crate::Box::new(f);
+                    obj.user_data = $crate::Box::into_raw(user_closure) as *mut cty::c_void;
                     lvgl_sys::lv_obj_set_event_cb(
                         obj,
                         lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),

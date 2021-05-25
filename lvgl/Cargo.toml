@@ -1,6 +1,6 @@
 [package]
 name = "lvgl"
-description = "LittlevGL bindings for Rust. A powerful and easy-to-use embedded GUI with many widgets, advanced visual effects (opacity, antialiasing, animations) and low memory requirements (16K RAM, 64K Flash)."
+description = "LVGL bindings for Rust. A powerful and easy-to-use embedded GUI with many widgets, advanced visual effects (opacity, antialiasing, animations) and low memory requirements (16K RAM, 64K Flash)."
 version = "0.5.2"
 authors = ["Rafael Caricio <crates.lvgl@caric.io>"]
 edition = "2018"
@@ -17,6 +17,10 @@ cty = "0.2.1"
 embedded-graphics = "0.6.2"
 cstr_core = "0.2.3"
 bitflags = "1.2.1"
+lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
+
+[features]
+lvgl_alloc = []
 
 [build-dependencies]
 quote = "1.0.9"
@@ -24,3 +28,28 @@ proc-macro2 = "1.0.24"
 lvgl-codegen = { version = "0.5.2", path = "../lvgl-codegen" }
 lvgl-sys = { version = "0.5.2", path = "../lvgl-sys" }
 
+
+[dev-dependencies]
+embedded-graphics-simulator = "0.2.1"
+heapless = "0.5.5"
+cstr_core = { version = "0.2.0", features = ["alloc"] }
+
+[[example]]
+name = "demo"
+path = "../examples/demo.rs"
+
+[[example]]
+name = "bar"
+path = "../examples/bar.rs"
+
+[[example]]
+name = "button_click"
+path = "../examples/button_click.rs"
+
+[[example]]
+name = "gauge"
+path = "../examples/gauge.rs"
+
+[[example]]
+name = "arc"
+path = "../examples/arc.rs"

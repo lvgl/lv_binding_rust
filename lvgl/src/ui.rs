@@ -1,4 +1,4 @@
-use crate::mem::Box;
+use crate::Box;
 use crate::{Color, Event, LvError, LvResult, Obj, Widget};
 use core::marker::PhantomData;
 use core::mem::MaybeUninit;
@@ -10,7 +10,7 @@ use embedded_graphics::pixelcolor::PixelColor;
 use embedded_graphics::prelude::*;
 use embedded_graphics::{drawable, DrawTarget};
 
-// There can only be a single reference to LittlevGL library.
+// There can only be a single reference to LVGL library.
 static LVGL_IN_USE: AtomicBool = AtomicBool::new(false);
 
 // TODO: Make this an external configuration
@@ -23,13 +23,13 @@ where
     T: DrawTarget<C>,
     C: PixelColor + From<Color>,
 {
-    // LittlevGL is not thread-safe by default.
+    // LVGL is not thread-safe by default.
     _not_sync: PhantomData<*mut ()>,
     // Later we can add possibility to have multiple displays by using `heapless::Vec`
     display_data: Option<DisplayUserData<T, C>>,
 }
 
-// LittlevGL does not use thread locals.
+// LVGL does not use thread locals.
 unsafe impl<T, C> Send for UI<T, C>
 where
     T: DrawTarget<C>,
@@ -47,9 +47,7 @@ where
             .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
             .is_ok()
         {
-            unsafe {
-                lvgl_sys::lv_init();
-            }
+            let _ = *crate::LVGL_INITIALIZED;
             Ok(Self {
                 _not_sync: PhantomData,
                 display_data: None,
@@ -75,15 +73,15 @@ where
             // Initialize the display buffer
             lvgl_sys::lv_disp_buf_init(
                 disp_buf.as_mut_ptr(),
-                Box::into_raw(Box::new(refresh_buffer1)?) as *mut cty::c_void,
-                Box::into_raw(Box::new(refresh_buffer2)?) as *mut cty::c_void,
+                Box::into_raw(Box::new(refresh_buffer1)) as *mut cty::c_void,
+                Box::into_raw(Box::new(refresh_buffer2)) as *mut cty::c_void,
                 lvgl_sys::LV_HOR_RES_MAX * REFRESH_BUFFER_LEN as u32,
             );
             // Basic initialization of the display driver
             lvgl_sys::lv_disp_drv_init(disp_drv.as_mut_ptr());
-            let mut disp_drv = Box::new(disp_drv.assume_init())?;
+            let mut disp_drv = Box::new(disp_drv.assume_init());
             // Assign the buffer to the display
-            disp_drv.buffer = Box::into_raw(Box::new(disp_buf.assume_init())?);
+            disp_drv.buffer = Box::into_raw(Box::new(disp_buf.assume_init()));
             // Set your driver function
             disp_drv.flush_cb = Some(display_callback_wrapper::<T, C>);
             disp_drv.user_data = &mut self.display_data as *mut _ as *mut cty::c_void;
@@ -166,12 +164,12 @@ unsafe extern "C" fn display_callback_wrapper<T, C>(
         // TODO: Can we do anything when there is a error while flushing?
         let _ = display_flush(&mut user_data.display, (x1, x2), (y1, y2), color_p);
     }
-    // Indicate to LittlevGL that we are ready with the flushing
+    // Indicate to LVGL that we are ready with the flushing
     lvgl_sys::lv_disp_flush_ready(disp_drv);
 }
 
 // We separate this display flush function to reduce the amount of unsafe code we need to write.
-// This also provides a good separation of concerns, what is necessary from LittlevGL to work and
+// This also provides a good separation of concerns, what is necessary from LVGL to work and
 // what is the lvgl-rs wrapper responsibility.
 fn display_flush<T, C>(
     display: &mut T,
