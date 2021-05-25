@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "lvgl",
-    "lvgl-sys",
     "lvgl-codegen",
-    "examples"
+    "lvgl-sys",
 ]

@@ -17,13 +17,37 @@
 #[macro_use]
 extern crate bitflags;
 
-pub(crate) mod mem;
+#[cfg(feature = "lvgl_alloc")]
+extern crate alloc;
+
 mod support;
 mod ui;
 #[macro_use]
 mod lv_core;
 pub mod widgets;
 
+#[cfg(feature = "lvgl_alloc")]
+mod allocator;
+
+#[cfg(feature = "lvgl_alloc")]
+use ::alloc::boxed::Box;
+
+#[cfg(not(feature = "lvgl_alloc"))]
+pub(crate) mod mem;
+
+#[cfg(not(feature = "lvgl_alloc"))]
+use crate::mem::Box;
+
 pub use lv_core::*;
 pub use support::*;
 pub use ui::*;
+
+// Initialize LVGL only once.
+lazy_static::lazy_static! {
+     static ref LVGL_INITIALIZED: bool = {
+        unsafe {
+            lvgl_sys::lv_init();
+        }
+        true
+    };
+}

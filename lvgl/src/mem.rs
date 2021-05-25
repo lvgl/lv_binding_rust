@@ -1,4 +1,3 @@
-use crate::{LvError, LvResult};
 use core::mem;
 use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
@@ -12,7 +11,7 @@ pub(crate) struct Box<T>(NonNull<T>);
 
 impl<T> Box<T> {
     /// Allocate memory using LVGL memory API and place `T` in the LVGL tracked memory.
-    pub fn new(value: T) -> LvResult<Box<T>> {
+    pub fn new(value: T) -> Box<T> {
         let size = mem::size_of::<T>();
         let inner = unsafe {
             let ptr = lvgl_sys::lv_mem_alloc(size as lvgl_sys::size_t) as *mut T;
@@ -29,9 +28,11 @@ impl<T> Box<T> {
                     p.as_ptr().write(value);
                     p
                 })
-                .ok_or(LvError::LvOOMemory)?
+                .unwrap_or_else(|| {
+                    panic!("Could not allocate memory {} bytes", size);
+                })
         };
-        Ok(Box(inner))
+        Box(inner)
     }
 
     pub fn into_raw(self) -> *mut T {
@@ -88,9 +89,9 @@ mod test {
     fn place_value_in_lv_mem() {
         init();
 
-        let v = Box::new(5).unwrap();
+        let v = Box::new(5);
         drop(v);
-        let v = Box::new(10).unwrap();
+        let v = Box::new(10);
         drop(v);
     }
 
@@ -119,11 +120,7 @@ mod test {
             };
 
             println!("{:?}", p);
-            let mut b = Box::new(p).unwrap_or_else(|_| {
-                let info = mem_info();
-                println!("mem info: {:?}", &info);
-                panic!("OOM");
-            });
+            let mut b = Box::new(p);
 
             println!("memory address is {:p}", b.as_mut());
 
@@ -159,7 +156,7 @@ mod test {
             used_cnt: 0,
             max_used: 0,
             used_pct: 0,
-            frag_pct: 0
+            frag_pct: 0,
         };
         unsafe {
             lvgl_sys::lv_mem_monitor(&mut info as *mut _);

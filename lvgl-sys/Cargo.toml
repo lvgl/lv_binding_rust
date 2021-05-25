@@ -1,6 +1,6 @@
 [package]
 name = "lvgl-sys"
-description = "Raw bindings to the LittlevGL C library."
+description = "Raw bindings to the LVGL C library."
 version = "0.5.2"
 authors = ["Rafael Caricio <crates.lvgl-sys@caric.io>"]
 edition = "2018"
