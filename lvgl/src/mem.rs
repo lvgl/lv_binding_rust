@@ -72,22 +72,11 @@ impl<T> AsMut<T> for Box<T> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::sync::Once;
     use std::vec::Vec;
-
-    static INIT_LVGL: Once = Once::new();
-
-    fn init() {
-        INIT_LVGL.call_once(|| {
-            unsafe {
-                lvgl_sys::lv_init();
-            };
-        });
-    }
 
     #[test]
     fn place_value_in_lv_mem() {
-        init();
+        crate::lvgl_init();
 
         let v = Box::new(5);
         drop(v);
@@ -97,7 +86,7 @@ mod test {
 
     #[test]
     fn place_complex_value_in_lv_mem() {
-        init();
+        crate::lvgl_init();
 
         #[repr(C)]
         #[derive(Debug)]

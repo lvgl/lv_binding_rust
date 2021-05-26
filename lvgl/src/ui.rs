@@ -47,7 +47,7 @@ where
             .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
             .is_ok()
         {
-            let _ = *crate::LVGL_INITIALIZED;
+            crate::lvgl_init();
             Ok(Self {
                 _not_sync: PhantomData,
                 display_data: None,
