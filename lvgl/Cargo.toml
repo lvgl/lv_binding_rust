@@ -17,10 +17,10 @@ cty = "0.2.1"
 embedded-graphics = "0.6.2"
 cstr_core = "0.2.3"
 bitflags = "1.2.1"
-lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 
 [features]
-lvgl_alloc = []
+alloc = ["cstr_core/alloc"]
+lvgl_alloc = ["alloc"]
 
 [build-dependencies]
 quote = "1.0.9"
@@ -28,23 +28,24 @@ proc-macro2 = "1.0.24"
 lvgl-codegen = { version = "0.5.2", path = "../lvgl-codegen" }
 lvgl-sys = { version = "0.5.2", path = "../lvgl-sys" }
 
-
 [dev-dependencies]
 embedded-graphics-simulator = "0.2.1"
 heapless = "0.5.5"
-cstr_core = { version = "0.2.0", features = ["alloc"] }
 
 [[example]]
 name = "demo"
 path = "../examples/demo.rs"
+required-features = ["alloc"]
 
 [[example]]
 name = "bar"
 path = "../examples/bar.rs"
+required-features = ["alloc"]
 
 [[example]]
 name = "button_click"
 path = "../examples/button_click.rs"
+required-features = ["alloc"]
 
 [[example]]
 name = "gauge"
@@ -53,3 +54,4 @@ path = "../examples/gauge.rs"
 [[example]]
 name = "arc"
 path = "../examples/arc.rs"
+required-features = ["lvgl_alloc"]
