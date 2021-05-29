@@ -11,7 +11,7 @@ pub(crate) struct Box<T>(NonNull<T>);
 
 impl<T> Box<T> {
     /// Allocate memory using LVGL memory API and place `T` in the LVGL tracked memory.
-    pub fn new(value: T) -> Box<T> {
+    pub fn new(value: T) -> Self {
         let size = mem::size_of::<T>();
         let inner = unsafe {
             let ptr = lvgl_sys::lv_mem_alloc(size as cty::size_t) as *mut T;
@@ -29,10 +29,10 @@ impl<T> Box<T> {
                     p
                 })
                 .unwrap_or_else(|| {
-                    panic!("Could not allocate memory {} bytes", size);
+                    panic!("Could not allocate memory {} bytes: {:?}", size, mem_info());
                 })
         };
-        Box(inner)
+        Self(inner)
     }
 
     pub fn into_raw(self) -> *mut T {
@@ -75,10 +75,29 @@ impl<T: Clone> Clone for Box<T> {
     }
 }
 
+fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
+    let mut info = lvgl_sys::lv_mem_monitor_t {
+        total_size: 0,
+        free_cnt: 0,
+        free_size: 0,
+        free_biggest_size: 0,
+        used_cnt: 0,
+        max_used: 0,
+        used_pct: 0,
+        frag_pct: 0,
+    };
+    unsafe {
+        lvgl_sys::lv_mem_monitor(&mut info as *mut _);
+    }
+    info
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
     use core::mem::MaybeUninit;
+    use crate::mem::mem_info;
+    use crate::*;
     use std::vec::Vec;
 
     fn init() {
@@ -95,7 +114,7 @@ mod test {
 
     #[test]
     fn place_value_in_lv_mem() {
-        crate::lvgl_init();
+        tests::initialize_test();
 
         let v = Box::new(5);
         drop(v);
@@ -107,7 +126,7 @@ mod test {
 
     #[test]
     fn place_complex_value_in_lv_mem() {
-        crate::lvgl_init();
+        tests::initialize_test();
 
         #[repr(C)]
         #[derive(Debug)]
@@ -161,7 +180,7 @@ mod test {
 
     #[test]
     fn clone_object_in_lv_mem() {
-        crate::lvgl_init();
+        crate::init();
 
         let v1 = Box::new(5);
         let v2 = v1.clone();
@@ -170,22 +189,5 @@ mod test {
         assert_eq!(*v1, *v2);
         // They should have different memory addresses, however.
         assert_ne!(v1.into_raw() as usize, v2.into_raw() as usize);
-    }
-
-    fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
-        let mut info = lvgl_sys::lv_mem_monitor_t {
-            total_size: 0,
-            free_cnt: 0,
-            free_size: 0,
-            free_biggest_size: 0,
-            used_cnt: 0,
-            max_used: 0,
-            used_pct: 0,
-            frag_pct: 0,
-        };
-        unsafe {
-            lvgl_sys::lv_mem_monitor(&mut info as *mut _);
-        }
-        info
     }
 }
