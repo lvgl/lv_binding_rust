@@ -86,7 +86,7 @@ $ git submodule update
 Then run the `demo` example:
 
 ```shell
-$ DEP_LV_CONFIG_PATH=`pwd`/examples/include cargo run --example demo
+$ DEP_LV_CONFIG_PATH=`pwd`/examples/include cargo run --example demo --features="alloc"
 ```
 
 ## Feature Support
