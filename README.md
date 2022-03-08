@@ -1,3 +1,5 @@
+[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+
 <h1 align="center"> LVGL - Open-source Embedded GUI Library in Rust</h1>
 
 ![Original LVGL demo image](lv_demo.png)
