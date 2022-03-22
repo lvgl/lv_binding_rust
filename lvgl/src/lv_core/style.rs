@@ -7,6 +7,7 @@ pub enum Themes {
     Pretty,
 }
 
+#[derive(Clone)]
 pub struct Style {
     pub(crate) raw: Box<lvgl_sys::lv_style_t>,
 }

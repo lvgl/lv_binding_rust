@@ -69,6 +69,12 @@ impl<T> AsMut<T> for Box<T> {
     }
 }
 
+impl<T: Clone> Clone for Box<T> {
+    fn clone(&self) -> Self {
+        unsafe { Self::new(self.0.as_ref().clone()) }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -134,6 +140,19 @@ mod test {
 
         // If this fails, we are leaking memory! BOOM! \o/
         assert_eq!(initial_mem_info.free_size, final_info.free_size)
+    }
+
+    #[test]
+    fn clone_object_in_lv_mem() {
+        crate::lvgl_init();
+
+        let v1 = Box::new(5);
+        let v2 = v1.clone();
+
+        // Ensure that the two objects have identical values.
+        assert_eq!(*v1, *v2);
+        // They should have different memory addresses, however.
+        assert_ne!(v1.into_raw() as usize, v2.into_raw() as usize);
     }
 
     fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
