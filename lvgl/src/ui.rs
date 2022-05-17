@@ -6,9 +6,9 @@ use core::ptr;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicBool, Ordering};
 use core::time::Duration;
-use embedded_graphics::pixelcolor::PixelColor;
+use embedded_graphics::draw_target::DrawTarget;
 use embedded_graphics::prelude::*;
-use embedded_graphics::{drawable, DrawTarget};
+use embedded_graphics::{pixelcolor::PixelColor, Pixel};
 
 // There can only be a single reference to LVGL library.
 static LVGL_IN_USE: AtomicBool = AtomicBool::new(false);
@@ -20,7 +20,7 @@ pub(crate) const BUF_SIZE: usize = lvgl_sys::LV_HOR_RES_MAX as usize * REFRESH_B
 
 pub struct UI<T, C>
 where
-    T: DrawTarget<C>,
+    T: DrawTarget<Color = C>,
     C: PixelColor + From<Color>,
 {
     // LVGL is not thread-safe by default.
@@ -32,14 +32,14 @@ where
 // LVGL does not use thread locals.
 unsafe impl<T, C> Send for UI<T, C>
 where
-    T: DrawTarget<C>,
+    T: DrawTarget<Color = C>,
     C: PixelColor + From<Color>,
 {
 }
 
 impl<T, C> UI<T, C>
 where
-    T: DrawTarget<C>,
+    T: DrawTarget<Color = C>,
     C: PixelColor + From<Color>,
 {
     pub fn init() -> LvResult<Self> {
@@ -135,7 +135,7 @@ where
 
 pub(crate) struct DisplayUserData<T, C>
 where
-    T: DrawTarget<C>,
+    T: DrawTarget<Color = C>,
     C: PixelColor + From<Color>,
 {
     display: T,
@@ -147,7 +147,7 @@ unsafe extern "C" fn display_callback_wrapper<T, C>(
     area: *const lvgl_sys::lv_area_t,
     color_p: *mut lvgl_sys::lv_color_t,
 ) where
-    T: DrawTarget<C>,
+    T: DrawTarget<Color = C>,
     C: PixelColor + From<Color>,
 {
     // In the `std` world we would make sure to capture panics here and make them not escape across
@@ -178,7 +178,7 @@ fn display_flush<T, C>(
     color_p: *mut lvgl_sys::lv_color_t,
 ) -> Result<(), T::Error>
 where
-    T: DrawTarget<C>,
+    T: DrawTarget<Color = C>,
     C: PixelColor + From<Color>,
 {
     let ys = y1..=y2;
@@ -192,7 +192,7 @@ where
             let color_len = x_len * iy + ix;
             let lv_color = unsafe { *color_p.add(color_len) };
             let raw_color = Color::from_raw(lv_color);
-            drawable::Pixel(Point::new(x as i32, y as i32), raw_color.into())
+            Pixel(Point::new(x as i32, y as i32), raw_color.into())
         })
     });
 
