@@ -18,7 +18,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_ptr(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_STR
+                (lvgl_sys::LV_STYLE_VALUE_STR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.as_ptr() as *mut cty::c_void,
             );
@@ -40,19 +40,19 @@ impl Default for Style {
 
 bitflags! {
     pub struct Opacity: u32 {
-        const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP;
-        const OPA_0 = lvgl_sys::LV_OPA_0;
-        const OPA_10 = lvgl_sys::LV_OPA_10;
-        const OPA_20 = lvgl_sys::LV_OPA_20;
-        const OPA_30 = lvgl_sys::LV_OPA_30;
-        const OPA_40 = lvgl_sys::LV_OPA_40;
-        const OPA_50 = lvgl_sys::LV_OPA_50;
-        const OPA_60 = lvgl_sys::LV_OPA_60;
-        const OPA_70 = lvgl_sys::LV_OPA_70;
-        const OPA_80 = lvgl_sys::LV_OPA_80;
-        const OPA_90 = lvgl_sys::LV_OPA_90;
-        const OPA_100 = lvgl_sys::LV_OPA_100;
-        const OPA_COVER = lvgl_sys::LV_OPA_COVER;
+        const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP as u32;
+        const OPA_0 = lvgl_sys::LV_OPA_0 as u32;
+        const OPA_10 = lvgl_sys::LV_OPA_10 as u32;
+        const OPA_20 = lvgl_sys::LV_OPA_20 as u32;
+        const OPA_30 = lvgl_sys::LV_OPA_30 as u32;
+        const OPA_40 = lvgl_sys::LV_OPA_40 as u32;
+        const OPA_50 = lvgl_sys::LV_OPA_50 as u32;
+        const OPA_60 = lvgl_sys::LV_OPA_60 as u32;
+        const OPA_70 = lvgl_sys::LV_OPA_70 as u32;
+        const OPA_80 = lvgl_sys::LV_OPA_80 as u32;
+        const OPA_90 = lvgl_sys::LV_OPA_90 as u32;
+        const OPA_100 = lvgl_sys::LV_OPA_100 as u32;
+        const OPA_COVER = lvgl_sys::LV_OPA_COVER as u32;
     }
 }
 
@@ -64,98 +64,98 @@ impl Into<u8> for Opacity {
 
 bitflags! {
     pub struct StyleProp: u32 {
-        const RADIUS = lvgl_sys::LV_STYLE_RADIUS;
-        const CLIP_CORNER = lvgl_sys::LV_STYLE_CLIP_CORNER;
-        const SIZE = lvgl_sys::LV_STYLE_SIZE;
-        const TRANSFORM_WIDTH = lvgl_sys::LV_STYLE_TRANSFORM_WIDTH;
-        const TRANSFORM_HEIGHT = lvgl_sys::LV_STYLE_TRANSFORM_HEIGHT;
-        const TRANSFORM_ANGLE = lvgl_sys::LV_STYLE_TRANSFORM_ANGLE;
-        const TRANSFORM_ZOOM = lvgl_sys::LV_STYLE_TRANSFORM_ZOOM;
-        const OPA_SCALE = lvgl_sys::LV_STYLE_OPA_SCALE;
-        const PAD_TOP = lvgl_sys::LV_STYLE_PAD_TOP;
-        const PAD_BOTTOM = lvgl_sys::LV_STYLE_PAD_BOTTOM;
-        const PAD_LEFT = lvgl_sys::LV_STYLE_PAD_LEFT;
-        const PAD_RIGHT = lvgl_sys::LV_STYLE_PAD_RIGHT;
-        const PAD_INNER = lvgl_sys::LV_STYLE_PAD_INNER;
-        const MARGIN_TOP = lvgl_sys::LV_STYLE_MARGIN_TOP;
-        const MARGIN_BOTTOM = lvgl_sys::LV_STYLE_MARGIN_BOTTOM;
-        const MARGIN_LEFT = lvgl_sys::LV_STYLE_MARGIN_LEFT;
-        const MARGIN_RIGHT = lvgl_sys::LV_STYLE_MARGIN_RIGHT;
-        const BG_BLEND_MODE = lvgl_sys::LV_STYLE_BG_BLEND_MODE;
-        const BG_MAIN_STOP = lvgl_sys::LV_STYLE_BG_MAIN_STOP;
-        const BG_GRAD_STOP = lvgl_sys::LV_STYLE_BG_GRAD_STOP;
-        const BG_GRAD_DIR = lvgl_sys::LV_STYLE_BG_GRAD_DIR;
-        const BG_COLOR = lvgl_sys::LV_STYLE_BG_COLOR;
-        const BG_GRAD_COLOR = lvgl_sys::LV_STYLE_BG_GRAD_COLOR;
-        const BG_OPA = lvgl_sys::LV_STYLE_BG_OPA;
-        const BORDER_WIDTH = lvgl_sys::LV_STYLE_BORDER_WIDTH;
-        const BORDER_SIDE = lvgl_sys::LV_STYLE_BORDER_SIDE;
-        const BORDER_BLEND_MODE = lvgl_sys::LV_STYLE_BORDER_BLEND_MODE;
-        const BORDER_POST = lvgl_sys::LV_STYLE_BORDER_POST;
-        const BORDER_COLOR = lvgl_sys::LV_STYLE_BORDER_COLOR;
-        const BORDER_OPA = lvgl_sys::LV_STYLE_BORDER_OPA;
-        const OUTLINE_WIDTH = lvgl_sys::LV_STYLE_OUTLINE_WIDTH;
-        const OUTLINE_PAD = lvgl_sys::LV_STYLE_OUTLINE_PAD;
-        const OUTLINE_BLEND_MODE = lvgl_sys::LV_STYLE_OUTLINE_BLEND_MODE;
-        const OUTLINE_COLOR = lvgl_sys::LV_STYLE_OUTLINE_COLOR;
-        const OUTLINE_OPA = lvgl_sys::LV_STYLE_OUTLINE_OPA;
-        const SHADOW_WIDTH = lvgl_sys::LV_STYLE_SHADOW_WIDTH;
-        const SHADOW_OFS_X = lvgl_sys::LV_STYLE_SHADOW_OFS_X;
-        const SHADOW_OFS_Y = lvgl_sys::LV_STYLE_SHADOW_OFS_Y;
-        const SHADOW_SPREAD = lvgl_sys::LV_STYLE_SHADOW_SPREAD;
-        const SHADOW_BLEND_MODE = lvgl_sys::LV_STYLE_SHADOW_BLEND_MODE;
-        const SHADOW_COLOR = lvgl_sys::LV_STYLE_SHADOW_COLOR;
-        const SHADOW_OPA = lvgl_sys::LV_STYLE_SHADOW_OPA;
-        const PATTERN_BLEND_MODE = lvgl_sys::LV_STYLE_PATTERN_BLEND_MODE;
-        const PATTERN_REPEAT = lvgl_sys::LV_STYLE_PATTERN_REPEAT;
-        const PATTERN_RECOLOR = lvgl_sys::LV_STYLE_PATTERN_RECOLOR;
-        const PATTERN_OPA = lvgl_sys::LV_STYLE_PATTERN_OPA;
-        const PATTERN_RECOLOR_OPA = lvgl_sys::LV_STYLE_PATTERN_RECOLOR_OPA;
-        const PATTERN_IMAGE = lvgl_sys::LV_STYLE_PATTERN_IMAGE;
-        const VALUE_LETTER_SPACE = lvgl_sys::LV_STYLE_VALUE_LETTER_SPACE;
-        const VALUE_LINE_SPACE = lvgl_sys::LV_STYLE_VALUE_LINE_SPACE;
-        const VALUE_BLEND_MODE = lvgl_sys::LV_STYLE_VALUE_BLEND_MODE;
-        const VALUE_OFS_X = lvgl_sys::LV_STYLE_VALUE_OFS_X;
-        const VALUE_OFS_Y = lvgl_sys::LV_STYLE_VALUE_OFS_Y;
-        const VALUE_ALIGN = lvgl_sys::LV_STYLE_VALUE_ALIGN;
-        const VALUE_COLOR = lvgl_sys::LV_STYLE_VALUE_COLOR;
-        const VALUE_OPA = lvgl_sys::LV_STYLE_VALUE_OPA;
-        const VALUE_FONT = lvgl_sys::LV_STYLE_VALUE_FONT;
-        const VALUE_STR = lvgl_sys::LV_STYLE_VALUE_STR;
-        const TEXT_LETTER_SPACE = lvgl_sys::LV_STYLE_TEXT_LETTER_SPACE;
-        const TEXT_LINE_SPACE = lvgl_sys::LV_STYLE_TEXT_LINE_SPACE;
-        const TEXT_DECOR = lvgl_sys::LV_STYLE_TEXT_DECOR;
-        const TEXT_BLEND_MODE = lvgl_sys::LV_STYLE_TEXT_BLEND_MODE;
-        const TEXT_COLOR = lvgl_sys::LV_STYLE_TEXT_COLOR;
-        const TEXT_SEL_COLOR = lvgl_sys::LV_STYLE_TEXT_SEL_COLOR;
-        const TEXT_OPA = lvgl_sys::LV_STYLE_TEXT_OPA;
-        const TEXT_FONT = lvgl_sys::LV_STYLE_TEXT_FONT;
-        const LINE_WIDTH = lvgl_sys::LV_STYLE_LINE_WIDTH;
-        const LINE_BLEND_MODE = lvgl_sys::LV_STYLE_LINE_BLEND_MODE;
-        const LINE_DASH_WIDTH = lvgl_sys::LV_STYLE_LINE_DASH_WIDTH;
-        const LINE_DASH_GAP = lvgl_sys::LV_STYLE_LINE_DASH_GAP;
-        const LINE_ROUNDED = lvgl_sys::LV_STYLE_LINE_ROUNDED;
-        const LINE_COLOR = lvgl_sys::LV_STYLE_LINE_COLOR;
-        const LINE_OPA = lvgl_sys::LV_STYLE_LINE_OPA;
-        const IMAGE_BLEND_MODE = lvgl_sys::LV_STYLE_IMAGE_BLEND_MODE;
-        const IMAGE_RECOLOR = lvgl_sys::LV_STYLE_IMAGE_RECOLOR;
-        const IMAGE_OPA = lvgl_sys::LV_STYLE_IMAGE_OPA;
-        const IMAGE_RECOLOR_OPA = lvgl_sys::LV_STYLE_IMAGE_RECOLOR_OPA;
-        const TRANSITION_TIME = lvgl_sys::LV_STYLE_TRANSITION_TIME;
-        const TRANSITION_DELAY = lvgl_sys::LV_STYLE_TRANSITION_DELAY;
-        const TRANSITION_PROP_1 = lvgl_sys::LV_STYLE_TRANSITION_PROP_1;
-        const TRANSITION_PROP_2 = lvgl_sys::LV_STYLE_TRANSITION_PROP_2;
-        const TRANSITION_PROP_3 = lvgl_sys::LV_STYLE_TRANSITION_PROP_3;
-        const TRANSITION_PROP_4 = lvgl_sys::LV_STYLE_TRANSITION_PROP_4;
-        const TRANSITION_PROP_5 = lvgl_sys::LV_STYLE_TRANSITION_PROP_5;
-        const TRANSITION_PROP_6 = lvgl_sys::LV_STYLE_TRANSITION_PROP_6;
-        const TRANSITION_PATH = lvgl_sys::LV_STYLE_TRANSITION_PATH;
-        const SCALE_WIDTH = lvgl_sys::LV_STYLE_SCALE_WIDTH;
-        const SCALE_BORDER_WIDTH = lvgl_sys::LV_STYLE_SCALE_BORDER_WIDTH;
-        const SCALE_END_BORDER_WIDTH = lvgl_sys::LV_STYLE_SCALE_END_BORDER_WIDTH;
-        const SCALE_END_LINE_WIDTH = lvgl_sys::LV_STYLE_SCALE_END_LINE_WIDTH;
-        const SCALE_GRAD_COLOR = lvgl_sys::LV_STYLE_SCALE_GRAD_COLOR;
-        const SCALE_END_COLOR = lvgl_sys::LV_STYLE_SCALE_END_COLOR;
+        const RADIUS = lvgl_sys::LV_STYLE_RADIUS as u32;
+        const CLIP_CORNER = lvgl_sys::LV_STYLE_CLIP_CORNER as u32;
+        const SIZE = lvgl_sys::LV_STYLE_SIZE as u32;
+        const TRANSFORM_WIDTH = lvgl_sys::LV_STYLE_TRANSFORM_WIDTH as u32;
+        const TRANSFORM_HEIGHT = lvgl_sys::LV_STYLE_TRANSFORM_HEIGHT as u32;
+        const TRANSFORM_ANGLE = lvgl_sys::LV_STYLE_TRANSFORM_ANGLE as u32;
+        const TRANSFORM_ZOOM = lvgl_sys::LV_STYLE_TRANSFORM_ZOOM as u32;
+        const OPA_SCALE = lvgl_sys::LV_STYLE_OPA_SCALE as u32;
+        const PAD_TOP = lvgl_sys::LV_STYLE_PAD_TOP as u32;
+        const PAD_BOTTOM = lvgl_sys::LV_STYLE_PAD_BOTTOM as u32;
+        const PAD_LEFT = lvgl_sys::LV_STYLE_PAD_LEFT as u32;
+        const PAD_RIGHT = lvgl_sys::LV_STYLE_PAD_RIGHT as u32;
+        const PAD_INNER = lvgl_sys::LV_STYLE_PAD_INNER as u32;
+        const MARGIN_TOP = lvgl_sys::LV_STYLE_MARGIN_TOP as u32;
+        const MARGIN_BOTTOM = lvgl_sys::LV_STYLE_MARGIN_BOTTOM as u32;
+        const MARGIN_LEFT = lvgl_sys::LV_STYLE_MARGIN_LEFT as u32;
+        const MARGIN_RIGHT = lvgl_sys::LV_STYLE_MARGIN_RIGHT as u32;
+        const BG_BLEND_MODE = lvgl_sys::LV_STYLE_BG_BLEND_MODE as u32;
+        const BG_MAIN_STOP = lvgl_sys::LV_STYLE_BG_MAIN_STOP as u32;
+        const BG_GRAD_STOP = lvgl_sys::LV_STYLE_BG_GRAD_STOP as u32;
+        const BG_GRAD_DIR = lvgl_sys::LV_STYLE_BG_GRAD_DIR as u32;
+        const BG_COLOR = lvgl_sys::LV_STYLE_BG_COLOR as u32;
+        const BG_GRAD_COLOR = lvgl_sys::LV_STYLE_BG_GRAD_COLOR as u32;
+        const BG_OPA = lvgl_sys::LV_STYLE_BG_OPA as u32;
+        const BORDER_WIDTH = lvgl_sys::LV_STYLE_BORDER_WIDTH as u32;
+        const BORDER_SIDE = lvgl_sys::LV_STYLE_BORDER_SIDE as u32;
+        const BORDER_BLEND_MODE = lvgl_sys::LV_STYLE_BORDER_BLEND_MODE as u32;
+        const BORDER_POST = lvgl_sys::LV_STYLE_BORDER_POST as u32;
+        const BORDER_COLOR = lvgl_sys::LV_STYLE_BORDER_COLOR as u32;
+        const BORDER_OPA = lvgl_sys::LV_STYLE_BORDER_OPA as u32;
+        const OUTLINE_WIDTH = lvgl_sys::LV_STYLE_OUTLINE_WIDTH as u32;
+        const OUTLINE_PAD = lvgl_sys::LV_STYLE_OUTLINE_PAD as u32;
+        const OUTLINE_BLEND_MODE = lvgl_sys::LV_STYLE_OUTLINE_BLEND_MODE as u32;
+        const OUTLINE_COLOR = lvgl_sys::LV_STYLE_OUTLINE_COLOR as u32;
+        const OUTLINE_OPA = lvgl_sys::LV_STYLE_OUTLINE_OPA as u32;
+        const SHADOW_WIDTH = lvgl_sys::LV_STYLE_SHADOW_WIDTH as u32;
+        const SHADOW_OFS_X = lvgl_sys::LV_STYLE_SHADOW_OFS_X as u32;
+        const SHADOW_OFS_Y = lvgl_sys::LV_STYLE_SHADOW_OFS_Y as u32;
+        const SHADOW_SPREAD = lvgl_sys::LV_STYLE_SHADOW_SPREAD as u32;
+        const SHADOW_BLEND_MODE = lvgl_sys::LV_STYLE_SHADOW_BLEND_MODE as u32;
+        const SHADOW_COLOR = lvgl_sys::LV_STYLE_SHADOW_COLOR as u32;
+        const SHADOW_OPA = lvgl_sys::LV_STYLE_SHADOW_OPA as u32;
+        const PATTERN_BLEND_MODE = lvgl_sys::LV_STYLE_PATTERN_BLEND_MODE as u32;
+        const PATTERN_REPEAT = lvgl_sys::LV_STYLE_PATTERN_REPEAT as u32;
+        const PATTERN_RECOLOR = lvgl_sys::LV_STYLE_PATTERN_RECOLOR as u32;
+        const PATTERN_OPA = lvgl_sys::LV_STYLE_PATTERN_OPA as u32;
+        const PATTERN_RECOLOR_OPA = lvgl_sys::LV_STYLE_PATTERN_RECOLOR_OPA as u32;
+        const PATTERN_IMAGE = lvgl_sys::LV_STYLE_PATTERN_IMAGE as u32;
+        const VALUE_LETTER_SPACE = lvgl_sys::LV_STYLE_VALUE_LETTER_SPACE as u32;
+        const VALUE_LINE_SPACE = lvgl_sys::LV_STYLE_VALUE_LINE_SPACE as u32;
+        const VALUE_BLEND_MODE = lvgl_sys::LV_STYLE_VALUE_BLEND_MODE as u32;
+        const VALUE_OFS_X = lvgl_sys::LV_STYLE_VALUE_OFS_X as u32;
+        const VALUE_OFS_Y = lvgl_sys::LV_STYLE_VALUE_OFS_Y as u32;
+        const VALUE_ALIGN = lvgl_sys::LV_STYLE_VALUE_ALIGN as u32;
+        const VALUE_COLOR = lvgl_sys::LV_STYLE_VALUE_COLOR as u32;
+        const VALUE_OPA = lvgl_sys::LV_STYLE_VALUE_OPA as u32;
+        const VALUE_FONT = lvgl_sys::LV_STYLE_VALUE_FONT as u32;
+        const VALUE_STR = lvgl_sys::LV_STYLE_VALUE_STR as u32;
+        const TEXT_LETTER_SPACE = lvgl_sys::LV_STYLE_TEXT_LETTER_SPACE as u32;
+        const TEXT_LINE_SPACE = lvgl_sys::LV_STYLE_TEXT_LINE_SPACE as u32;
+        const TEXT_DECOR = lvgl_sys::LV_STYLE_TEXT_DECOR as u32;
+        const TEXT_BLEND_MODE = lvgl_sys::LV_STYLE_TEXT_BLEND_MODE as u32;
+        const TEXT_COLOR = lvgl_sys::LV_STYLE_TEXT_COLOR as u32;
+        const TEXT_SEL_COLOR = lvgl_sys::LV_STYLE_TEXT_SEL_COLOR as u32;
+        const TEXT_OPA = lvgl_sys::LV_STYLE_TEXT_OPA as u32;
+        const TEXT_FONT = lvgl_sys::LV_STYLE_TEXT_FONT as u32;
+        const LINE_WIDTH = lvgl_sys::LV_STYLE_LINE_WIDTH as u32;
+        const LINE_BLEND_MODE = lvgl_sys::LV_STYLE_LINE_BLEND_MODE as u32;
+        const LINE_DASH_WIDTH = lvgl_sys::LV_STYLE_LINE_DASH_WIDTH as u32;
+        const LINE_DASH_GAP = lvgl_sys::LV_STYLE_LINE_DASH_GAP as u32;
+        const LINE_ROUNDED = lvgl_sys::LV_STYLE_LINE_ROUNDED as u32;
+        const LINE_COLOR = lvgl_sys::LV_STYLE_LINE_COLOR as u32;
+        const LINE_OPA = lvgl_sys::LV_STYLE_LINE_OPA as u32;
+        const IMAGE_BLEND_MODE = lvgl_sys::LV_STYLE_IMAGE_BLEND_MODE as u32;
+        const IMAGE_RECOLOR = lvgl_sys::LV_STYLE_IMAGE_RECOLOR as u32;
+        const IMAGE_OPA = lvgl_sys::LV_STYLE_IMAGE_OPA as u32;
+        const IMAGE_RECOLOR_OPA = lvgl_sys::LV_STYLE_IMAGE_RECOLOR_OPA as u32;
+        const TRANSITION_TIME = lvgl_sys::LV_STYLE_TRANSITION_TIME as u32;
+        const TRANSITION_DELAY = lvgl_sys::LV_STYLE_TRANSITION_DELAY as u32;
+        const TRANSITION_PROP_1 = lvgl_sys::LV_STYLE_TRANSITION_PROP_1 as u32;
+        const TRANSITION_PROP_2 = lvgl_sys::LV_STYLE_TRANSITION_PROP_2 as u32;
+        const TRANSITION_PROP_3 = lvgl_sys::LV_STYLE_TRANSITION_PROP_3 as u32;
+        const TRANSITION_PROP_4 = lvgl_sys::LV_STYLE_TRANSITION_PROP_4 as u32;
+        const TRANSITION_PROP_5 = lvgl_sys::LV_STYLE_TRANSITION_PROP_5 as u32;
+        const TRANSITION_PROP_6 = lvgl_sys::LV_STYLE_TRANSITION_PROP_6 as u32;
+        const TRANSITION_PATH = lvgl_sys::LV_STYLE_TRANSITION_PATH as u32;
+        const SCALE_WIDTH = lvgl_sys::LV_STYLE_SCALE_WIDTH as u32;
+        const SCALE_BORDER_WIDTH = lvgl_sys::LV_STYLE_SCALE_BORDER_WIDTH as u32;
+        const SCALE_END_BORDER_WIDTH = lvgl_sys::LV_STYLE_SCALE_END_BORDER_WIDTH as u32;
+        const SCALE_END_LINE_WIDTH = lvgl_sys::LV_STYLE_SCALE_END_LINE_WIDTH as u32;
+        const SCALE_GRAD_COLOR = lvgl_sys::LV_STYLE_SCALE_GRAD_COLOR as u32;
+        const SCALE_END_COLOR = lvgl_sys::LV_STYLE_SCALE_END_COLOR as u32;
     }
 }
 
@@ -166,8 +166,8 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_RADIUS | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32))
-                    as u16,
+                (lvgl_sys::LV_STYLE_RADIUS as u32
+                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
         }
@@ -178,7 +178,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_CLIP_CORNER
+                (lvgl_sys::LV_STYLE_CLIP_CORNER as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -190,8 +190,8 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SIZE | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32))
-                    as u16,
+                (lvgl_sys::LV_STYLE_SIZE as u32
+                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
         }
@@ -202,7 +202,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSFORM_WIDTH
+                (lvgl_sys::LV_STYLE_TRANSFORM_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -214,7 +214,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSFORM_HEIGHT
+                (lvgl_sys::LV_STYLE_TRANSFORM_HEIGHT as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -226,7 +226,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSFORM_ANGLE
+                (lvgl_sys::LV_STYLE_TRANSFORM_ANGLE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -238,7 +238,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSFORM_ZOOM
+                (lvgl_sys::LV_STYLE_TRANSFORM_ZOOM as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -250,7 +250,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_OPA_SCALE
+                (lvgl_sys::LV_STYLE_OPA_SCALE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -262,8 +262,8 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PAD_TOP | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32))
-                    as u16,
+                (lvgl_sys::LV_STYLE_PAD_TOP as u32
+                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
         }
@@ -274,7 +274,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PAD_BOTTOM
+                (lvgl_sys::LV_STYLE_PAD_BOTTOM as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -286,7 +286,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PAD_LEFT
+                (lvgl_sys::LV_STYLE_PAD_LEFT as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -298,7 +298,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PAD_RIGHT
+                (lvgl_sys::LV_STYLE_PAD_RIGHT as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -310,7 +310,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PAD_INNER
+                (lvgl_sys::LV_STYLE_PAD_INNER as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -322,7 +322,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_MARGIN_TOP
+                (lvgl_sys::LV_STYLE_MARGIN_TOP as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -334,7 +334,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_MARGIN_BOTTOM
+                (lvgl_sys::LV_STYLE_MARGIN_BOTTOM as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -346,7 +346,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_MARGIN_LEFT
+                (lvgl_sys::LV_STYLE_MARGIN_LEFT as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -358,7 +358,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_MARGIN_RIGHT
+                (lvgl_sys::LV_STYLE_MARGIN_RIGHT as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -370,7 +370,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BG_BLEND_MODE
+                (lvgl_sys::LV_STYLE_BG_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -382,7 +382,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BG_MAIN_STOP
+                (lvgl_sys::LV_STYLE_BG_MAIN_STOP as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -394,7 +394,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BG_GRAD_STOP
+                (lvgl_sys::LV_STYLE_BG_GRAD_STOP as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -406,7 +406,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BG_GRAD_DIR
+                (lvgl_sys::LV_STYLE_BG_GRAD_DIR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -418,7 +418,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BG_COLOR
+                (lvgl_sys::LV_STYLE_BG_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -430,7 +430,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BG_GRAD_COLOR
+                (lvgl_sys::LV_STYLE_BG_GRAD_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -442,8 +442,8 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BG_OPA | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32))
-                    as u16,
+                (lvgl_sys::LV_STYLE_BG_OPA as u32
+                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
         }
@@ -454,7 +454,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BORDER_WIDTH
+                (lvgl_sys::LV_STYLE_BORDER_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -466,7 +466,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BORDER_SIDE
+                (lvgl_sys::LV_STYLE_BORDER_SIDE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -478,7 +478,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BORDER_BLEND_MODE
+                (lvgl_sys::LV_STYLE_BORDER_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -490,7 +490,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BORDER_POST
+                (lvgl_sys::LV_STYLE_BORDER_POST as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -502,7 +502,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BORDER_COLOR
+                (lvgl_sys::LV_STYLE_BORDER_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -514,7 +514,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_BORDER_OPA
+                (lvgl_sys::LV_STYLE_BORDER_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -526,7 +526,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_OUTLINE_WIDTH
+                (lvgl_sys::LV_STYLE_OUTLINE_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -538,7 +538,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_OUTLINE_PAD
+                (lvgl_sys::LV_STYLE_OUTLINE_PAD as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -550,7 +550,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_OUTLINE_BLEND_MODE
+                (lvgl_sys::LV_STYLE_OUTLINE_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -562,7 +562,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_OUTLINE_COLOR
+                (lvgl_sys::LV_STYLE_OUTLINE_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -574,7 +574,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_OUTLINE_OPA
+                (lvgl_sys::LV_STYLE_OUTLINE_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -586,7 +586,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SHADOW_WIDTH
+                (lvgl_sys::LV_STYLE_SHADOW_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -598,7 +598,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SHADOW_OFS_X
+                (lvgl_sys::LV_STYLE_SHADOW_OFS_X as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -610,7 +610,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SHADOW_OFS_Y
+                (lvgl_sys::LV_STYLE_SHADOW_OFS_Y as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -622,7 +622,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SHADOW_SPREAD
+                (lvgl_sys::LV_STYLE_SHADOW_SPREAD as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -634,7 +634,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SHADOW_BLEND_MODE
+                (lvgl_sys::LV_STYLE_SHADOW_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -646,7 +646,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SHADOW_COLOR
+                (lvgl_sys::LV_STYLE_SHADOW_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -658,7 +658,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SHADOW_OPA
+                (lvgl_sys::LV_STYLE_SHADOW_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -670,7 +670,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PATTERN_REPEAT
+                (lvgl_sys::LV_STYLE_PATTERN_REPEAT as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -682,7 +682,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PATTERN_BLEND_MODE
+                (lvgl_sys::LV_STYLE_PATTERN_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -694,7 +694,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PATTERN_RECOLOR
+                (lvgl_sys::LV_STYLE_PATTERN_RECOLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -706,7 +706,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PATTERN_OPA
+                (lvgl_sys::LV_STYLE_PATTERN_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -718,7 +718,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_PATTERN_RECOLOR_OPA
+                (lvgl_sys::LV_STYLE_PATTERN_RECOLOR_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -730,7 +730,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_LETTER_SPACE
+                (lvgl_sys::LV_STYLE_VALUE_LETTER_SPACE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -742,7 +742,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_LINE_SPACE
+                (lvgl_sys::LV_STYLE_VALUE_LINE_SPACE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -754,7 +754,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_BLEND_MODE
+                (lvgl_sys::LV_STYLE_VALUE_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -766,7 +766,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_OFS_X
+                (lvgl_sys::LV_STYLE_VALUE_OFS_X as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -778,7 +778,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_OFS_Y
+                (lvgl_sys::LV_STYLE_VALUE_OFS_Y as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -790,7 +790,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_ALIGN
+                (lvgl_sys::LV_STYLE_VALUE_ALIGN as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -802,7 +802,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_COLOR
+                (lvgl_sys::LV_STYLE_VALUE_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -814,7 +814,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_VALUE_OPA
+                (lvgl_sys::LV_STYLE_VALUE_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -826,7 +826,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TEXT_LETTER_SPACE
+                (lvgl_sys::LV_STYLE_TEXT_LETTER_SPACE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -838,7 +838,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TEXT_LINE_SPACE
+                (lvgl_sys::LV_STYLE_TEXT_LINE_SPACE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -850,7 +850,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TEXT_DECOR
+                (lvgl_sys::LV_STYLE_TEXT_DECOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -862,7 +862,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TEXT_BLEND_MODE
+                (lvgl_sys::LV_STYLE_TEXT_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -874,7 +874,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TEXT_COLOR
+                (lvgl_sys::LV_STYLE_TEXT_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -886,7 +886,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TEXT_SEL_COLOR
+                (lvgl_sys::LV_STYLE_TEXT_SEL_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -898,7 +898,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TEXT_OPA
+                (lvgl_sys::LV_STYLE_TEXT_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -910,7 +910,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_LINE_WIDTH
+                (lvgl_sys::LV_STYLE_LINE_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -922,7 +922,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_LINE_BLEND_MODE
+                (lvgl_sys::LV_STYLE_LINE_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -934,7 +934,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_LINE_DASH_WIDTH
+                (lvgl_sys::LV_STYLE_LINE_DASH_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -946,7 +946,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_LINE_DASH_GAP
+                (lvgl_sys::LV_STYLE_LINE_DASH_GAP as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -958,7 +958,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_LINE_ROUNDED
+                (lvgl_sys::LV_STYLE_LINE_ROUNDED as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -970,7 +970,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_LINE_COLOR
+                (lvgl_sys::LV_STYLE_LINE_COLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -982,7 +982,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_LINE_OPA
+                (lvgl_sys::LV_STYLE_LINE_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -994,7 +994,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_IMAGE_BLEND_MODE
+                (lvgl_sys::LV_STYLE_IMAGE_BLEND_MODE as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1006,7 +1006,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_IMAGE_RECOLOR
+                (lvgl_sys::LV_STYLE_IMAGE_RECOLOR as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.raw,
             );
@@ -1018,7 +1018,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_IMAGE_OPA
+                (lvgl_sys::LV_STYLE_IMAGE_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -1030,7 +1030,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_opa(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_IMAGE_RECOLOR_OPA
+                (lvgl_sys::LV_STYLE_IMAGE_RECOLOR_OPA as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value.into(),
             );
@@ -1042,7 +1042,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_TIME
+                (lvgl_sys::LV_STYLE_TRANSITION_TIME as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1054,7 +1054,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_DELAY
+                (lvgl_sys::LV_STYLE_TRANSITION_DELAY as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1066,7 +1066,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_PROP_1
+                (lvgl_sys::LV_STYLE_TRANSITION_PROP_1 as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1078,7 +1078,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_PROP_2
+                (lvgl_sys::LV_STYLE_TRANSITION_PROP_2 as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1090,7 +1090,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_PROP_3
+                (lvgl_sys::LV_STYLE_TRANSITION_PROP_3 as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1102,7 +1102,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_PROP_4
+                (lvgl_sys::LV_STYLE_TRANSITION_PROP_4 as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1114,7 +1114,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_PROP_5
+                (lvgl_sys::LV_STYLE_TRANSITION_PROP_5 as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1126,7 +1126,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_TRANSITION_PROP_6
+                (lvgl_sys::LV_STYLE_TRANSITION_PROP_6 as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1138,7 +1138,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SCALE_WIDTH
+                (lvgl_sys::LV_STYLE_SCALE_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1150,7 +1150,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SCALE_BORDER_WIDTH
+                (lvgl_sys::LV_STYLE_SCALE_BORDER_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1162,7 +1162,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SCALE_END_BORDER_WIDTH
+                (lvgl_sys::LV_STYLE_SCALE_END_BORDER_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1174,7 +1174,7 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_int(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SCALE_END_LINE_WIDTH
+                (lvgl_sys::LV_STYLE_SCALE_END_LINE_WIDTH as u32
                     | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
                 value,
             );
@@ -1186,8 +1186,8 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SCALE_GRAD_COLOR
-                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
+                (lvgl_sys::LV_STYLE_SCALE_GRAD_COLOR as u32
+                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS)) as u16,
                 value.raw,
             );
         }
@@ -1198,8 +1198,8 @@ impl Style {
         unsafe {
             lvgl_sys::_lv_style_set_color(
                 self.raw.as_mut(),
-                (lvgl_sys::LV_STYLE_SCALE_END_COLOR
-                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS as u32)) as u16,
+                (lvgl_sys::LV_STYLE_SCALE_END_COLOR as u32
+                    | (native_state << lvgl_sys::LV_STYLE_STATE_POS)) as u16,
                 value.raw,
             );
         }

@@ -4,16 +4,14 @@ use std::{env, path::Path, path::PathBuf};
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
 
 fn main() {
-    let project_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
-        .canonicalize()
-        .unwrap();
+    let project_dir = canonicalize(PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()));
     let shims_dir = project_dir.join("shims");
     let vendor = project_dir.join("vendor");
     let vendor_src = vendor.join("lvgl").join("src");
 
     let lv_config_dir = {
         let conf_path = env::var(CONFIG_NAME)
-            .map(|raw_path| PathBuf::from(raw_path))
+            .map(PathBuf::from)
             .unwrap_or_else(|_| {
                 match std::env::var("DOCS_RS") {
                     Ok(_) => {
@@ -138,4 +136,11 @@ fn add_c_files(build: &mut cc::Build, path: impl AsRef<Path>) {
             build.file(&path);
         }
     }
+}
+
+fn canonicalize(path: impl AsRef<Path>) -> PathBuf {
+    let canonicalized = path.as_ref().canonicalize().unwrap();
+    let canonicalized = &*canonicalized.to_string_lossy();
+
+    PathBuf::from(canonicalized.strip_prefix(r"\\?\").unwrap_or(canonicalized))
 }

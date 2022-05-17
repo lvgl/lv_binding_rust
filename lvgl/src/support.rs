@@ -112,23 +112,25 @@ impl<S> TryFrom<lvgl_sys::lv_event_t> for Event<S> {
     type Error = ();
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
+        const LV_EVENT_PRESSED: u32 = lvgl_sys::LV_EVENT_PRESSED as u32;
+        const LV_EVENT_PRESSING: u32 = lvgl_sys::LV_EVENT_PRESSING as u32;
+        const LV_EVENT_PRESS_LOST: u32 = lvgl_sys::LV_EVENT_PRESS_LOST as u32;
+        const LV_EVENT_SHORT_CLICKED: u32 = lvgl_sys::LV_EVENT_SHORT_CLICKED as u32;
+        const LV_EVENT_CLICKED: u32 = lvgl_sys::LV_EVENT_CLICKED as u32;
+        const LV_EVENT_LONG_PRESSED: u32 = lvgl_sys::LV_EVENT_LONG_PRESSED as u32;
+        const LV_EVENT_LONG_PRESSED_REPEAT: u32 = lvgl_sys::LV_EVENT_LONG_PRESSED_REPEAT as u32;
+        const LV_EVENT_RELEASED: u32 = lvgl_sys::LV_EVENT_RELEASED as u32;
+
         match value as u32 {
-            lvgl_sys::LV_EVENT_PRESSED => Ok(Event::Pressed),
-            lvgl_sys::LV_EVENT_PRESSING => Ok(Event::Pressing),
-            lvgl_sys::LV_EVENT_PRESS_LOST => Ok(Event::PressLost),
-            lvgl_sys::LV_EVENT_SHORT_CLICKED => Ok(Event::ShortClicked),
-            lvgl_sys::LV_EVENT_CLICKED => Ok(Event::Clicked),
-            lvgl_sys::LV_EVENT_LONG_PRESSED => Ok(Event::LongPressed),
-            lvgl_sys::LV_EVENT_LONG_PRESSED_REPEAT => Ok(Event::LongPressedRepeat),
-            lvgl_sys::LV_EVENT_RELEASED => Ok(Event::Released),
+            LV_EVENT_PRESSED => Ok(Event::Pressed),
+            LV_EVENT_PRESSING => Ok(Event::Pressing),
+            LV_EVENT_PRESS_LOST => Ok(Event::PressLost),
+            LV_EVENT_SHORT_CLICKED => Ok(Event::ShortClicked),
+            LV_EVENT_CLICKED => Ok(Event::Clicked),
+            LV_EVENT_LONG_PRESSED => Ok(Event::LongPressed),
+            LV_EVENT_LONG_PRESSED_REPEAT => Ok(Event::LongPressedRepeat),
+            LV_EVENT_RELEASED => Ok(Event::Released),
             _ => Err(()),
-            // _ => {
-            //     if let Ok(special_event_type) = S::try_from(value) {
-            //         Ok(Event::Special(special_event_type))
-            //     } else {
-            //         Err(())
-            //     }
-            // }
         }
     }
 }
@@ -247,7 +249,6 @@ impl From<Animation> for lvgl_sys::lv_anim_enable_t {
 #[cfg(test)]
 mod test {
     use super::*;
-    use lvgl_sys;
 
     #[test]
     fn color_properties_accessible() {
