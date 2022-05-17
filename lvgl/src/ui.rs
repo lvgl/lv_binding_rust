@@ -187,17 +187,14 @@ where
 
     // We use iterators here to ensure that the Rust compiler can apply all possible
     // optimizations at compile time.
-    let pixels = ys
-        .enumerate()
-        .map(|(iy, y)| {
-            xs.clone().map(move |(ix, x)| {
-                let color_len = x_len * iy + ix;
-                let lv_color = unsafe { *color_p.add(color_len) };
-                let raw_color = Color::from_raw(lv_color);
-                drawable::Pixel(Point::new(x as i32, y as i32), raw_color.into())
-            })
+    let pixels = ys.enumerate().flat_map(|(iy, y)| {
+        xs.clone().map(move |(ix, x)| {
+            let color_len = x_len * iy + ix;
+            let lv_color = unsafe { *color_p.add(color_len) };
+            let raw_color = Color::from_raw(lv_color);
+            drawable::Pixel(Point::new(x as i32, y as i32), raw_color.into())
         })
-        .flatten();
+    });
 
-    Ok(display.draw_iter(pixels)?)
+    display.draw_iter(pixels)
 }

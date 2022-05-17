@@ -203,9 +203,9 @@ pub enum Align {
     OutRightBottom,
 }
 
-impl Into<u8> for Align {
-    fn into(self) -> u8 {
-        let native = match self {
+impl From<Align> for u8 {
+    fn from(self_: Align) -> u8 {
+        let native = match self_ {
             Align::Center => lvgl_sys::LV_ALIGN_CENTER,
             Align::InTopLeft => lvgl_sys::LV_ALIGN_IN_TOP_LEFT,
             Align::InTopMid => lvgl_sys::LV_ALIGN_IN_TOP_MID,

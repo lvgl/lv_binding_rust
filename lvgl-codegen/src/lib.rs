@@ -303,21 +303,21 @@ impl Rusty for LvArg {
 #[derive(Clone)]
 pub struct LvType {
     literal_name: String,
-    r_type: Option<Box<syn::Type>>,
+    _r_type: Option<Box<syn::Type>>,
 }
 
 impl LvType {
     pub fn new(literal_name: String) -> Self {
         Self {
             literal_name,
-            r_type: None,
+            _r_type: None,
         }
     }
 
     pub fn from(r_type: Box<syn::Type>) -> Self {
         Self {
             literal_name: r_type.to_token_stream().to_string(),
-            r_type: Some(r_type),
+            _r_type: Some(r_type),
         }
     }
 
