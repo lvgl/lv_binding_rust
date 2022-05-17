@@ -179,19 +179,19 @@ macro_rules! define_object {
 bitflags! {
     pub struct State: u32 {
         /// Normal, released
-        const DEFAULT  = lvgl_sys::LV_STATE_DEFAULT;
+        const DEFAULT  = lvgl_sys::LV_STATE_DEFAULT as u32;
         /// Toggled or checked
-        const CHECKED  = lvgl_sys::LV_STATE_CHECKED;
+        const CHECKED  = lvgl_sys::LV_STATE_CHECKED as u32;
         /// Focused via keypad or encoder or clicked via touchpad/mouse
-        const FOCUSED  = lvgl_sys::LV_STATE_FOCUSED;
+        const FOCUSED  = lvgl_sys::LV_STATE_FOCUSED as u32;
         /// Edit by an encoder
-        const EDITED   = lvgl_sys::LV_STATE_EDITED;
+        const EDITED   = lvgl_sys::LV_STATE_EDITED as u32;
         /// Hovered by mouse (not supported now)
-        const HOVERED  = lvgl_sys::LV_STATE_HOVERED;
+        const HOVERED  = lvgl_sys::LV_STATE_HOVERED as u32;
         /// Pressed
-        const PRESSED  = lvgl_sys::LV_STATE_PRESSED;
+        const PRESSED  = lvgl_sys::LV_STATE_PRESSED as u32;
         /// Disabled or inactive
-        const DISABLED = lvgl_sys::LV_STATE_DISABLED;
+        const DISABLED = lvgl_sys::LV_STATE_DISABLED as u32;
     }
 }
 
