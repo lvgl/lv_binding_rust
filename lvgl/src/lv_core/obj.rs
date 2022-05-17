@@ -206,9 +206,9 @@ pub enum Part {
     All,
 }
 
-impl Into<u8> for Part {
-    fn into(self) -> u8 {
-        match self {
+impl From<Part> for u8 {
+    fn from(self_: Part) -> u8 {
+        match self_ {
             Part::Main => lvgl_sys::LV_OBJ_PART_MAIN as u8,
             Part::All => lvgl_sys::LV_OBJ_PART_ALL as u8,
         }
