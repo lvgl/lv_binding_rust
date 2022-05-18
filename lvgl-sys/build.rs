@@ -19,10 +19,16 @@ fn main() {
                         // so let's use the vendored `lv_conf.h` file.
                         vendor.join("include")
                     }
-                    Err(_) => panic!(
-                        "The environment variable {} is required to be defined",
-                        CONFIG_NAME
-                    ),
+                    Err(_) => {
+                        #[cfg(not(feature = "use-vendored-config"))]
+                        panic!(
+                            "The environment variable {} is required to be defined",
+                            CONFIG_NAME
+                        );
+
+                        #[cfg(feature = "use-vendored-config")]
+                        vendor.join("include")
+                    }
                 }
             });
 

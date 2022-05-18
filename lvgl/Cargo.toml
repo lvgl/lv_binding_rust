@@ -21,6 +21,7 @@ bitflags = "1.2.1"
 [features]
 alloc = ["cstr_core/alloc"]
 lvgl_alloc = ["alloc"]
+use-vendored-config = ["lvgl-sys/use-vendored-config"]
 
 [build-dependencies]
 quote = "1.0.9"
