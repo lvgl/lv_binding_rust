@@ -1,6 +1,11 @@
-[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
-
 <h1 align="center"> LVGL - Open-source Embedded GUI Library in Rust</h1>
+
+> This library is looking for a new maintainer. If you are intested in taking over the development, please open a
+> ticket. I would like to find someone committed and with genuine interest to continue the work that I have started
+> here. Initially, I will add the new maintainer as collaborator and after demonstrated interest, I will add
+> as admin, etc. If you have forked and continued the development, please link your work this might speed up the
+> process.
+
 
 ![Original LVGL demo image](lv_demo.png)
 
@@ -115,3 +120,5 @@ List of LVGL features that impacts the library usage in general.
 
 Widgets currently implemented might have some missing features. If the widget you want to use is not exposed or
 is missing a feature you want to make use, please send a Pull Request or open an issue.
+
+[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
