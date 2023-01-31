@@ -110,6 +110,13 @@ where
         }
     }
 
+    pub fn load_scr(&mut self, screen: &mut Obj) -> LvResult<()> {
+        unsafe {
+            lvgl_sys::lv_disp_load_scr(screen.raw()?.as_mut());
+        }
+        Ok(())
+    }
+
     pub fn event_send<W>(&mut self, obj: &mut W, event: Event<W::SpecialEvent>) -> LvResult<()>
     where
         W: Widget,
