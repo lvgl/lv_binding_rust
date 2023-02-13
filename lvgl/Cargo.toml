@@ -15,7 +15,7 @@ build = "build.rs"
 lvgl-sys = { version = "0.5.2", path = "../lvgl-sys" }
 cty = "0.2.1"
 embedded-graphics = "0.7.1"
-cstr_core = "0.2.3"
+cstr_core = { version = "0.2.3", default-features = false, features = ["alloc"] }
 bitflags = "1.2.1"
 
 [features]
