@@ -1,5 +1,5 @@
 use crate::Box;
-use crate::{Color, Event, LvError, LvResult, Obj, Widget};
+use crate::{Color, Event, LvError, LvResult, Obj, Widget, lv_core::obj::NativeObject};
 use core::marker::PhantomData;
 use core::mem::MaybeUninit;
 use core::ptr;
