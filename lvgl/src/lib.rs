@@ -31,12 +31,11 @@ use ::alloc::boxed::Box;
 #[cfg(feature = "lvgl_alloc")]
 mod allocator;
 
-pub mod input_device;
-pub(crate) mod mem;
 mod support;
 mod ui;
 #[macro_use]
 mod lv_core;
+pub mod input_device;
 pub mod widgets;
 
 #[cfg(not(feature = "lvgl_alloc"))]
