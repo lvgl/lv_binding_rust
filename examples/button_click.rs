@@ -5,7 +5,10 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 
-use lvgl::input_device::{BufferStatus, InputData, Pointer};
+use lvgl::input_device::{
+    generic::DisplayDriver,
+    pointer::{Pointer, PointerInputData},
+};
 use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
 use lvgl::{self, Align, Color, LvError, Part, State, Widget, UI};
@@ -26,11 +29,11 @@ fn main() -> Result<(), LvError> {
     ui.disp_drv_register(display)?;
 
     // Define the initial state of your input
-    let mut latest_touch_status = InputData::Touch(Point::new(0, 0)).released().once();
+    let mut latest_touch_status = PointerInputData::Touch(Point::new(0, 0)).released().once();
 
     // Register a new input device that's capable of reading the current state of the input
     let mut touch_screen = Pointer::new(|| latest_touch_status);
-    ui.indev_drv_register(&mut touch_screen)?;
+    ui.indev_drv_register_pointer(&mut touch_screen)?;
 
     // Create screen and widgets
     let mut screen = ui.scr_act()?;
@@ -71,7 +74,7 @@ fn main() -> Result<(), LvError> {
         let mut events = window.events().peekable();
 
         if events.peek().is_none() {
-            latest_touch_status = InputData::Touch(latest_touch_point.clone())
+            latest_touch_status = PointerInputData::Touch(latest_touch_point.clone())
                 .released()
                 .once();
         }
@@ -85,7 +88,7 @@ fn main() -> Result<(), LvError> {
                     println!("Clicked on: {:?}", point);
                     // Send a event to the button directly
                     latest_touch_point = point.clone();
-                    latest_touch_status = InputData::Touch(point).pressed().once();
+                    latest_touch_status = PointerInputData::Touch(point).pressed().once();
                 }
                 SimulatorEvent::Quit => break 'running,
                 _ => {}

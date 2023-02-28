@@ -1,44 +1,24 @@
-use crate::mem::Box;
-use crate::LvResult;
+use crate::Box;
+use crate::{LvError, LvResult};
 use core::mem::MaybeUninit;
 use embedded_graphics::geometry::Point;
 
+use super::generic::{BufferStatus, Data, DisplayDriver, InputState};
+
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
-pub enum InputData {
+pub enum PointerInputData {
     Touch(Point),
     Key(u32),
 }
 
-impl InputData {
+impl PointerInputData {
     pub fn released(self) -> InputState {
-        InputState::Released(self)
+        InputState::Released(Data::Pointer(self))
     }
 
     pub fn pressed(self) -> InputState {
-        InputState::Pressed(self)
+        InputState::Pressed(Data::Pointer(self))
     }
-}
-
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
-pub enum InputState {
-    Released(InputData),
-    Pressed(InputData),
-}
-
-impl InputState {
-    pub fn once(self) -> BufferStatus {
-        BufferStatus::Once(self)
-    }
-
-    pub fn and_continued(self) -> BufferStatus {
-        BufferStatus::Buffered(self)
-    }
-}
-
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
-pub enum BufferStatus {
-    Once(InputState),
-    Buffered(InputState),
 }
 
 pub struct Pointer {
@@ -46,8 +26,8 @@ pub struct Pointer {
     pub(crate) descriptor: Option<lvgl_sys::lv_indev_t>,
 }
 
-impl Pointer {
-    pub fn new<F>(handler: F) -> Self
+impl DisplayDriver<Pointer> for Pointer {
+    fn new<F>(handler: F) -> Self
     where
         F: Fn() -> BufferStatus,
     {
@@ -57,8 +37,8 @@ impl Pointer {
             let mut indev_drv = indev_drv.assume_init();
             indev_drv.type_ = lvgl_sys::LV_INDEV_TYPE_POINTER as lvgl_sys::lv_indev_type_t;
             indev_drv.read_cb = Some(read_input::<F>);
-            indev_drv.user_data = Box::into_raw(Box::new(handler).unwrap()) as *mut _
-                as lvgl_sys::lv_indev_drv_user_data_t;
+            indev_drv.user_data =
+                Box::into_raw(Box::new(handler)) as *mut _ as lvgl_sys::lv_indev_drv_user_data_t;
             indev_drv
         };
         Self {
@@ -67,12 +47,12 @@ impl Pointer {
         }
     }
 
-    pub(crate) unsafe fn set_descriptor(
-        &mut self,
-        descriptor: *mut lvgl_sys::lv_indev_t,
-    ) -> LvResult<()> {
-        // TODO: check if not null && check if `self.descriptor` is not already set!
-        self.descriptor = Some(*descriptor);
+    unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()> {
+        if !(descriptor.is_null() || self.descriptor.is_none()) {
+            self.descriptor = Some(*descriptor);
+        } else {
+            return Err(LvError::AlreadyInUse);
+        }
         Ok(())
     }
 }
@@ -89,34 +69,42 @@ where
     // call user data
     let info: BufferStatus = user_closure();
     match info {
-        BufferStatus::Once(InputState::Pressed(InputData::Touch(point))) => {
+        BufferStatus::Once(InputState::Pressed(Data::Pointer(PointerInputData::Touch(point)))) => {
             (*data).point.x = point.x as lvgl_sys::lv_coord_t;
             (*data).point.y = point.y as lvgl_sys::lv_coord_t;
             (*data).state = lvgl_sys::LV_INDEV_STATE_PR as lvgl_sys::lv_indev_state_t;
             false
         }
-        BufferStatus::Once(InputState::Released(InputData::Touch(point))) => {
+        BufferStatus::Once(InputState::Released(Data::Pointer(PointerInputData::Touch(point)))) => {
             (*data).point.x = point.x as lvgl_sys::lv_coord_t;
             (*data).point.y = point.y as lvgl_sys::lv_coord_t;
             (*data).state = lvgl_sys::LV_INDEV_STATE_REL as lvgl_sys::lv_indev_state_t;
             false
         }
-        BufferStatus::Buffered(InputState::Pressed(InputData::Touch(point))) => {
+        BufferStatus::Buffered(InputState::Pressed(Data::Pointer(PointerInputData::Touch(
+            point,
+        )))) => {
             (*data).point.x = point.x as lvgl_sys::lv_coord_t;
             (*data).point.y = point.y as lvgl_sys::lv_coord_t;
             (*data).state = lvgl_sys::LV_INDEV_STATE_PR as lvgl_sys::lv_indev_state_t;
             true
         }
-        BufferStatus::Buffered(InputState::Released(InputData::Touch(point))) => {
+        BufferStatus::Buffered(InputState::Released(Data::Pointer(PointerInputData::Touch(
+            point,
+        )))) => {
             (*data).point.x = point.x as lvgl_sys::lv_coord_t;
             (*data).point.y = point.y as lvgl_sys::lv_coord_t;
             (*data).state = lvgl_sys::LV_INDEV_STATE_REL as lvgl_sys::lv_indev_state_t;
             true
         }
-        BufferStatus::Once(InputState::Released(InputData::Key(_))) => false,
-        BufferStatus::Once(InputState::Pressed(InputData::Key(_))) => false,
-        BufferStatus::Buffered(InputState::Released(InputData::Key(_))) => true,
-        BufferStatus::Buffered(InputState::Pressed(InputData::Key(_))) => true,
+        BufferStatus::Once(InputState::Released(Data::Pointer(PointerInputData::Key(_)))) => false,
+        BufferStatus::Once(InputState::Pressed(Data::Pointer(PointerInputData::Key(_)))) => false,
+        BufferStatus::Buffered(InputState::Released(Data::Pointer(PointerInputData::Key(_)))) => {
+            true
+        }
+        BufferStatus::Buffered(InputState::Pressed(Data::Pointer(PointerInputData::Key(_)))) => {
+            true
+        }
     }
 }
 
@@ -125,11 +113,12 @@ mod test {
     use super::*;
     use crate::UI;
     use core::marker::PhantomData;
-    use embedded_graphics::drawable::Pixel;
+    use embedded_graphics::draw_target::DrawTarget;
     use embedded_graphics::geometry::Size;
     use embedded_graphics::pixelcolor::PixelColor;
     use embedded_graphics::pixelcolor::Rgb565;
-    use embedded_graphics::DrawTarget;
+    use embedded_graphics::prelude::OriginDimensions;
+    use embedded_graphics::Pixel;
 
     struct FakeDisplay<C>
     where
@@ -138,16 +127,25 @@ mod test {
         p: PhantomData<C>,
     }
 
-    impl<C> DrawTarget<C> for FakeDisplay<C>
+    impl<C> DrawTarget for FakeDisplay<C>
     where
         C: PixelColor,
     {
+        type Color = C;
         type Error = ();
 
-        fn draw_pixel(&mut self, item: Pixel<C>) -> Result<(), Self::Error> {
+        fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
+        where
+            I: IntoIterator<Item = Pixel<Self::Color>>,
+        {
             Ok(())
         }
+    }
 
+    impl<C> OriginDimensions for FakeDisplay<C>
+    where
+        C: PixelColor,
+    {
         fn size(&self) -> Size {
             Size::new(crate::VER_RES_MAX, crate::HOR_RES_MAX)
         }
@@ -164,12 +162,14 @@ mod test {
         ui.disp_drv_register(disp)?;
 
         fn read_touchpad_device() -> BufferStatus {
-            InputData::Touch(Point::new(120, 23)).pressed().once()
+            PointerInputData::Touch(Point::new(120, 23))
+                .pressed()
+                .once()
         }
 
         let mut touch_screen = Pointer::new(|| read_touchpad_device());
 
-        ui.indev_drv_register(&mut touch_screen)?;
+        ui.indev_drv_register_pointer(&mut touch_screen)?;
 
         Ok(())
     }

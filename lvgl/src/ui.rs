@@ -1,6 +1,6 @@
-use crate::input_device::Pointer;
-use crate::mem::Box;
-use crate::{Color, Event, LvError, LvResult, Obj, Widget};
+use crate::input_device::{generic::DisplayDriver, pointer::Pointer};
+use crate::Box;
+use crate::{lv_core::obj::NativeObject, Color, Event, LvError, LvResult, Obj, Widget};
 use core::marker::PhantomData;
 use core::mem::MaybeUninit;
 use core::ptr;
@@ -58,7 +58,10 @@ where
         }
     }
 
-    pub fn indev_drv_register(&mut self, input_device: &mut Pointer) -> LvResult<()> {
+    pub fn indev_drv_register_pointer(&mut self, input_device: &mut Pointer) -> LvResult<()> {
+        // This function _has_ to be pointer device type specific w/o a refactor
+        // that is probably not worth doing, especially since there may be merit
+        // in doing pointer device type specific logic anyways in the future
         if self.display_data.is_none() {
             // TODO: Better yet would be to create a display struct that one register the
             // input device in that instance. Represents better the LVGL correct usage. Also it's

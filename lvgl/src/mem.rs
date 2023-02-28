@@ -78,8 +78,8 @@ impl<T: Clone> Clone for Box<T> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::vec::Vec;
     use core::mem::MaybeUninit;
+    use std::vec::Vec;
 
     fn init() {
         unsafe {
