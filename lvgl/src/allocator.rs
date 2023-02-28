@@ -10,7 +10,7 @@ unsafe impl GlobalAlloc for LvglAlloc {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         // Make sure LVGL is initialized!
         crate::lvgl_init();
-        lvgl_sys::lv_mem_alloc(layout.size() as lvgl_sys::size_t) as *mut u8
+        lvgl_sys::lv_mem_alloc(layout.size() as cty::size_t) as *mut u8
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
