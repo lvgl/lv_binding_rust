@@ -14,7 +14,7 @@ impl<T> Box<T> {
     pub fn new(value: T) -> Box<T> {
         let size = mem::size_of::<T>();
         let inner = unsafe {
-            let ptr = lvgl_sys::lv_mem_alloc(size as lvgl_sys::size_t) as *mut T;
+            let ptr = lvgl_sys::lv_mem_alloc(size as cty::size_t) as *mut T;
 
             // LVGL should align the memory address for us!
             assert_eq!(

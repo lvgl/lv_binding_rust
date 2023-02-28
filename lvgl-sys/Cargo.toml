@@ -17,11 +17,11 @@ links = "lvgl"
 name = "lvgl_sys"
 
 [dependencies]
-cty = "0.2.1"
+cty = "0.2.2"
 
 [build-dependencies]
-cc = "1.0.68"
-bindgen = "0.59.2"
+cc = "1.0.79"
+bindgen = "0.64.0"
 
 [features]
 use-vendored-config = []
