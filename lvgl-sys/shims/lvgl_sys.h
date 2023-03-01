@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "lvgl/lvgl.h"
+#include "lv_drivers/win_drv.h"
 
 lv_color_t _LV_COLOR_MAKE(uint8_t r, uint8_t g, uint8_t b);
 uint16_t _LV_COLOR_GET_R(lv_color_t color);

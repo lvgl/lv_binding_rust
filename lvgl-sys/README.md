@@ -1,5 +1,5 @@
 # lvgl-sys
-Rust raw bindings for LittlevGL library.
+Rust raw bindings for LittlevGL library and drivers.
 
 ## Usage
 
