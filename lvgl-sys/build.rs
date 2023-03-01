@@ -1,7 +1,22 @@
 use cc::Build;
-use std::{env, path::{Path, PathBuf}};
+use std::{env, path::{Path, PathBuf}, collections::HashSet};
 
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
+
+// See https://github.com/rust-lang/rust-bindgen/issues/687#issuecomment-450750547
+#[cfg(feature = "drivers")]
+#[derive(Debug)]
+struct IgnoreMacros(HashSet<String>);
+
+impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
+    fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
+        if self.0.contains(name) {
+            bindgen::callbacks::MacroParsingBehavior::Ignore
+        } else {
+            bindgen::callbacks::MacroParsingBehavior::Default
+        }
+    }
+}
 
 fn main() {
     let project_dir = canonicalize(PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()));
@@ -133,10 +148,27 @@ fn main() {
         }
     }
 
+    #[cfg(feature = "drivers")]
+    let ignored_macros = IgnoreMacros(
+        vec![
+            "FP_INFINITE".into(),
+            "FP_NAN".into(),
+            "FP_NORMAL".into(),
+            "FP_SUBNORMAL".into(),
+            "FP_ZERO".into(),
+            "IPPORT_RESERVED".into(),
+        ]
+        .into_iter()
+        .collect(),
+    );
+
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings = bindgen::Builder::default()
-        .header(shims_dir.join("lvgl_sys.h").to_str().unwrap())
-        .generate_comments(false)
+        .header(shims_dir.join("lvgl_sys.h").to_str().unwrap());
+    #[cfg(feature = "drivers")]
+    let bindings = bindings.header(shims_dir.join("lvgl_drv.h").to_str().unwrap())
+        .parse_callbacks(Box::new(ignored_macros));
+    let bindings = bindings.generate_comments(false)
         .derive_default(true)
         .layout_tests(false)
         .use_core()
