@@ -7,7 +7,12 @@ fn main() {
     let project_dir = canonicalize(PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()));
     let shims_dir = project_dir.join("shims");
     let vendor = project_dir.join("vendor");
-    let vendor_src = vendor.join("lvgl").join("src");
+    let lvgl_src = vendor.join("lvgl").join("src");
+
+    #[cfg(feature = "drivers")]
+    let driver_display = vendor.join("lv_drivers").join("display");
+    #[cfg(feature = "drivers")]
+    let driver_indev = vendor.join("lv_drivers").join("indev");
 
     let lv_config_dir = {
         let conf_path = env::var(CONFIG_NAME)
@@ -49,25 +54,46 @@ fn main() {
                 CONFIG_NAME
             );
         }
+        #[cfg(feature = "drivers")]
+        if !conf_path.join("lv_drv_conf.h").exists() {
+            panic!(
+                "Directory {} referenced by {} needs to contain a file called lv_drv_conf.h",
+                conf_path.to_string_lossy(),
+                CONFIG_NAME
+            );
+        }
 
         println!(
             "cargo:rerun-if-changed={}",
             conf_path.join("lv_conf.h").to_str().unwrap()
         );
+        #[cfg(feature = "drivers")]
+        println!(
+            "cargo:rerun-if-changed={}",
+            conf_path.join("lv_drv_conf.h").to_str().unwrap()
+        );
         conf_path
     };
 
     let mut cfg = Build::new();
-    add_c_files(&mut cfg, &vendor_src);
+    add_c_files(&mut cfg, &lvgl_src);
     add_c_files(&mut cfg, &lv_config_dir);
     add_c_files(&mut cfg, &shims_dir);
+    #[cfg(feature = "drivers")]
+    add_c_files(&mut cfg, &driver_display);
+    #[cfg(feature = "drivers")]
+    add_c_files(&mut cfg, &driver_indev);
 
     cfg.define("LV_CONF_INCLUDE_SIMPLE", Some("1"))
-        .include(&vendor_src)
+        .include(&lvgl_src)
         .include(&vendor)
         .warnings(false)
-        .include(&lv_config_dir)
-        .compile("lvgl");
+        .include(&lv_config_dir);
+    #[cfg(feature = "drivers")]
+    cfg.include(&driver_display)
+       .include(&driver_indev);
+
+    cfg.compile("lvgl");
 
     let mut cc_args = vec![
         "-DLV_CONF_INCLUDE_SIMPLE=1",

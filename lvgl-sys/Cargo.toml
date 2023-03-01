@@ -24,4 +24,6 @@ cc = "1.0.79"
 bindgen = "0.64.0"
 
 [features]
+default = ["drivers"]
 use-vendored-config = []
+drivers = []
