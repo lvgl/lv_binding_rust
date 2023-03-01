@@ -105,11 +105,15 @@ this section you can check what is implemented at the moment.
 
 List of LVGL features that impacts the library usage in general.
 - [x] Displays: We use [`embedded_graphics`](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/) library to
-      draw to the display. You can use `lvgl-rs` with any of the
-      [`embedded_graphics` supported displays](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/#supported-displays).
+      draw to the display, along with [`lv_drivers`](https://github.com/lvgl/lv_drivers). You can
+      use `lvgl-rs` with any of the [`embedded_graphics`](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/#supported-displays) supported
+      displays, and those supported by [`lv_drivers`](https://github.com/lvgl/lv_drivers).
+      **Note:** [`lv_drivers`](https://github.com/lvgl/lv_drivers) support is currently experimental.
 - [x] Events: You can listen and trigger events in widget objects.
 - [x] Styles: You can set styles in any exposed object. We are still missing the possibility of defining global base styles.
-- [ ] Input Devices
+- [x] Input Devices: Input devices supported by [`lv_drivers`](https://github.com/lvgl/lv_drivers)
+      can be used.
+      **Note:** [`lv_drivers`](https://github.com/lvgl/lv_drivers) support is currently experimental.
 - [ ] Fonts
 - [ ] Images
 - [ ] File system
