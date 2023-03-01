@@ -1,5 +1,5 @@
 use cc::Build;
-use std::{env, path::Path, path::PathBuf};
+use std::{env, path::{Path, PathBuf}};
 
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
 
