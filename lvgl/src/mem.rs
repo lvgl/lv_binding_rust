@@ -97,14 +97,15 @@ mod test {
     use super::*;
     use crate::mem::mem_info;
     use crate::*;
-    use core::mem::MaybeUninit;
     use std::vec::Vec;
 
+    /*
     fn init() {
         unsafe {
             lvgl_sys::lv_init();
         };
     }
+    */
 
     fn teardown() {
         unsafe {

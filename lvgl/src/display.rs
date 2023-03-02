@@ -7,9 +7,7 @@ use core::mem::MaybeUninit;
 use core::ptr::NonNull;
 use core::{ptr, result};
 
-pub const DISP_HOR_RES: usize = lvgl_sys::LV_HOR_RES_MAX as usize;
-pub const DISP_VER_RES: usize = lvgl_sys::LV_VER_RES_MAX as usize;
-
+/// Error in interacting with a `Display`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum DisplayError {
     NotAvailable,
@@ -19,6 +17,7 @@ pub enum DisplayError {
 
 type Result<T> = result::Result<T, DisplayError>;
 
+/// An LVGL-registered display. Equivalent to an `lv_disp_t`.
 pub struct Display {
     pub(crate) disp: NonNull<lvgl_sys::lv_disp_t>,
 }
@@ -28,6 +27,8 @@ impl<'a> Display {
         Self { disp }
     }
 
+    /// Registers a given `DrawBuffer` with an associated update function to
+    /// LVGL. `display_update` takes a `&DisplayRefresh`.
     pub fn register<F, const N: usize>(
         draw_buffer: &'a DrawBuffer<N>,
         display_update: F,
@@ -51,21 +52,25 @@ impl Default for Display {
 }
 
 #[derive(Copy, Clone)]
-pub struct DefaultDisplay {}
+pub(crate) struct DefaultDisplay {}
 
 impl DefaultDisplay {
-    /// Gets the screen active of the default display.
-    pub fn get_scr_act() -> Result<Obj> {
+    /// Gets the active screen of the default display.
+    pub(crate) fn get_scr_act() -> Result<Obj> {
         Ok(get_str_act(None)?)
     }
 }
 
+/// A buffer of size `N` representing `N` pixels. `N` can be smaller than the
+/// entire number of pixels on the screen, in which case the screen will be
+/// drawn to multiple times per frame.
 pub struct DrawBuffer<const N: usize> {
     initialized: RunOnce,
     refresh_buffer: RefCell<[MaybeUninit<lvgl_sys::lv_color_t>; N]>,
 }
 
 impl<const N: usize> DrawBuffer<N> {
+    /// Constructs an empty `DrawBuffer`.
     pub const fn new() -> Self {
         Self {
             initialized: RunOnce::new(),
@@ -96,7 +101,7 @@ impl<const N: usize> DrawBuffer<N> {
     }
 }
 
-pub struct DisplayDriver {
+pub(crate) struct DisplayDriver {
     pub(crate) disp_drv: lvgl_sys::lv_disp_drv_t,
 }
 
@@ -140,8 +145,9 @@ pub struct Area {
     pub y2: i16,
 }
 
-/// It's a update to the display information, contains the area that is being updated and the color
-/// of the pixels that need to be updated. The colors are represented in a contiguous array.
+/// An update to the display information, contains the area that is being
+/// updated and the color of the pixels that need to be updated. The colors
+/// are represented in a contiguous array.
 pub struct DisplayRefresh<const N: usize> {
     pub area: Area,
     pub colors: [Color; N],

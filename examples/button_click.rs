@@ -16,9 +16,9 @@ use lvgl::{
     Align, Color, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX, VER_RES_MAX,
 };
 use std::cell::RefCell;
-use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
+#[allow(unused_assignments)]
 fn main() -> Result<(), LvError> {
     lvgl::init();
     let sim_display: SimulatorDisplay<Rgb565> =

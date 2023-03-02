@@ -4,6 +4,7 @@ use core::alloc::{GlobalAlloc, Layout};
 #[global_allocator]
 static ALLOCATOR: LvglAlloc = LvglAlloc;
 
+/// LVGL allocator. Enabled by toggling the `lvgl_alloc` or `alloc` features.
 pub struct LvglAlloc;
 
 unsafe impl GlobalAlloc for LvglAlloc {

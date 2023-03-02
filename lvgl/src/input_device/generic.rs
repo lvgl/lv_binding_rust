@@ -1,11 +1,14 @@
 use super::pointer::*;
 use crate::LvResult;
 
+/// Generic data which can be associated with an input device driver. Varies
+/// based on the concrete type of the input device driver
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum Data {
     Pointer(PointerInputData),
 }
 
+/// Boolean states for an input.
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum InputState {
     Released(Data),
@@ -13,21 +16,24 @@ pub enum InputState {
 }
 
 impl InputState {
+    /// Represents a non-buffered input device.
     pub fn once(self) -> BufferStatus {
         BufferStatus::Once(self)
     }
-
+    /// Represents a buffered input device.
     pub fn and_continued(self) -> BufferStatus {
         BufferStatus::Buffered(self)
     }
 }
 
+/// Boolean buffering states for an input device driver.
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum BufferStatus {
     Once(InputState),
     Buffered(InputState),
 }
 
+/// A generic input driver trait.
 pub trait InputDriver<D> {
     fn new<F>(handler: F) -> D
     where

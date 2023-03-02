@@ -2,9 +2,9 @@ use crate::Box;
 use crate::{LvError, LvResult};
 use core::mem::MaybeUninit;
 use embedded_graphics::geometry::Point;
-
 use super::generic::{BufferStatus, Data, InputDriver, InputState};
 
+/// Pointer-specific input data. Contains the point clicked and the key.
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum PointerInputData {
     Touch(Point),
@@ -21,6 +21,7 @@ impl PointerInputData {
     }
 }
 
+/// Represents a pointer-type input driver.
 pub struct Pointer {
     pub(crate) driver: lvgl_sys::lv_indev_drv_t,
     pub(crate) descriptor: Option<lvgl_sys::lv_indev_t>,
@@ -114,12 +115,12 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    //use super::*;
     use core::marker::PhantomData;
     use embedded_graphics::draw_target::DrawTarget;
     use embedded_graphics::geometry::Size;
     use embedded_graphics::pixelcolor::PixelColor;
-    use embedded_graphics::pixelcolor::Rgb565;
+    //use embedded_graphics::pixelcolor::Rgb565;
     use embedded_graphics::prelude::OriginDimensions;
     use embedded_graphics::Pixel;
 
@@ -137,7 +138,7 @@ mod test {
         type Color = C;
         type Error = ();
 
-        fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
+        fn draw_iter<I>(&mut self, _pixels: I) -> Result<(), Self::Error>
         where
             I: IntoIterator<Item = Pixel<Self::Color>>,
         {
@@ -157,6 +158,7 @@ mod test {
     //#[test]
     // We cannot test right now by having instances of UI global state... :(
     // I need to find a way to test while having global state...
+    /*
     fn pointer_input_device() -> LvResult<()> {
         crate::init();
 
@@ -177,4 +179,5 @@ mod test {
 
         Ok(())
     }
+    */
 }

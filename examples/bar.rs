@@ -12,7 +12,7 @@ use lvgl::{
     VER_RES_MAX,
 };
 use std::cell::RefCell;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 fn main() -> Result<(), LvError> {
     lvgl::init();
@@ -64,7 +64,6 @@ fn main() -> Result<(), LvError> {
     loading_lbl.add_style(Part::Main, &mut loading_style)?;
 
     let mut i = 0;
-    let mut loop_started = Instant::now();
     'running: loop {
         if i > 100 {
             i = 0;

@@ -8,13 +8,13 @@ use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Arc, Label, LabelAlign};
 use lvgl::{
-    Align, Color, Display, DisplayRefresh, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX,
+    Align, Color, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX,
     VER_RES_MAX,
 };
 use lvgl_sys;
 use std::cell::RefCell;
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
     let mut info = lvgl_sys::lv_mem_monitor_t {
