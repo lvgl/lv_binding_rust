@@ -5,6 +5,7 @@ use core::ptr::NonNull;
 use core::time::Duration;
 use core::{ptr, result};
 
+/// Internal LVGL error.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum CoreError {
     ResourceNotAvailable,
@@ -40,9 +41,8 @@ pub(crate) fn get_str_act(disp: Option<&Display>) -> Result<Obj> {
     ))
 }
 
-/// You have to call this function periodically.
-/// Expects a `tick_period` duration as argument which is the call period of this
-/// function in milliseconds.
+/// Runs an LVGL tick lasting a given `core::time::Duration`. This function
+/// should be called periodically.
 #[inline]
 pub fn tick_inc(tick_period: Duration) {
     unsafe {
@@ -50,13 +50,13 @@ pub fn tick_inc(tick_period: Duration) {
     }
 }
 
-/// Call it periodically to handle tasks.
+/// Calls the LVGL task handler. This function should be called periodically.
 #[inline]
 pub fn task_handler() {
     unsafe { lvgl_sys::lv_task_handler() };
 }
 
-/// Directly send an event to a widget
+/// Directly send an event to a specific widget.
 #[inline]
 pub fn event_send<W: Widget>(obj: &mut W, event: Event<W::SpecialEvent>) -> LvResult<()> {
     unsafe {
@@ -65,7 +65,7 @@ pub fn event_send<W: Widget>(obj: &mut W, event: Event<W::SpecialEvent>) -> LvRe
     Ok(())
 }
 
-/// Register an input device driver to LVGL
+/// Register an input device driver to LVGL.
 pub fn indev_drv_register<D>(input_device: &mut impl InputDriver<D>) -> LvResult<()> {
     unsafe {
         let descr = lvgl_sys::lv_indev_drv_register(&mut input_device.get_driver() as *mut _);

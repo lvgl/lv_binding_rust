@@ -58,7 +58,9 @@ mod support;
 pub mod input_device;
 pub mod widgets;
 
+/// Maximum horizontal display resolution, as defined in `lv_conf.h`.
 pub const HOR_RES_MAX: u32 = lvgl_sys::LV_HOR_RES_MAX;
+/// Maximum vertical display resolution, as defined in `lv_conf.h`.
 pub const VER_RES_MAX: u32 = lvgl_sys::LV_VER_RES_MAX;
 
 struct RunOnce(AtomicBool);
@@ -77,6 +79,7 @@ impl RunOnce {
 
 static LVGL_INITIALIZED: RunOnce = RunOnce::new();
 
+/// Initializes LVGL. Call at the start of the program.
 pub fn init() {
     if LVGL_INITIALIZED.swap_and_check() {
         unsafe {

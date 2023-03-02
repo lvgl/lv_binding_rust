@@ -2,7 +2,7 @@ use crate::lv_core::style::Style;
 use crate::{Align, LvError, LvResult};
 use core::ptr;
 
-/// Represents a native LVGL object
+/// Represents a native LVGL object.
 pub trait NativeObject {
     /// Provide common way to access to the underlying native object pointer.
     fn raw(&self) -> LvResult<ptr::NonNull<lvgl_sys::lv_obj_t>>;
@@ -33,9 +33,9 @@ pub trait Widget: NativeObject {
     type Part: Into<u8>;
 
     /// Construct an instance of the object from a raw pointer.
-    ///
     fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
 
+    /// Adds a `Style` to a given widget.
     fn add_style(&self, part: Self::Part, style: &mut Style) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_add_style(
@@ -47,6 +47,7 @@ pub trait Widget: NativeObject {
         Ok(())
     }
 
+    /// Sets a widget's position relative to its parent.
     fn set_pos(&mut self, x: i16, y: i16) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_set_pos(
@@ -58,6 +59,7 @@ pub trait Widget: NativeObject {
         Ok(())
     }
 
+    /// Sets a widget's size. Alternatively, use `set_width()` and `set_height()`.
     fn set_size(&mut self, w: i16, h: i16) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_set_size(
@@ -69,6 +71,7 @@ pub trait Widget: NativeObject {
         Ok(())
     }
 
+    /// Sets a widget's width. Alternatively, use `set_size()`.
     fn set_width(&mut self, w: u32) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_set_width(self.raw()?.as_mut(), w as lvgl_sys::lv_coord_t);
@@ -76,6 +79,7 @@ pub trait Widget: NativeObject {
         Ok(())
     }
 
+    /// Sets a widget's height. Alternatively, use `set_size()`.
     fn set_height(&mut self, h: u32) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_set_height(self.raw()?.as_mut(), h as lvgl_sys::lv_coord_t);
@@ -83,6 +87,7 @@ pub trait Widget: NativeObject {
         Ok(())
     }
 
+    /// Sets a widget's align relative to its parent along with an offset.
     fn set_align<C>(&mut self, base: &mut C, align: Align, x_mod: i32, y_mod: i32) -> LvResult<()>
     where
         C: NativeObject,

@@ -8,14 +8,14 @@ use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Label, LabelAlign};
 use lvgl::{
-    Align, Color, DefaultDisplay, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX,
+    Align, Color, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX,
     VER_RES_MAX,
 };
 use lvgl_sys;
 use std::cell::RefCell;
 use std::thread;
 use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 fn main() -> Result<(), LvError> {
     lvgl::init();
@@ -40,7 +40,7 @@ fn main() -> Result<(), LvError> {
     let display = Display::register(&buffer, |refresh| {
         shared_native_display
             .borrow_mut()
-            .draw_iter(refresh.as_pixels());
+            .draw_iter(refresh.as_pixels()).unwrap();
     })?;
 
     // Create screen and widgets

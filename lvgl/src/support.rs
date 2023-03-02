@@ -8,6 +8,7 @@ use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 
 pub type LvResult<T> = Result<T, LvError>;
 
+/// Generic LVGL error. All other errors can be coerced into it.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum LvError {
     InvalidReference,
@@ -27,29 +28,31 @@ impl From<DisplayError> for LvError {
     }
 }
 
+/// An LVGL color. Equivalent to `lv_color_t`.
 #[derive(Copy, Clone, Default)]
 pub struct Color {
     pub(crate) raw: lvgl_sys::lv_color_t,
 }
 
 impl Color {
+    /// Creates a `Color` from red, green, and blue values.
     pub fn from_rgb((r, g, b): (u8, u8, u8)) -> Self {
         let raw = unsafe { lvgl_sys::_LV_COLOR_MAKE(r, g, b) };
         Self { raw }
     }
-
+    /// Creates a `Color` from a native `lv_color_t` instance.
     pub fn from_raw(raw: lvgl_sys::lv_color_t) -> Self {
         Self { raw }
     }
-
+    /// Returns the value of the red channel.
     pub fn r(&self) -> u8 {
         unsafe { lvgl_sys::_LV_COLOR_GET_R(self.raw) as u8 }
     }
-
+    /// Returns the value of the green channel.
     pub fn g(&self) -> u8 {
         unsafe { lvgl_sys::_LV_COLOR_GET_G(self.raw) as u8 }
     }
-
+    /// Returns the value of the blue channel.
     pub fn b(&self) -> u8 {
         unsafe { lvgl_sys::_LV_COLOR_GET_B(self.raw) as u8 }
     }
@@ -170,7 +173,7 @@ impl<S> From<Event<S>> for lvgl_sys::lv_event_t {
     }
 }
 
-/// These events are sent only by pointer-like input devices (E.g. mouse or touchpad)
+/// Events sent only by pointer-like input devices (e.g. mouse or touchpad)
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum PointerEvent {
     DragBegin,
@@ -197,6 +200,7 @@ pub(crate) unsafe extern "C" fn event_callback<T, F>(
     }
 }
 
+/// Possible LVGL alignments for widgets.
 pub enum Align {
     Center,
     InTopLeft,
@@ -250,6 +254,7 @@ impl From<Align> for u8 {
     }
 }
 
+/// Boolean for determining whether animations are enabled.
 pub enum Animation {
     ON,
     OFF,
