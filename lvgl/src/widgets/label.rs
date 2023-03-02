@@ -13,9 +13,9 @@ impl Label {
 #[cfg(feature = "alloc")]
 mod alloc_imp {
     use crate::widgets::Label;
-    use crate::LvError;
+    //use crate::LvError;
     use cstr_core::CString;
-    use core::convert::TryFrom;
+    //use core::convert::TryFrom;
 
     impl<S: AsRef<str>> From<S> for Label {
         fn from(text: S) -> Self {
@@ -39,7 +39,6 @@ mod alloc_imp {
     //     }
     // }
 }
-
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]

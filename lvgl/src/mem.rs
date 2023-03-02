@@ -95,9 +95,9 @@ fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
 #[cfg(test)]
 mod test {
     use super::*;
-    use core::mem::MaybeUninit;
     use crate::mem::mem_info;
     use crate::*;
+    use core::mem::MaybeUninit;
     use std::vec::Vec;
 
     fn init() {

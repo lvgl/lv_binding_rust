@@ -5,48 +5,57 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 
+use lvgl;
 use lvgl::input_device::{
-    generic::DisplayDriver,
+    generic::InputDriver,
     pointer::{Pointer, PointerInputData},
 };
 use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
-use lvgl::{self, Align, Color, LvError, Part, State, Widget, UI};
-
+use lvgl::{
+    Align, Color, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX, VER_RES_MAX,
+};
+use std::cell::RefCell;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
 fn main() -> Result<(), LvError> {
-    let display: SimulatorDisplay<Rgb565> =
-        SimulatorDisplay::new(Size::new(lvgl::HOR_RES_MAX, lvgl::VER_RES_MAX));
+    lvgl::init();
+    let sim_display: SimulatorDisplay<Rgb565> =
+        SimulatorDisplay::new(Size::new(HOR_RES_MAX, VER_RES_MAX));
 
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
-    let mut window = Window::new("Bar Example", &output_settings);
+    let mut window = Window::new("Button Example", &output_settings);
 
-    let mut ui = UI::init()?;
+    let shared_native_display = RefCell::new(sim_display);
 
-    // Register your display:
-    ui.disp_drv_register(display)?;
+    let buffer = DrawBuffer::<{ (HOR_RES_MAX * VER_RES_MAX) as usize }>::new();
+
+    let display = Display::register(&buffer, |refresh| {
+        shared_native_display
+            .borrow_mut()
+            .draw_iter(refresh.as_pixels())
+            .unwrap();
+    })?;
 
     // Define the initial state of your input
     let mut latest_touch_status = PointerInputData::Touch(Point::new(0, 0)).released().once();
 
     // Register a new input device that's capable of reading the current state of the input
     let mut touch_screen = Pointer::new(|| latest_touch_status);
-    ui.indev_drv_register_pointer(&mut touch_screen)?;
+    lvgl::indev_drv_register(&mut touch_screen)?;
 
     // Create screen and widgets
-    let mut screen = ui.scr_act()?;
+    let mut screen = display.get_scr_act()?;
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
-    screen.add_style(Part::Main, screen_style)?;
-
+    screen.add_style(Part::Main, &mut screen_style)?;
     // Create the button
-    let mut button = Btn::new(&mut screen)?;
+    let mut button = Btn::create(&mut screen, None)?;
     button.set_align(&mut screen, Align::InLeftMid, 30, 0)?;
     button.set_size(180, 80)?;
-    let mut btn_lbl = Label::new(&mut button)?;
+    let mut btn_lbl = Label::create(&mut button, None)?;
     btn_lbl.set_text(CString::new("Click me!").unwrap().as_c_str())?;
 
     let mut btn_state = false;
@@ -65,11 +74,10 @@ fn main() -> Result<(), LvError> {
         }
     })?;
 
-    let mut loop_started = Instant::now();
     let mut latest_touch_point = Point::new(0, 0);
     'running: loop {
-        ui.task_handler();
-        window.update(ui.get_display_ref().unwrap());
+        lvgl::task_handler();
+        window.update(&shared_native_display.borrow());
 
         let mut events = window.events().peekable();
 
@@ -95,10 +103,7 @@ fn main() -> Result<(), LvError> {
             }
         }
 
-        sleep(Duration::from_millis(15));
-
-        ui.tick_inc(loop_started.elapsed());
-        loop_started = Instant::now();
+        lvgl::tick_inc(Duration::from_millis(15));
     }
 
     Ok(())

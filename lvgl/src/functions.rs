@@ -1,5 +1,6 @@
 use crate::display::{Display, DisplayDriver};
-use crate::{Obj, Widget};
+use crate::input_device::generic::InputDriver;
+use crate::{Event, LvResult, Obj, Widget};
 use core::ptr::NonNull;
 use core::time::Duration;
 use core::{ptr, result};
@@ -53,4 +54,22 @@ pub fn tick_inc(tick_period: Duration) {
 #[inline]
 pub fn task_handler() {
     unsafe { lvgl_sys::lv_task_handler() };
+}
+
+/// Directly send an event to a widget
+#[inline]
+pub fn event_send<W: Widget>(obj: &mut W, event: Event<W::SpecialEvent>) -> LvResult<()> {
+    unsafe {
+        lvgl_sys::lv_event_send(obj.raw()?.as_mut(), event.into(), ptr::null_mut());
+    };
+    Ok(())
+}
+
+/// Register an input device driver to LVGL
+pub fn indev_drv_register<D>(input_device: &mut impl InputDriver<D>) -> LvResult<()> {
+    unsafe {
+        let descr = lvgl_sys::lv_indev_drv_register(&mut input_device.get_driver() as *mut _);
+        input_device.set_descriptor(descr)?;
+    };
+    Ok(())
 }

@@ -28,10 +28,11 @@ pub enum BufferStatus {
     Buffered(InputState),
 }
 
-pub trait DisplayDriver<D> {
+pub trait InputDriver<D> {
     fn new<F>(handler: F) -> D
     where
         F: Fn() -> BufferStatus;
 
+    fn get_driver(&self) -> lvgl_sys::lv_indev_drv_t;
     unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()>;
 }

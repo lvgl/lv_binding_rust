@@ -4,14 +4,15 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
-use lvgl::display::Display;
+use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Arc, Label, LabelAlign};
-use lvgl::{self, Align, Color, Part, State};
-use lvgl::{LvError, Widget};
+use lvgl::{
+    Align, Color, Display, DisplayRefresh, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX,
+    VER_RES_MAX,
+};
 use lvgl_sys;
-use parking_lot::Mutex;
-use std::sync::Arc as SyncArc;
+use std::cell::RefCell;
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -41,16 +42,24 @@ fn main() -> Result<(), LvError> {
 
 fn run_arc_demo() -> Result<(), LvError> {
     lvgl::init();
-    let display: SimulatorDisplay<Rgb565> =
-        SimulatorDisplay::new(Size::new(lvgl::HOR_RES_MAX, lvgl::VER_RES_MAX));
+    let sim_display: SimulatorDisplay<Rgb565> =
+        SimulatorDisplay::new(Size::new(HOR_RES_MAX, VER_RES_MAX));
 
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Arc Example", &output_settings);
 
-    let shared_native_display = SyncArc::new(Mutex::new(display));
-    let display = Display::register_shared(&shared_native_display)?;
+    let shared_native_display = RefCell::new(sim_display);
 
-    let mut screen = display.get_str_act()?;
+    let buffer = DrawBuffer::<{ (HOR_RES_MAX * VER_RES_MAX) as usize }>::new();
+
+    let display = Display::register(&buffer, |refresh| {
+        shared_native_display
+            .borrow_mut()
+            .draw_iter(refresh.as_pixels())
+            .unwrap();
+    })?;
+
+    let mut screen = display.get_scr_act()?;
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
@@ -58,13 +67,13 @@ fn run_arc_demo() -> Result<(), LvError> {
     screen.add_style(Part::Main, &mut screen_style)?;
 
     // Create the arc object
-    let mut arc = Arc::new()?;
+    let mut arc = Arc::create(&mut screen, None)?;
     arc.set_size(150, 150)?;
     arc.set_align(&mut screen, Align::Center, 0, 10)?;
     arc.set_start_angle(135)?;
     arc.set_end_angle(135)?;
 
-    let mut loading_lbl = Label::new()?;
+    let mut loading_lbl = Label::create(&mut screen, None)?;
     loading_lbl.set_text(CString::new("Loading...").unwrap().as_c_str())?;
     loading_lbl.set_align(&mut arc, Align::OutTopMid, 0, -10)?;
     loading_lbl.set_label_align(LabelAlign::Center)?;
@@ -97,10 +106,7 @@ fn run_arc_demo() -> Result<(), LvError> {
         i += 1;
 
         lvgl::task_handler();
-        {
-            let eg_display = shared_native_display.lock();
-            window.update(&eg_display);
-        }
+        window.update(&shared_native_display.borrow());
 
         for event in window.events() {
             match event {
@@ -108,7 +114,7 @@ fn run_arc_demo() -> Result<(), LvError> {
                 _ => {}
             }
         }
-        thread::sleep(Duration::from_millis(15));
+        lvgl::tick_inc(Duration::from_millis(15));
     }
 
     Ok(())

@@ -6,8 +6,6 @@ use core::cell::RefCell;
 use core::mem::MaybeUninit;
 use core::ptr::NonNull;
 use core::{ptr, result};
-use parking_lot::const_mutex;
-use parking_lot::Mutex;
 
 pub const DISP_HOR_RES: usize = lvgl_sys::LV_HOR_RES_MAX as usize;
 pub const DISP_VER_RES: usize = lvgl_sys::LV_VER_RES_MAX as usize;
@@ -25,17 +23,17 @@ pub struct Display {
     pub(crate) disp: NonNull<lvgl_sys::lv_disp_t>,
 }
 
-impl Display {
+impl<'a> Display {
     pub(crate) fn from_raw(disp: NonNull<lvgl_sys::lv_disp_t>) -> Self {
         Self { disp }
     }
 
     pub fn register<F, const N: usize>(
-        draw_buffer: &'static DrawBuffer<N>,
+        draw_buffer: &'a DrawBuffer<N>,
         display_update: F,
     ) -> Result<Self>
     where
-        F: FnMut(&DisplayRefresh<N>) + 'static,
+        F: FnMut(&DisplayRefresh<N>) + 'a,
     {
         let mut display_diver = DisplayDriver::new(draw_buffer, display_update)?;
         Ok(disp_drv_register(&mut display_diver)?)
@@ -64,14 +62,14 @@ impl DefaultDisplay {
 
 pub struct DrawBuffer<const N: usize> {
     initialized: RunOnce,
-    refresh_buffer: Mutex<RefCell<[MaybeUninit<lvgl_sys::lv_color_t>; N]>>,
+    refresh_buffer: RefCell<[MaybeUninit<lvgl_sys::lv_color_t>; N]>,
 }
 
 impl<const N: usize> DrawBuffer<N> {
     pub const fn new() -> Self {
         Self {
             initialized: RunOnce::new(),
-            refresh_buffer: const_mutex(RefCell::new([MaybeUninit::uninit(); N])),
+            refresh_buffer: RefCell::new([MaybeUninit::uninit(); N]),
         }
     }
 
@@ -81,7 +79,7 @@ impl<const N: usize> DrawBuffer<N> {
             // Cannot be in the DrawBuffer struct because the type `lv_disp_buf_t` contains a raw
             // pointer and raw pointers are not Send and consequently cannot be in `static` variables.
             let mut inner: MaybeUninit<lvgl_sys::lv_disp_buf_t> = MaybeUninit::uninit();
-            let primary_buffer_guard = self.refresh_buffer.lock();
+            let primary_buffer_guard = &self.refresh_buffer;
             let draw_buf = unsafe {
                 lvgl_sys::lv_disp_buf_init(
                     inner.as_mut_ptr(),
@@ -102,13 +100,13 @@ pub struct DisplayDriver {
     pub(crate) disp_drv: lvgl_sys::lv_disp_drv_t,
 }
 
-impl DisplayDriver {
+impl<'a> DisplayDriver {
     pub fn new<F, const N: usize>(
-        draw_buffer: &'static DrawBuffer<N>,
+        draw_buffer: &'a DrawBuffer<N>,
         display_update_callback: F,
     ) -> Result<Self>
     where
-        F: FnMut(&DisplayRefresh<N>) + 'static,
+        F: FnMut(&DisplayRefresh<N>) + 'a,
     {
         let mut disp_drv = unsafe {
             let mut inner = MaybeUninit::uninit();
@@ -152,11 +150,11 @@ pub struct DisplayRefresh<const N: usize> {
 #[cfg(feature = "embedded_graphics")]
 mod embedded_graphics_impl {
     use crate::{Color, DisplayRefresh};
-    use embedded_graphics::drawable;
     use embedded_graphics::prelude::*;
+    use embedded_graphics::Pixel;
 
     impl<const N: usize> DisplayRefresh<N> {
-        pub fn as_pixels<C>(&self) -> impl IntoIterator<Item = drawable::Pixel<C>> + '_
+        pub fn as_pixels<C>(&self) -> impl IntoIterator<Item = Pixel<C>> + '_
         where
             C: PixelColor + From<Color>,
         {
@@ -177,7 +175,7 @@ mod embedded_graphics_impl {
                     xs.clone().map(move |(ix, x)| {
                         let color_len = x_len * iy + ix;
                         let raw_color = self.colors[color_len];
-                        drawable::Pixel(Point::new(x as i32, y as i32), raw_color.into())
+                        Pixel(Point::new(x as i32, y as i32), raw_color.into())
                     })
                 })
                 .flatten()
@@ -185,12 +183,12 @@ mod embedded_graphics_impl {
     }
 }
 
-unsafe extern "C" fn disp_flush_trampoline<F, const N: usize>(
+unsafe extern "C" fn disp_flush_trampoline<'a, F, const N: usize>(
     disp_drv: *mut lvgl_sys::lv_disp_drv_t,
     area: *const lvgl_sys::lv_area_t,
     color_p: *mut lvgl_sys::lv_color_t,
 ) where
-    F: FnMut(&DisplayRefresh<N>) + 'static,
+    F: FnMut(&DisplayRefresh<N>) + 'a,
 {
     let display_driver = *disp_drv;
     if !display_driver.user_data.is_null() {
