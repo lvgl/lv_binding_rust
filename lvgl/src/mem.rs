@@ -44,7 +44,7 @@ impl<T> Box<T> {
 impl<T> Drop for Box<T> {
     fn drop(&mut self) {
         unsafe {
-            lvgl_sys::lv_mem_free(self.0.as_ptr() as *const cty::c_void);
+            lvgl_sys::lv_mem_free(self.0.as_ptr() as *mut cty::c_void);
         }
     }
 }
@@ -166,9 +166,9 @@ mod test {
         }
         drop(keep);
 
-        unsafe {
-            lvgl_sys::lv_mem_defrag();
-        }
+        //unsafe {
+        //    lvgl_sys::lv_mem_defrag();
+        //}
 
         let final_info = mem_info();
         println!("mem info: {:?}", &final_info);

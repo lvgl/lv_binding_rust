@@ -16,6 +16,6 @@ unsafe impl GlobalAlloc for LvglAlloc {
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
         crate::init();
-        lvgl_sys::lv_mem_free(ptr as *const cty::c_void)
+        lvgl_sys::lv_mem_free(ptr as *mut cty::c_void)
     }
 }

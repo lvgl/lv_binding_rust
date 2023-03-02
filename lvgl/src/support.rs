@@ -84,6 +84,12 @@ impl From<Color> for Rgb565 {
     }
 }
 
+impl Into<lvgl_sys::lv_color_t> for Color {
+    fn into(self) -> lvgl_sys::lv_color_t {
+        self.raw
+    }
+}
+
 /// Events are triggered in LVGL when something happens which might be interesting to
 /// the user, e.g. if an object:
 ///  - is clicked
@@ -128,18 +134,19 @@ pub enum Event<T> {
     Special(T),
 }
 
-impl<S> TryFrom<lvgl_sys::lv_event_t> for Event<S> {
+impl<S> TryFrom<lvgl_sys::lv_event_code_t> for Event<S> {
     type Error = ();
 
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        const LV_EVENT_PRESSED: u32 = lvgl_sys::LV_EVENT_PRESSED as u32;
-        const LV_EVENT_PRESSING: u32 = lvgl_sys::LV_EVENT_PRESSING as u32;
-        const LV_EVENT_PRESS_LOST: u32 = lvgl_sys::LV_EVENT_PRESS_LOST as u32;
-        const LV_EVENT_SHORT_CLICKED: u32 = lvgl_sys::LV_EVENT_SHORT_CLICKED as u32;
-        const LV_EVENT_CLICKED: u32 = lvgl_sys::LV_EVENT_CLICKED as u32;
-        const LV_EVENT_LONG_PRESSED: u32 = lvgl_sys::LV_EVENT_LONG_PRESSED as u32;
-        const LV_EVENT_LONG_PRESSED_REPEAT: u32 = lvgl_sys::LV_EVENT_LONG_PRESSED_REPEAT as u32;
-        const LV_EVENT_RELEASED: u32 = lvgl_sys::LV_EVENT_RELEASED as u32;
+    fn try_from(value: lvgl_sys::lv_event_code_t) -> Result<Self, Self::Error> {
+        const LV_EVENT_PRESSED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESSED as u32;
+        const LV_EVENT_PRESSING: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESSING as u32;
+        const LV_EVENT_PRESS_LOST: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESS_LOST as u32;
+        const LV_EVENT_SHORT_CLICKED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_SHORT_CLICKED as u32;
+        const LV_EVENT_CLICKED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_CLICKED as u32;
+        const LV_EVENT_LONG_PRESSED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED as u32;
+        const LV_EVENT_LONG_PRESSED_REPEAT: u32 =
+            lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED_REPEAT as u32;
+        const LV_EVENT_RELEASED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_RELEASED as u32;
 
         match value as u32 {
             LV_EVENT_PRESSED => Ok(Event::Pressed),
@@ -155,21 +162,21 @@ impl<S> TryFrom<lvgl_sys::lv_event_t> for Event<S> {
     }
 }
 
-impl<S> From<Event<S>> for lvgl_sys::lv_event_t {
+impl<S> From<Event<S>> for lvgl_sys::lv_event_code_t {
     fn from(event: Event<S>) -> Self {
         let native_event = match event {
-            Event::Pressed => lvgl_sys::LV_EVENT_PRESSED,
-            Event::Pressing => lvgl_sys::LV_EVENT_PRESSING,
-            Event::PressLost => lvgl_sys::LV_EVENT_PRESS_LOST,
-            Event::ShortClicked => lvgl_sys::LV_EVENT_SHORT_CLICKED,
-            Event::Clicked => lvgl_sys::LV_EVENT_CLICKED,
-            Event::LongPressed => lvgl_sys::LV_EVENT_LONG_PRESSED,
-            Event::LongPressedRepeat => lvgl_sys::LV_EVENT_LONG_PRESSED_REPEAT,
-            Event::Released => lvgl_sys::LV_EVENT_RELEASED,
+            Event::Pressed => lvgl_sys::lv_event_code_t_LV_EVENT_PRESSED,
+            Event::Pressing => lvgl_sys::lv_event_code_t_LV_EVENT_PRESSING,
+            Event::PressLost => lvgl_sys::lv_event_code_t_LV_EVENT_PRESS_LOST,
+            Event::ShortClicked => lvgl_sys::lv_event_code_t_LV_EVENT_SHORT_CLICKED,
+            Event::Clicked => lvgl_sys::lv_event_code_t_LV_EVENT_CLICKED,
+            Event::LongPressed => lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED,
+            Event::LongPressedRepeat => lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED_REPEAT,
+            Event::Released => lvgl_sys::lv_event_code_t_LV_EVENT_RELEASED,
             // TODO: handle all types...
-            _ => lvgl_sys::LV_EVENT_CLICKED,
+            _ => lvgl_sys::lv_event_code_t_LV_EVENT_CLICKED,
         };
-        native_event as lvgl_sys::lv_event_t
+        native_event as lvgl_sys::lv_event_code_t
     }
 }
 
@@ -181,21 +188,24 @@ pub enum PointerEvent {
     DragThrowBegin,
 }
 
-pub(crate) unsafe extern "C" fn event_callback<T, F>(
-    obj: *mut lvgl_sys::lv_obj_t,
-    event: lvgl_sys::lv_event_t,
-) where
+//pub(crate) unsafe extern "C" fn event_callback<T, F>(
+//obj: *mut lvgl_sys::lv_obj_t,
+//event: lvgl_sys::lv_event_code_t,
+pub(crate) unsafe extern "C" fn event_callback<T, F>(event: *mut lvgl_sys::lv_event_t)
+where
     T: Widget + Sized,
     F: FnMut(T, Event<T::SpecialEvent>),
 {
-    // convert the lv_event_t to lvgl-rs Event type
-    if let Ok(event) = event.try_into() {
+    let code = (*event).code;
+    let obj = (*event).target;
+    // convert the lv_event_code_t to lvgl-rs Event type
+    if let Ok(code) = code.try_into() {
         if let Some(obj_ptr) = NonNull::new(obj) {
             let object = T::from_raw(obj_ptr);
             // get the pointer from the Rust callback closure FnMut provided by users
             let user_closure = &mut *((*obj).user_data as *mut F);
             // call user callback closure
-            user_closure(object, event);
+            user_closure(object, code);
         }
     }
 }
@@ -203,14 +213,14 @@ pub(crate) unsafe extern "C" fn event_callback<T, F>(
 /// Possible LVGL alignments for widgets.
 pub enum Align {
     Center,
-    InTopLeft,
-    InTopMid,
-    InTopRight,
-    InBottomLeft,
-    InBottomMid,
-    InBottomRight,
-    InLeftMid,
-    InRightMid,
+    TopLeft,
+    TopMid,
+    TopRight,
+    BottomLeft,
+    BottomMid,
+    BottomRight,
+    LeftMid,
+    RightMid,
     OutTopLeft,
     OutTopMid,
     OutTopRight,
@@ -226,17 +236,17 @@ pub enum Align {
 }
 
 impl From<Align> for u8 {
-    fn from(self_: Align) -> u8 {
-        let native = match self_ {
+    fn from(value: Align) -> u8 {
+        let native = match value {
             Align::Center => lvgl_sys::LV_ALIGN_CENTER,
-            Align::InTopLeft => lvgl_sys::LV_ALIGN_IN_TOP_LEFT,
-            Align::InTopMid => lvgl_sys::LV_ALIGN_IN_TOP_MID,
-            Align::InTopRight => lvgl_sys::LV_ALIGN_IN_TOP_RIGHT,
-            Align::InBottomLeft => lvgl_sys::LV_ALIGN_IN_BOTTOM_LEFT,
-            Align::InBottomMid => lvgl_sys::LV_ALIGN_IN_BOTTOM_MID,
-            Align::InBottomRight => lvgl_sys::LV_ALIGN_IN_BOTTOM_RIGHT,
-            Align::InLeftMid => lvgl_sys::LV_ALIGN_IN_LEFT_MID,
-            Align::InRightMid => lvgl_sys::LV_ALIGN_IN_RIGHT_MID,
+            Align::TopLeft => lvgl_sys::LV_ALIGN_TOP_LEFT,
+            Align::TopMid => lvgl_sys::LV_ALIGN_TOP_MID,
+            Align::TopRight => lvgl_sys::LV_ALIGN_TOP_RIGHT,
+            Align::BottomLeft => lvgl_sys::LV_ALIGN_BOTTOM_LEFT,
+            Align::BottomMid => lvgl_sys::LV_ALIGN_BOTTOM_MID,
+            Align::BottomRight => lvgl_sys::LV_ALIGN_BOTTOM_RIGHT,
+            Align::LeftMid => lvgl_sys::LV_ALIGN_LEFT_MID,
+            Align::RightMid => lvgl_sys::LV_ALIGN_RIGHT_MID,
             Align::OutTopLeft => lvgl_sys::LV_ALIGN_OUT_TOP_LEFT,
             Align::OutTopMid => lvgl_sys::LV_ALIGN_OUT_TOP_MID,
             Align::OutTopRight => lvgl_sys::LV_ALIGN_OUT_TOP_RIGHT,
@@ -254,6 +264,25 @@ impl From<Align> for u8 {
     }
 }
 
+pub enum TextAlign {
+    Auto,
+    Center,
+    Left,
+    Right,
+}
+
+impl From<TextAlign> for u8 {
+    fn from(value: TextAlign) -> Self {
+        let native = match value {
+            TextAlign::Auto => lvgl_sys::LV_TEXT_ALIGN_AUTO,
+            TextAlign::Center => lvgl_sys::LV_TEXT_ALIGN_CENTER,
+            TextAlign::Left => lvgl_sys::LV_TEXT_ALIGN_LEFT,
+            TextAlign::Right => lvgl_sys::LV_TEXT_ALIGN_RIGHT,
+        };
+        native as u8
+    }
+}
+
 /// Boolean for determining whether animations are enabled.
 pub enum Animation {
     ON,
@@ -263,8 +292,8 @@ pub enum Animation {
 impl From<Animation> for lvgl_sys::lv_anim_enable_t {
     fn from(anim: Animation) -> Self {
         match anim {
-            Animation::ON => lvgl_sys::LV_ANIM_ON as u8,
-            Animation::OFF => lvgl_sys::LV_ANIM_OFF as u8,
+            Animation::ON => lvgl_sys::lv_anim_enable_t_LV_ANIM_ON,
+            Animation::OFF => lvgl_sys::lv_anim_enable_t_LV_ANIM_OFF,
         }
     }
 }

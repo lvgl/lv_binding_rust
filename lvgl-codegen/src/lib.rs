@@ -98,7 +98,6 @@ impl Rusty for LvFunc {
     type Parent = LvWidget;
 
     fn code(&self, parent: &Self::Parent) -> WrapperResult<TokenStream> {
-        let widget_name = format_ident!("{}", parent.pascal_name());
         let templ = format!("{}{}_", LIB_PREFIX, parent.name.as_str());
         let new_name = self.name.replace(templ.as_str(), "");
         let func_name = format_ident!("{}", new_name);
@@ -108,11 +107,10 @@ impl Rusty for LvFunc {
         if new_name.as_str().eq("create") {
             return Ok(quote! {
 
-                pub fn create(parent: &mut impl crate::NativeObject, copy: Option<&#widget_name>) -> crate::LvResult<Self> {
+                pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::#original_func_name(
                             parent.raw()?.as_mut(),
-                            copy.map(|c| c.raw().unwrap().as_mut() as *mut lvgl_sys::lv_obj_t).unwrap_or(core::ptr::null_mut() as *mut lvgl_sys::lv_obj_t),
                         );
                         if let Some(raw) = core::ptr::NonNull::new(ptr) {
                             let core = <crate::Obj as crate::Widget>::from_raw(raw);
@@ -124,7 +122,7 @@ impl Rusty for LvFunc {
                 }
 
                 pub fn create_at(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
-                    Ok(Self::create(parent, None)?)
+                    Ok(Self::create(parent)?)
                 }
 
                 pub fn new() -> crate::LvResult<Self> {
@@ -424,7 +422,7 @@ impl CodeGen {
 
         functions
             .iter()
-            .filter(|e| create_func.is_match(e.name.as_str()) && e.args.len() == 2)
+            .filter(|e| create_func.is_match(e.name.as_str()) && e.args.len() == 1)
             .map(|f| {
                 String::from(
                     create_func
@@ -498,30 +496,6 @@ mod test {
         let funcs = vec![
             LvFunc::new(
                 "lv_obj_create".to_string(),
-                vec![
-                    LvArg::new("parent".to_string(), LvType::new("abc".to_string())),
-                    LvArg::new("copy_from".to_string(), LvType::new("bcf".to_string())),
-                ],
-                None,
-            ),
-            LvFunc::new(
-                "lv_btn_create".to_string(),
-                vec![
-                    LvArg::new("parent".to_string(), LvType::new("abc".to_string())),
-                    LvArg::new("copy_from".to_string(), LvType::new("bcf".to_string())),
-                ],
-                None,
-            ),
-            LvFunc::new(
-                "lv_do_something".to_string(),
-                vec![
-                    LvArg::new("parent".to_string(), LvType::new("abc".to_string())),
-                    LvArg::new("copy_from".to_string(), LvType::new("bcf".to_string())),
-                ],
-                None,
-            ),
-            LvFunc::new(
-                "lv_invalid_create".to_string(),
                 vec![LvArg::new(
                     "parent".to_string(),
                     LvType::new("abc".to_string()),
@@ -529,11 +503,35 @@ mod test {
                 None,
             ),
             LvFunc::new(
-                "lv_cb_create".to_string(),
+                "lv_btn_create".to_string(),
+                vec![LvArg::new(
+                    "parent".to_string(),
+                    LvType::new("abc".to_string()),
+                )],
+                None,
+            ),
+            LvFunc::new(
+                "lv_do_something".to_string(),
+                vec![LvArg::new(
+                    "parent".to_string(),
+                    LvType::new("abc".to_string()),
+                )],
+                None,
+            ),
+            LvFunc::new(
+                "lv_invalid_create".to_string(),
                 vec![
                     LvArg::new("parent".to_string(), LvType::new("abc".to_string())),
                     LvArg::new("copy_from".to_string(), LvType::new("bcf".to_string())),
                 ],
+                None,
+            ),
+            LvFunc::new(
+                "lv_cb_create".to_string(),
+                vec![LvArg::new(
+                    "parent".to_string(),
+                    LvType::new("abc".to_string()),
+                )],
                 None,
             ),
         ];
@@ -652,11 +650,10 @@ mod test {
             define_object!(Arc);
 
             impl Arc {
-                pub fn create(parent: &mut impl crate::NativeObject, copy: Option<&Arc>) -> crate::LvResult<Self> {
+                pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::lv_arc_create(
                             parent.raw()?.as_mut(),
-                            copy.map(|c| c.raw().unwrap().as_mut() as *mut lvgl_sys::lv_obj_t).unwrap_or(core::ptr::null_mut() as *mut lvgl_sys::lv_obj_t),
                         );
                         if let Some(raw) = core::ptr::NonNull::new(ptr) {
                             let core = <crate::Obj as crate::Widget>::from_raw(raw);
@@ -668,7 +665,7 @@ mod test {
                 }
 
                 pub fn create_at(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
-                    Ok(Self::create(parent, None)?)
+                    Ok(Self::create(parent)?)
                 }
 
                 pub fn new() -> crate::LvResult<Self> {

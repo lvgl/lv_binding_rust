@@ -58,14 +58,7 @@ fn main() {
     };
 
     let mut cfg = Build::new();
-    add_c_files(&mut cfg, vendor_src.join("lv_core"));
-    add_c_files(&mut cfg, vendor_src.join("lv_draw"));
-    add_c_files(&mut cfg, vendor_src.join("lv_font"));
-    add_c_files(&mut cfg, vendor_src.join("lv_gpu"));
-    add_c_files(&mut cfg, vendor_src.join("lv_hal"));
-    add_c_files(&mut cfg, vendor_src.join("lv_misc"));
-    add_c_files(&mut cfg, vendor_src.join("lv_themes"));
-    add_c_files(&mut cfg, vendor_src.join("lv_widgets"));
+    add_c_files(&mut cfg, &vendor_src);
     add_c_files(&mut cfg, &lv_config_dir);
     add_c_files(&mut cfg, &shims_dir);
 
@@ -138,7 +131,7 @@ fn add_c_files(build: &mut cc::Build, path: impl AsRef<Path>) {
         let e = e.unwrap();
         let path = e.path();
         if e.file_type().unwrap().is_dir() {
-            // skip dirs for now
+            add_c_files(build, e.path());
         } else if path.extension().and_then(|s| s.to_str()) == Some("c") {
             build.file(&path);
         }

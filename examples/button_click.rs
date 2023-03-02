@@ -12,30 +12,25 @@ use lvgl::input_device::{
 };
 use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
-use lvgl::{
-    Align, Color, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX, VER_RES_MAX,
-};
-use std::cell::RefCell;
+use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, Widget};
 use std::time::Duration;
 
 #[allow(unused_assignments)]
 fn main() -> Result<(), LvError> {
+    const HOR_RES: u32 = 240;
+    const VER_RES: u32 = 240;
+
     lvgl::init();
-    let sim_display: SimulatorDisplay<Rgb565> =
-        SimulatorDisplay::new(Size::new(HOR_RES_MAX, VER_RES_MAX));
+    let mut sim_display: SimulatorDisplay<Rgb565> =
+        SimulatorDisplay::new(Size::new(HOR_RES, VER_RES));
 
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Button Example", &output_settings);
 
-    let shared_native_display = RefCell::new(sim_display);
+    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
 
-    let buffer = DrawBuffer::<{ (HOR_RES_MAX * VER_RES_MAX) as usize }>::new();
-
-    let display = Display::register(&buffer, |refresh| {
-        shared_native_display
-            .borrow_mut()
-            .draw_iter(refresh.as_pixels())
-            .unwrap();
+    let display = Display::register(buffer, HOR_RES, VER_RES, |refresh| {
+        sim_display.draw_iter(refresh.as_pixels()).unwrap();
     })?;
 
     // Define the initial state of your input
@@ -49,17 +44,17 @@ fn main() -> Result<(), LvError> {
     let mut screen = display.get_scr_act()?;
 
     let mut screen_style = Style::default();
-    screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
+    screen_style.set_bg_color(Color::from_rgb((0, 0, 0)));
     screen.add_style(Part::Main, &mut screen_style)?;
     // Create the button
-    let mut button = Btn::create(&mut screen, None)?;
-    button.set_align(&mut screen, Align::InLeftMid, 30, 0)?;
+    let mut button = Btn::create(&mut screen)?;
+    button.set_align(Align::LeftMid, 30, 0)?;
     button.set_size(180, 80)?;
-    let mut btn_lbl = Label::create(&mut button, None)?;
+    let mut btn_lbl = Label::create(&mut button)?;
     btn_lbl.set_text(CString::new("Click me!").unwrap().as_c_str())?;
 
     let mut btn_state = false;
-    button.on_event(|mut btn, event| {
+    button.on_event(|_btn, event| {
         println!("Button received event: {:?}", event);
         if let lvgl::Event::Clicked = event {
             if btn_state {
@@ -70,14 +65,14 @@ fn main() -> Result<(), LvError> {
                 btn_lbl.set_text(nt.as_c_str()).unwrap();
             }
             btn_state = !btn_state;
-            btn.toggle().unwrap();
+            //btn.toggle().unwrap();
         }
     })?;
 
     let mut latest_touch_point = Point::new(0, 0);
     'running: loop {
         lvgl::task_handler();
-        window.update(&shared_native_display.borrow());
+        window.update(&sim_display);
 
         let mut events = window.events().peekable();
 
@@ -102,7 +97,6 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-
         lvgl::tick_inc(Duration::from_millis(15));
     }
 
