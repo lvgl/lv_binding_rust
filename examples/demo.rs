@@ -1,5 +1,4 @@
 use cstr_core::CString;
-use embedded_graphics::drawable;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
@@ -8,30 +7,28 @@ use embedded_graphics_simulator::{
 use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Label, LabelAlign};
-use lvgl::{Align, Color, DefaultDisplay, Display, DrawBuffer, LvError, Part, State, Widget};
+use lvgl::{
+    Align, Color, DefaultDisplay, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX,
+    VER_RES_MAX,
+};
 use lvgl_sys;
-use parking_lot::Mutex;
-use std::sync::Arc as SyncArc;
+use std::cell::RefCell;
 use std::thread;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
 fn main() -> Result<(), LvError> {
-    let display: SimulatorDisplay<Rgb565> =
-        SimulatorDisplay::new(Size::new(lvgl::HOR_RES_MAX, lvgl::VER_RES_MAX));
+    lvgl::init();
+    let sim_display: SimulatorDisplay<Rgb565> =
+        SimulatorDisplay::new(Size::new(HOR_RES_MAX, VER_RES_MAX));
 
     let output_settings = OutputSettingsBuilder::new().scale(1).build();
     let mut window = Window::new("PineTime", &output_settings);
 
-    let shared_native_display = SyncArc::new(Mutex::new(embedded_graphics_display));
-
-    // LVGL-rs usage starts here
-    lvgl::init();
-
+    let shared_native_display = RefCell::new(sim_display);
     // LVGL will render the graphics here first, and seed the rendered image to the
-    // display. The buffer size can be set freely but 1/10 screen size is a good starting point.
-    const REFRESH_BUFFER_SIZE: usize = lvgl::DISP_HOR_RES * lvgl::DISP_VER_RES / 10;
-    static DRAW_BUFFER: DrawBuffer<REFRESH_BUFFER_SIZE> = DrawBuffer::new();
+    // display. The buffer size can be set freely.
+    let buffer = DrawBuffer::<{ (HOR_RES_MAX * VER_RES_MAX) as usize }>::new();
     //
     // const NUMBER_OF_DISPLAYS: usize = 1;
     // static DISPLAY_REGISTRY: DisplayRegistry<NUMBER_OF_DISPLAYS> = DisplayRegistry::empty();
@@ -40,12 +37,10 @@ fn main() -> Result<(), LvError> {
 
     // Register your display update callback with LVGL. The closure you pass here will be called
     // whenever LVGL has updates to be painted to the display.
-    let display = Display::register(&DRAW_BUFFER, {
-        let shared_disp_inner = SyncArc::clone(&shared_native_display);
-        move |update| {
-            let mut em_disp = shared_disp_inner.lock();
-            em_disp.draw_iter(update.as_pixels());
-        }
+    let display = Display::register(&buffer, |refresh| {
+        shared_native_display
+            .borrow_mut()
+            .draw_iter(refresh.as_pixels());
     })?;
 
     // Create screen and widgets
@@ -100,10 +95,7 @@ fn main() -> Result<(), LvError> {
         i = 1 + i;
 
         lvgl::task_handler();
-        {
-            let native_display = shared_native_display.lock();
-            window.update(&native_display);
-        }
+        window.update(&shared_native_display.borrow());
 
         for event in window.events() {
             match event {

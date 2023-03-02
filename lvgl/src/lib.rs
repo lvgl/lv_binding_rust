@@ -44,15 +44,19 @@ pub(crate) mod mem;
 #[cfg(not(feature = "lvgl_alloc"))]
 use crate::mem::Box;
 
-mod display;
-pub use display::*;
-mod functions;
-mod support;
-pub mod widgets;
 use core::sync::atomic::{AtomicBool, Ordering};
+
+pub use display::*;
 pub use functions::*;
 pub use lv_core::*;
 pub use support::*;
+
+mod display;
+mod functions;
+mod support;
+
+pub mod input_device;
+pub mod widgets;
 
 pub const HOR_RES_MAX: u32 = lvgl_sys::LV_HOR_RES_MAX;
 pub const VER_RES_MAX: u32 = lvgl_sys::LV_VER_RES_MAX;
@@ -89,12 +93,12 @@ pub(crate) mod tests {
     pub(crate) fn initialize_test() {
         init();
 
-        const REFRESH_BUFFER_SIZE: usize = 64 * 64 / 10;
-        static DRAW_BUFFER: DrawBuffer<REFRESH_BUFFER_SIZE> = DrawBuffer::new();
         static ONCE_INIT: RunOnce = RunOnce::new();
+        const REFRESH_BUFFER_SIZE: usize = 64 * 64 / 10;
+        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::new();
 
         if ONCE_INIT.swap_and_check() {
-            let _ = Display::register(&DRAW_BUFFER, |_| {}).unwrap();
+            let _ = Display::register(&buffer, |_| {}).unwrap();
         }
     }
 }

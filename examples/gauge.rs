@@ -3,29 +3,39 @@ use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
+use lvgl;
 use lvgl::style::{Opacity, Style};
 use lvgl::widgets::Gauge;
-use lvgl::{self, Align, Color, LvError, Part, State, Widget, UI};
+use lvgl::{
+    Align, Color, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX, VER_RES_MAX,
+};
+use std::cell::RefCell;
 use std::time::Instant;
 
 fn main() -> Result<(), LvError> {
-    let display: SimulatorDisplay<Rgb565> =
-        SimulatorDisplay::new(Size::new(lvgl::HOR_RES_MAX, lvgl::VER_RES_MAX));
+    lvgl::init();
+    let sim_display: SimulatorDisplay<Rgb565> =
+        SimulatorDisplay::new(Size::new(HOR_RES_MAX, VER_RES_MAX));
 
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Gauge Example", &output_settings);
 
-    let mut ui = UI::init()?;
+    let shared_native_display = RefCell::new(sim_display);
 
-    // Implement and register your display:
-    ui.disp_drv_register(display)?;
+    let buffer = DrawBuffer::<{ (HOR_RES_MAX * VER_RES_MAX) as usize }>::new();
 
-    // Create screen and widgets
-    let mut screen = ui.scr_act()?;
+    let display = Display::register(&buffer, |refresh| {
+        shared_native_display
+            .borrow_mut()
+            .draw_iter(refresh.as_pixels())
+            .unwrap();
+    })?;
+
+    let mut screen = display.get_scr_act()?;
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
-    screen.add_style(Part::Main, screen_style)?;
+    screen.add_style(Part::Main, &mut screen_style)?;
 
     // Create the gauge
     let mut gauge_style = Style::default();
@@ -46,8 +56,8 @@ fn main() -> Result<(), LvError> {
     gauge_style.set_scale_end_line_width(State::DEFAULT, 4);
     gauge_style.set_scale_end_border_width(State::DEFAULT, 4);
 
-    let mut gauge = Gauge::new(&mut screen)?;
-    gauge.add_style(Part::Main, gauge_style)?;
+    let mut gauge = Gauge::create(&mut screen, None)?;
+    gauge.add_style(Part::Main, &mut gauge_style)?;
     gauge.set_align(&mut screen, Align::Center, 0, 0)?;
     gauge.set_value(0, 50)?;
 
@@ -56,8 +66,8 @@ fn main() -> Result<(), LvError> {
     'running: loop {
         gauge.set_value(0, i)?;
 
-        ui.task_handler();
-        window.update(ui.get_display_ref().unwrap());
+        lvgl::task_handler();
+        window.update(&shared_native_display.borrow());
 
         for event in window.events() {
             match event {
@@ -78,7 +88,7 @@ fn main() -> Result<(), LvError> {
             i = i + 1;
         }
 
-        ui.tick_inc(loop_started.elapsed());
+        lvgl::tick_inc(loop_started.elapsed());
         loop_started = Instant::now();
     }
 

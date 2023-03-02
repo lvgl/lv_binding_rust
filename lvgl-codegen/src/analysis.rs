@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 /// A parameter of C functions.
 ///
 /// This struct represents all relevant information we can extract from the C function declaration

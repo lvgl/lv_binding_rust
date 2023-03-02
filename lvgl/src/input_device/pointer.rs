@@ -3,7 +3,7 @@ use crate::{LvError, LvResult};
 use core::mem::MaybeUninit;
 use embedded_graphics::geometry::Point;
 
-use super::generic::{BufferStatus, Data, DisplayDriver, InputState};
+use super::generic::{BufferStatus, Data, InputDriver, InputState};
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum PointerInputData {
@@ -26,7 +26,7 @@ pub struct Pointer {
     pub(crate) descriptor: Option<lvgl_sys::lv_indev_t>,
 }
 
-impl DisplayDriver<Pointer> for Pointer {
+impl InputDriver<Pointer> for Pointer {
     fn new<F>(handler: F) -> Self
     where
         F: Fn() -> BufferStatus,
@@ -47,8 +47,12 @@ impl DisplayDriver<Pointer> for Pointer {
         }
     }
 
+    fn get_driver(&self) -> lvgl_sys::lv_indev_drv_t {
+        self.driver
+    }
+
     unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()> {
-        if !(descriptor.is_null() || self.descriptor.is_none()) {
+        if descriptor.is_null() || self.descriptor.is_none() {
             self.descriptor = Some(*descriptor);
         } else {
             return Err(LvError::AlreadyInUse);
@@ -111,7 +115,6 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::UI;
     use core::marker::PhantomData;
     use embedded_graphics::draw_target::DrawTarget;
     use embedded_graphics::geometry::Size;
@@ -155,11 +158,12 @@ mod test {
     // We cannot test right now by having instances of UI global state... :(
     // I need to find a way to test while having global state...
     fn pointer_input_device() -> LvResult<()> {
-        let mut ui = UI::init()?;
+        crate::init();
 
+        //FIXME
         let disp: FakeDisplay<Rgb565> = FakeDisplay { p: PhantomData };
 
-        ui.disp_drv_register(disp)?;
+        //ui.disp_drv_register(disp)?;
 
         fn read_touchpad_device() -> BufferStatus {
             PointerInputData::Touch(Point::new(120, 23))
@@ -169,7 +173,7 @@ mod test {
 
         let mut touch_screen = Pointer::new(|| read_touchpad_device());
 
-        ui.indev_drv_register_pointer(&mut touch_screen)?;
+        crate::indev_drv_register(&mut touch_screen)?;
 
         Ok(())
     }
