@@ -1,6 +1,6 @@
 use crate::display::{Display, DisplayDriver};
 use crate::input_device::generic::InputDriver;
-use crate::{Event, LvResult, Obj, Widget};
+use crate::{Event, LvError, LvResult, Obj, Widget};
 use core::ptr::NonNull;
 use core::time::Duration;
 use core::{ptr, result};
@@ -15,7 +15,9 @@ pub enum CoreError {
 type Result<T> = result::Result<T, CoreError>;
 
 /// Register own buffer
-pub(crate) fn disp_drv_register(disp_drv: &mut DisplayDriver) -> Result<Display> {
+pub(crate) fn disp_drv_register<const N: usize>(
+    disp_drv: &mut DisplayDriver<N>,
+) -> Result<Display> {
     let disp_ptr = unsafe { lvgl_sys::lv_disp_drv_register(&mut disp_drv.disp_drv as *mut _) };
     Ok(Display::from_raw(
         NonNull::new(disp_ptr).ok_or(CoreError::OperationFailed)?,
@@ -50,10 +52,10 @@ pub fn tick_inc(tick_period: Duration) {
     }
 }
 
-/// Calls the LVGL task handler. This function should be called periodically.
+/// Calls the LVGL timer handler. This function should be called periodically.
 #[inline]
 pub fn task_handler() {
-    unsafe { lvgl_sys::lv_task_handler() };
+    unsafe { lvgl_sys::lv_timer_handler() };
 }
 
 /// Directly send an event to a specific widget.
@@ -68,7 +70,10 @@ pub fn event_send<W: Widget>(obj: &mut W, event: Event<W::SpecialEvent>) -> LvRe
 /// Register an input device driver to LVGL.
 pub fn indev_drv_register<D>(input_device: &mut impl InputDriver<D>) -> LvResult<()> {
     unsafe {
-        let descr = lvgl_sys::lv_indev_drv_register(&mut input_device.get_driver() as *mut _);
+        let descr = lvgl_sys::lv_indev_drv_register(input_device.get_driver() as *mut _);
+        if descr.is_null() {
+            return Err(LvError::LvOOMemory);
+        }
         input_device.set_descriptor(descr)?;
     };
     Ok(())

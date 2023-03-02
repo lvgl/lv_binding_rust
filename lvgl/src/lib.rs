@@ -58,11 +58,6 @@ mod support;
 pub mod input_device;
 pub mod widgets;
 
-/// Maximum horizontal display resolution, as defined in `lv_conf.h`.
-pub const HOR_RES_MAX: u32 = lvgl_sys::LV_HOR_RES_MAX;
-/// Maximum vertical display resolution, as defined in `lv_conf.h`.
-pub const VER_RES_MAX: u32 = lvgl_sys::LV_VER_RES_MAX;
-
 struct RunOnce(AtomicBool);
 
 impl RunOnce {
@@ -101,7 +96,7 @@ pub(crate) mod tests {
         let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::new();
 
         if ONCE_INIT.swap_and_check() {
-            let _ = Display::register(&buffer, |_| {}).unwrap();
+            let _ = Display::register(buffer, 240, 240, |_| {}).unwrap();
         }
     }
 }

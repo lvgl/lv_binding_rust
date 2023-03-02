@@ -2,7 +2,7 @@
 
 lv_color_t _LV_COLOR_MAKE(uint8_t r, uint8_t g, uint8_t b)
 {
-    return LV_COLOR_MAKE(r, g, b);
+    return lv_color_make(r, g, b);
 }
 
 uint16_t _LV_COLOR_GET_R(lv_color_t color)

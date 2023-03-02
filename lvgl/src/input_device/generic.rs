@@ -39,6 +39,6 @@ pub trait InputDriver<D> {
     where
         F: Fn() -> BufferStatus;
 
-    fn get_driver(&self) -> lvgl_sys::lv_indev_drv_t;
+    fn get_driver(&mut self) -> &mut lvgl_sys::lv_indev_drv_t;
     unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()>;
 }

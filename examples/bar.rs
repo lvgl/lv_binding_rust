@@ -6,27 +6,26 @@ use embedded_graphics_simulator::{
 };
 use lvgl;
 use lvgl::style::Style;
-use lvgl::widgets::{Bar, Label, LabelAlign};
-use lvgl::{
-    Align, Animation, Color, Display, DrawBuffer, Event, LvError, Part, State, Widget, HOR_RES_MAX,
-    VER_RES_MAX,
-};
+use lvgl::widgets::{Bar, Label};
+use lvgl::{Align, Animation, Color, Display, DrawBuffer, Event, LvError, Part, Widget};
 use std::cell::RefCell;
 use std::time::Duration;
 
 fn main() -> Result<(), LvError> {
+    const HOR_RES: u32 = 240;
+    const VER_RES: u32 = 240;
+
     lvgl::init();
-    let sim_display: SimulatorDisplay<Rgb565> =
-        SimulatorDisplay::new(Size::new(HOR_RES_MAX, VER_RES_MAX));
+    let sim_display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(HOR_RES, VER_RES));
 
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Bar Example", &output_settings);
 
     let shared_native_display = RefCell::new(sim_display);
 
-    let buffer = DrawBuffer::<{ (HOR_RES_MAX * VER_RES_MAX) as usize }>::new();
+    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
 
-    let display = Display::register(&buffer, |refresh| {
+    let display = Display::register(buffer, HOR_RES, VER_RES, |refresh| {
         shared_native_display
             .borrow_mut()
             .draw_iter(refresh.as_pixels())
@@ -36,31 +35,31 @@ fn main() -> Result<(), LvError> {
     let mut screen = display.get_scr_act()?;
 
     let mut screen_style = Style::default();
-    screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
-    screen_style.set_radius(State::DEFAULT, 0);
+    screen_style.set_bg_color(Color::from_rgb((255, 255, 255)));
+    screen_style.set_radius(0);
     screen.add_style(Part::Main, &mut screen_style)?;
 
     // Create the bar object
-    let mut bar = Bar::create(&mut screen, None)?;
+    let mut bar = Bar::create(&mut screen)?;
     bar.set_size(175, 20)?;
-    bar.set_align(&mut screen, Align::Center, 0, 10)?;
+    bar.set_align(Align::Center, 0, 10)?;
     bar.set_range(0, 100)?;
     bar.on_event(|_b, _e| {
         println!("Completed!");
     })?;
 
-    // // Set the indicator style for the bar object
+    // Set the indicator style for the bar object
     let mut ind_style = Style::default();
-    ind_style.set_bg_color(State::DEFAULT, Color::from_rgb((100, 245, 100)));
-    bar.add_style(Part::All, &mut ind_style)?;
+    ind_style.set_bg_color(Color::from_rgb((100, 245, 100)));
+    bar.add_style(Part::Any, &mut ind_style)?;
 
-    let mut loading_lbl = Label::create(&mut screen, None)?;
+    let mut loading_lbl = Label::create(&mut screen)?;
     loading_lbl.set_text(CString::new("Loading...").unwrap().as_c_str())?;
-    loading_lbl.set_align(&mut bar, Align::OutTopMid, 0, -10)?;
-    loading_lbl.set_label_align(LabelAlign::Center)?;
+    loading_lbl.set_align(Align::OutTopMid, 0, 0)?;
+    //loading_lbl.set_label_align(LabelAlign::Center)?;
 
     let mut loading_style = Style::default();
-    loading_style.set_text_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
+    loading_style.set_text_color(Color::from_rgb((0, 0, 0)));
     loading_lbl.add_style(Part::Main, &mut loading_style)?;
 
     let mut i = 0;

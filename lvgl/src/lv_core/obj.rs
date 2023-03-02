@@ -30,18 +30,18 @@ impl NativeObject for Obj {
 /// A wrapper for all LVGL common operations on generic objects.
 pub trait Widget: NativeObject {
     type SpecialEvent;
-    type Part: Into<u8>;
+    type Part: Into<lvgl_sys::lv_part_t>;
 
     /// Construct an instance of the object from a raw pointer.
     fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
 
     /// Adds a `Style` to a given widget.
-    fn add_style(&self, part: Self::Part, style: &mut Style) -> LvResult<()> {
+    fn add_style(&mut self, part: Self::Part, style: &mut Style) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_add_style(
                 self.raw()?.as_mut(),
-                part.into(),
                 style.raw.as_mut() as *mut _,
+                part.into(),
             );
         };
         Ok(())
@@ -88,14 +88,10 @@ pub trait Widget: NativeObject {
     }
 
     /// Sets a widget's align relative to its parent along with an offset.
-    fn set_align<C>(&mut self, base: &mut C, align: Align, x_mod: i32, y_mod: i32) -> LvResult<()>
-    where
-        C: NativeObject,
-    {
+    fn set_align(&mut self, align: Align, x_mod: i32, y_mod: i32) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_align(
                 self.raw()?.as_mut(),
-                base.raw()?.as_mut(),
                 align.into(),
                 x_mod as lvgl_sys::lv_coord_t,
                 y_mod as lvgl_sys::lv_coord_t,
@@ -106,7 +102,7 @@ pub trait Widget: NativeObject {
 }
 
 impl Widget for Obj {
-    type SpecialEvent = ();
+    type SpecialEvent = u32;
     type Part = Part;
 
     fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
@@ -117,7 +113,7 @@ impl Widget for Obj {
 impl Default for Obj {
     fn default() -> Self {
         Self {
-            raw: unsafe { lvgl_sys::lv_obj_create(ptr::null_mut(), ptr::null_mut()) },
+            raw: unsafe { lvgl_sys::lv_obj_create(ptr::null_mut()) },
         }
     }
 }
@@ -153,9 +149,11 @@ macro_rules! define_object {
                     let obj = raw.as_mut();
                     let user_closure = $crate::Box::new(f);
                     obj.user_data = $crate::Box::into_raw(user_closure) as *mut cty::c_void;
-                    lvgl_sys::lv_obj_set_event_cb(
+                    lvgl_sys::lv_obj_add_event_cb(
                         obj,
                         lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),
+                        lvgl_sys::lv_event_code_t_LV_EVENT_ALL,
+                        obj.user_data,
                     );
                 }
                 Ok(())
@@ -213,41 +211,38 @@ macro_rules! define_object {
 //     }
 // }
 
-bitflags! {
-    pub struct State: u32 {
-        /// Normal, released
-        const DEFAULT  = lvgl_sys::LV_STATE_DEFAULT as u32;
-        /// Toggled or checked
-        const CHECKED  = lvgl_sys::LV_STATE_CHECKED as u32;
-        /// Focused via keypad or encoder or clicked via touchpad/mouse
-        const FOCUSED  = lvgl_sys::LV_STATE_FOCUSED as u32;
-        /// Edit by an encoder
-        const EDITED   = lvgl_sys::LV_STATE_EDITED as u32;
-        /// Hovered by mouse (not supported now)
-        const HOVERED  = lvgl_sys::LV_STATE_HOVERED as u32;
-        /// Pressed
-        const PRESSED  = lvgl_sys::LV_STATE_PRESSED as u32;
-        /// Disabled or inactive
-        const DISABLED = lvgl_sys::LV_STATE_DISABLED as u32;
-    }
-}
-
-impl State {
-    pub(crate) fn get_bits(&self) -> u32 {
-        self.bits
-    }
-}
-
 pub enum Part {
     Main,
-    All,
+    Scrollbar,
+    Indicator,
+    Knob,
+    Selected,
+    Items,
+    Ticks,
+    Cursor,
+    CustomFirst,
+    Any,
 }
 
-impl From<Part> for u8 {
-    fn from(self_: Part) -> u8 {
+impl Default for Part {
+    fn default() -> Self {
+        Self::Main
+    }
+}
+
+impl From<Part> for lvgl_sys::lv_part_t {
+    fn from(self_: Part) -> lvgl_sys::lv_part_t {
         match self_ {
-            Part::Main => lvgl_sys::LV_OBJ_PART_MAIN as u8,
-            Part::All => lvgl_sys::LV_OBJ_PART_ALL as u8,
+            Part::Main => lvgl_sys::LV_PART_MAIN,
+            Part::Scrollbar => lvgl_sys::LV_PART_SCROLLBAR,
+            Part::Indicator => lvgl_sys::LV_PART_INDICATOR,
+            Part::Knob => lvgl_sys::LV_PART_KNOB,
+            Part::Selected => lvgl_sys::LV_PART_SELECTED,
+            Part::Items => lvgl_sys::LV_PART_ITEMS,
+            Part::Ticks => lvgl_sys::LV_PART_TICKS,
+            Part::Cursor => lvgl_sys::LV_PART_CURSOR,
+            Part::CustomFirst => lvgl_sys::LV_PART_CUSTOM_FIRST,
+            Part::Any => lvgl_sys::LV_PART_ANY,
         }
     }
 }

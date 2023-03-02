@@ -6,14 +6,9 @@ use embedded_graphics_simulator::{
 };
 use lvgl;
 use lvgl::style::Style;
-use lvgl::widgets::{Arc, Label, LabelAlign};
-use lvgl::{
-    Align, Color, Display, DrawBuffer, LvError, Part, State, Widget, HOR_RES_MAX,
-    VER_RES_MAX,
-};
+use lvgl::widgets::{Arc, Label};
+use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, Widget};
 use lvgl_sys;
-use std::cell::RefCell;
-use std::thread;
 use std::time::Duration;
 
 fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
@@ -34,66 +29,49 @@ fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
 }
 
 fn main() -> Result<(), LvError> {
-    println!("meminfo init: {:?}", mem_info());
-    run_arc_demo()?;
-    println!("meminfo end: {:?}", mem_info());
-    Ok(())
-}
+    const HOR_RES: u32 = 240;
+    const VER_RES: u32 = 240;
 
-fn run_arc_demo() -> Result<(), LvError> {
     lvgl::init();
-    let sim_display: SimulatorDisplay<Rgb565> =
-        SimulatorDisplay::new(Size::new(HOR_RES_MAX, VER_RES_MAX));
+    println!("meminfo init: {:?}", mem_info());
+    let mut sim_display: SimulatorDisplay<Rgb565> =
+        SimulatorDisplay::new(Size::new(HOR_RES, VER_RES));
 
-    let output_settings = OutputSettingsBuilder::new().scale(2).build();
+    let output_settings = OutputSettingsBuilder::new().scale(1).build();
     let mut window = Window::new("Arc Example", &output_settings);
 
-    let shared_native_display = RefCell::new(sim_display);
+    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
 
-    let buffer = DrawBuffer::<{ (HOR_RES_MAX * VER_RES_MAX) as usize }>::new();
-
-    let display = Display::register(&buffer, |refresh| {
-        shared_native_display
-            .borrow_mut()
-            .draw_iter(refresh.as_pixels())
-            .unwrap();
+    let display = Display::register(buffer, HOR_RES, VER_RES, |refresh| {
+        sim_display.draw_iter(refresh.as_pixels()).unwrap();
     })?;
 
     let mut screen = display.get_scr_act()?;
 
     let mut screen_style = Style::default();
-    screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
-    screen_style.set_radius(State::DEFAULT, 0);
+    screen_style.set_bg_color(Color::from_rgb((255, 255, 255)));
+    screen_style.set_radius(0);
     screen.add_style(Part::Main, &mut screen_style)?;
 
     // Create the arc object
-    let mut arc = Arc::create(&mut screen, None)?;
+    let mut arc = Arc::create(&mut screen)?;
     arc.set_size(150, 150)?;
-    arc.set_align(&mut screen, Align::Center, 0, 10)?;
+    arc.set_align(Align::Center, 0, 10)?;
     arc.set_start_angle(135)?;
     arc.set_end_angle(135)?;
 
-    let mut loading_lbl = Label::create(&mut screen, None)?;
+    let mut loading_lbl = Label::create(&mut screen)?;
     loading_lbl.set_text(CString::new("Loading...").unwrap().as_c_str())?;
-    loading_lbl.set_align(&mut arc, Align::OutTopMid, 0, -10)?;
-    loading_lbl.set_label_align(LabelAlign::Center)?;
+    loading_lbl.set_align(Align::OutTopMid, 0, 0)?;
+    //loading_lbl.set_label_align(LabelAlign::Center)?;
 
     let mut loading_style = Style::default();
-    loading_style.set_text_color(State::DEFAULT, Color::from_rgb((0, 0, 0)));
+    loading_style.set_text_color(Color::from_rgb((0, 0, 0)));
     loading_lbl.add_style(Part::Main, &mut loading_style)?;
 
     let mut angle = 0;
     let mut forward = true;
     let mut i = 0;
-
-    // LVGL timer thread
-    thread::spawn(|| {
-        let interval = Duration::from_millis(5);
-        loop {
-            thread::sleep(interval);
-            lvgl::tick_inc(interval);
-        }
-    });
 
     'running: loop {
         if i > 270 {
@@ -106,7 +84,7 @@ fn run_arc_demo() -> Result<(), LvError> {
         i += 1;
 
         lvgl::task_handler();
-        window.update(&shared_native_display.borrow());
+        window.update(&sim_display);
 
         for event in window.events() {
             match event {
@@ -116,6 +94,7 @@ fn run_arc_demo() -> Result<(), LvError> {
         }
         lvgl::tick_inc(Duration::from_millis(15));
     }
+    println!("meminfo end: {:?}", mem_info());
 
     Ok(())
 }
