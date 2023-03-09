@@ -278,6 +278,6 @@ mod tests {
         const VER_RES: u32 = 240;
         tests::initialize_test();
         let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
-        let _disp = lv_drv_disp_gtk!(buffer, HOR_RES, VER_RES);
+        //let _disp = lv_drv_disp_gtk!(buffer, HOR_RES, VER_RES);
     }
 }

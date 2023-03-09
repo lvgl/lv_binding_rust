@@ -29,9 +29,7 @@ fn main() {
     let lvgl_src = vendor.join("lvgl").join("src");
 
     #[cfg(feature = "drivers")]
-    let driver_display = vendor.join("lv_drivers").join("display");
-    #[cfg(feature = "drivers")]
-    let driver_indev = vendor.join("lv_drivers").join("indev");
+    let drivers = vendor.join("lv_drivers");
 
     let lv_config_dir = {
         let conf_path = env::var(CONFIG_NAME)
@@ -99,9 +97,7 @@ fn main() {
     add_c_files(&mut cfg, &lv_config_dir);
     add_c_files(&mut cfg, &shims_dir);
     #[cfg(feature = "drivers")]
-    add_c_files(&mut cfg, &driver_display);
-    #[cfg(feature = "drivers")]
-    add_c_files(&mut cfg, &driver_indev);
+    add_c_files(&mut cfg, &drivers);
 
     cfg.define("LV_CONF_INCLUDE_SIMPLE", Some("1"))
         .include(&lvgl_src)
@@ -109,7 +105,7 @@ fn main() {
         .warnings(false)
         .include(&lv_config_dir);
     #[cfg(feature = "drivers")]
-    cfg.include(&driver_display).include(&driver_indev);
+    cfg.include(&drivers);
 
     cfg.compile("lvgl");
 
