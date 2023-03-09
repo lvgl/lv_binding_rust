@@ -1,10 +1,9 @@
-use crate::{Display, DrawBuffer};
-
+#[macro_export]
 macro_rules! lv_drv_disp_fbdev {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::fbdev_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -23,11 +22,12 @@ macro_rules! lv_drv_disp_fbdev {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_drm {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::drm_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -46,11 +46,12 @@ macro_rules! lv_drv_disp_drm {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_gtk {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::gtkdrv_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -69,11 +70,12 @@ macro_rules! lv_drv_disp_gtk {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_sdl {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::sdl_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -92,6 +94,7 @@ macro_rules! lv_drv_disp_sdl {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_gc9a01 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
@@ -99,7 +102,7 @@ macro_rules! lv_drv_disp_gc9a01 {
                 0 => (),
                 c = panic!("GC9A01_init() returned error code {c}")
             };
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -118,11 +121,12 @@ macro_rules! lv_drv_disp_gc9a01 {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_ili9341 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::ili9341_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -141,11 +145,12 @@ macro_rules! lv_drv_disp_ili9341 {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_r61581 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::r61581_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -164,11 +169,12 @@ macro_rules! lv_drv_disp_r61581 {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_sharp_mip {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::sharp_mip_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -187,11 +193,12 @@ macro_rules! lv_drv_disp_sharp_mip {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_ssd1963 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::ssd1963_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -210,11 +217,12 @@ macro_rules! lv_drv_disp_ssd1963 {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_st7565 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::st7565_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
@@ -233,11 +241,12 @@ macro_rules! lv_drv_disp_st7565 {
     }
 }
 
+#[macro_export]
 macro_rules! lv_drv_disp_uc1610 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::uc1610_init();
-            Display::register_raw(
+            lvgl::Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,

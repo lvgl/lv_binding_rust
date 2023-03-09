@@ -58,7 +58,6 @@ mod support;
 pub mod input_device;
 pub mod widgets;
 #[cfg(feature = "drivers")]
-#[macro_use]
 pub mod drivers;
 
 struct RunOnce(AtomicBool);
