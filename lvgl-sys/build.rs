@@ -29,6 +29,9 @@ fn main() {
     let lvgl_src = vendor.join("lvgl").join("src");
 
     #[cfg(feature = "drivers")]
+    let incl_extra = env::var("LVGL_INCLUDE").unwrap_or("".to_string());
+
+    #[cfg(feature = "drivers")]
     let drivers = vendor.join("lv_drivers");
 
     let lv_config_dir = {
@@ -106,6 +109,8 @@ fn main() {
         .include(&lv_config_dir);
     #[cfg(feature = "drivers")]
     cfg.include(&drivers);
+    #[cfg(feature = "drivers")]
+    cfg.includes(incl_extra.split(','));
 
     cfg.compile("lvgl");
 
