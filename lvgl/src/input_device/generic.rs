@@ -42,8 +42,8 @@ pub trait InputDriver<D> {
     fn get_driver(&mut self) -> &mut lvgl_sys::lv_indev_drv_t;
 
     unsafe fn new_raw(
-        read_cb: Option<unsafe extern "C" fn(indev_drv: *mut _lv_indev_drv_t, data: *mut lv_indev_data_t)>,
-        feedback_cb: Option<unsafe extern "C" fn(arg1: *mut _lv_indev_drv_t, arg2: u8)>,
+        read_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t,*mut lvgl_sys::lv_indev_data_t)>,
+        feedback_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, u8)>,
     ) -> D;
 
     unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()>;
