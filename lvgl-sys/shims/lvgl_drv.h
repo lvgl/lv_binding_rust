@@ -1,9 +1,9 @@
-#ifndef LVGL_DRV_H
-#define LVGL_DRV_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifndef LVGL_DRV_H
+#define LVGL_DRV_H
 
 #include "lv_drv_conf.h"
 
