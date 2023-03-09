@@ -52,6 +52,25 @@ impl InputDriver<Pointer> for Pointer {
         self.driver.as_mut()
     }
 
+    unsafe fn new_raw(
+        read_cb: Option<unsafe extern "C" fn(indev_drv: *mut _lv_indev_drv_t, data: *mut lv_indev_data_t)>,
+        feedback_cb: Option<unsafe extern "C" fn(arg1: *mut _lv_indev_drv_t, arg2: u8)>,
+    ) -> Self {
+        let driver = unsafe {
+            let mut indev_drv = MaybeUninit::uninit();
+            lvgl_sys::lv_indev_drv_init(indev_drv.as_mut_ptr());
+            let mut indev_drv = Box::new(indev_drv.assume_init());
+            indev_drv.type_ = lvgl_sys::lv_indev_type_t_LV_INDEV_TYPE_POINTER;
+            indev_drv.read_cb = read_cb;
+            indev_drv.feedback_cb = feedback_cb;
+            indev_drv
+        };
+        Self {
+            driver,
+            descriptor: None,
+        }
+    }
+
     unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()> {
         if self.descriptor.is_none() {
             self.descriptor = Some(descriptor);

@@ -69,15 +69,15 @@ macro_rules! lv_drv_disp_gtk {
     }
 }
 
-macro_rules! lv_drv_disp_monitor {
+macro_rules! lv_drv_disp_sdl {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
-            lvgl_sys::monitor_init();
+            lvgl_sys::sdl_init();
             Display::register_raw(
                 draw_buffer = $draw_buffer,
                 hor_res = $hor_res,
                 ver_res = $ver_res,
-                flush_cb = lvgl_sys::monitor_flush,
+                flush_cb = lvgl_sys::sdl_display_flush,
                 rounder_cb = None,
                 set_px_cb = None,
                 clear_cb = None,
