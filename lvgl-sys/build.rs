@@ -1,5 +1,9 @@
 use cc::Build;
-use std::{env, path::{Path, PathBuf}, collections::HashSet};
+use std::{
+    collections::HashSet,
+    env,
+    path::{Path, PathBuf},
+};
 
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
 
@@ -105,8 +109,7 @@ fn main() {
         .warnings(false)
         .include(&lv_config_dir);
     #[cfg(feature = "drivers")]
-    cfg.include(&driver_display)
-       .include(&driver_indev);
+    cfg.include(&driver_display).include(&driver_indev);
 
     cfg.compile("lvgl");
 
@@ -163,12 +166,14 @@ fn main() {
     );
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let bindings = bindgen::Builder::default()
-        .header(shims_dir.join("lvgl_sys.h").to_str().unwrap());
+    let bindings =
+        bindgen::Builder::default().header(shims_dir.join("lvgl_sys.h").to_str().unwrap());
     #[cfg(feature = "drivers")]
-    let bindings = bindings.header(shims_dir.join("lvgl_drv.h").to_str().unwrap())
+    let bindings = bindings
+        .header(shims_dir.join("lvgl_drv.h").to_str().unwrap())
         .parse_callbacks(Box::new(ignored_macros));
-    let bindings = bindings.generate_comments(false)
+    let bindings = bindings
+        .generate_comments(false)
         .derive_default(true)
         .layout_tests(false)
         .use_core()

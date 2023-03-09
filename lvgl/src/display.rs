@@ -6,7 +6,6 @@ use core::convert::TryInto;
 use core::mem::MaybeUninit;
 use core::ptr::NonNull;
 use core::{ptr, result};
-use cty::c_void;
 use lvgl_sys::_lv_disp_draw_buf_t;
 
 /// Error in interacting with a `Display`.
@@ -22,11 +21,15 @@ type Result<T> = result::Result<T, DisplayError>;
 /// An LVGL-registered display. Equivalent to an `lv_disp_t`.
 pub struct Display {
     pub(crate) disp: NonNull<lvgl_sys::lv_disp_t>,
+    drop: Option<unsafe extern "C" fn()>,
 }
 
 impl<'a> Display {
-    pub(crate) fn from_raw(disp: NonNull<lvgl_sys::lv_disp_t>) -> Self {
-        Self { disp }
+    pub(crate) fn from_raw(
+        disp: NonNull<lvgl_sys::lv_disp_t>,
+        drop: Option<unsafe extern "C" fn()>,
+    ) -> Self {
+        Self { disp, drop }
     }
 
     /// Registers a given `DrawBuffer` with an associated update function to
@@ -44,17 +47,76 @@ impl<'a> Display {
         let disp_p = &mut display_diver.disp_drv;
         disp_p.hor_res = hor_res.try_into().unwrap_or(240);
         disp_p.ver_res = ver_res.try_into().unwrap_or(240);
-        Ok(disp_drv_register(&mut display_diver)?)
+        Ok(disp_drv_register(&mut display_diver, None)?)
     }
 
     pub fn get_scr_act(&self) -> Result<Obj> {
         Ok(get_str_act(Some(&self))?)
+    }
+
+    pub unsafe fn register_raw<const N: usize>(
+        draw_buffer: DrawBuffer<N>,
+        hor_res: u32,
+        ver_res: u32,
+        flush_cb: Option<
+            unsafe extern "C" fn(
+                *mut lvgl_sys::_lv_disp_drv_t,
+                *const lvgl_sys::lv_area_t,
+                *mut lvgl_sys::lv_color16_t,
+            ),
+        >,
+        rounder_cb: Option<
+            unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, *mut lvgl_sys::lv_area_t),
+        >,
+        set_px_cb: Option<
+            unsafe extern "C" fn(
+                *mut lvgl_sys::_lv_disp_drv_t,
+                *mut u8,
+                lvgl_sys::lv_coord_t,
+                lvgl_sys::lv_coord_t,
+                lvgl_sys::lv_coord_t,
+                lvgl_sys::lv_color_t,
+                lvgl_sys::lv_opa_t,
+            ),
+        >,
+        clear_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, *mut u8, u32)>,
+        monitor_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, u32, u32)>,
+        wait_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        clean_dcache_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        drv_update_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        render_start_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        drop: Option<unsafe extern "C" fn()>,
+    ) -> Result<Self> {
+        let mut display_driver = DisplayDriver::new_raw(
+            draw_buffer,
+            flush_cb,
+            rounder_cb,
+            set_px_cb,
+            clear_cb,
+            monitor_cb,
+            wait_cb,
+            clean_dcache_cb,
+            drv_update_cb,
+            render_start_cb,
+        )?;
+        let disp_p = &mut display_driver.disp_drv;
+        disp_p.hor_res = hor_res.try_into().unwrap_or(240);
+        disp_p.ver_res = ver_res.try_into().unwrap_or(240);
+        Ok(disp_drv_register(&mut display_driver, drop)?)
     }
 }
 
 impl Default for Display {
     fn default() -> Self {
         disp_get_default().expect("LVGL must be INITIALIZED")
+    }
+}
+
+impl Drop for Display {
+    fn drop(&mut self) {
+        if let Some(drop) = self.drop {
+            unsafe { drop() }
+        }
     }
 }
 
@@ -96,7 +158,7 @@ impl<const N: usize> DrawBuffer<N> {
             let draw_buf = unsafe {
                 lvgl_sys::lv_disp_draw_buf_init(
                     inner.as_mut_ptr(),
-                    primary_buffer_guard.borrow_mut().as_mut_ptr() as *mut _ as *mut cty::c_void,
+                    primary_buffer_guard.borrow_mut().as_mut_ptr() as *mut _,
                     ptr::null_mut(),
                     N as u32,
                 );
@@ -132,13 +194,73 @@ impl<'a, const N: usize> DisplayDriver<N> {
                 .ok_or(DisplayError::FailedToRegister)?,
         ) as *mut _;
 
-        disp_drv.user_data = Box::into_raw(Box::new(display_update_callback)) as *mut c_void;
+        disp_drv.user_data = Box::into_raw(Box::new(display_update_callback)) as *mut _;
 
         // Sets trampoline pointer to the function implementation that uses the `F` type for a
         // refresh buffer of size N specifically.
         disp_drv.flush_cb = Some(disp_flush_trampoline::<F, N>);
 
         // We do not store any memory that can be accidentally deallocated by on the Rust side.
+        Ok(Self {
+            disp_drv,
+            _buffer: draw_buffer,
+        })
+    }
+
+    pub unsafe fn new_raw(
+        draw_buffer: DrawBuffer<N>,
+        flush_cb: Option<
+            unsafe extern "C" fn(
+                *mut lvgl_sys::_lv_disp_drv_t,
+                *const lvgl_sys::lv_area_t,
+                *mut lvgl_sys::lv_color16_t,
+            ),
+        >,
+        rounder_cb: Option<
+            unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, *mut lvgl_sys::lv_area_t),
+        >,
+        set_px_cb: Option<
+            unsafe extern "C" fn(
+                *mut lvgl_sys::_lv_disp_drv_t,
+                *mut u8,
+                lvgl_sys::lv_coord_t,
+                lvgl_sys::lv_coord_t,
+                lvgl_sys::lv_coord_t,
+                lvgl_sys::lv_color_t,
+                lvgl_sys::lv_opa_t,
+            ),
+        >,
+        clear_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, *mut u8, u32)>,
+        monitor_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, u32, u32)>,
+        wait_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        clean_dcache_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        drv_update_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        render_start_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+    ) -> Result<Self> {
+        let mut disp_drv = unsafe {
+            let mut inner = MaybeUninit::uninit();
+            lvgl_sys::lv_disp_drv_init(inner.as_mut_ptr());
+            inner.assume_init()
+        };
+
+        disp_drv.draw_buf = Box::<_lv_disp_draw_buf_t>::into_raw(
+            draw_buffer
+                .get_ptr()
+                .ok_or(DisplayError::FailedToRegister)?,
+        ) as *mut _;
+
+        //disp_drv.user_data = Box::into_raw(Box::new(display_update_callback)) as *mut _;
+
+        disp_drv.flush_cb = flush_cb;
+        disp_drv.rounder_cb = rounder_cb;
+        disp_drv.set_px_cb = set_px_cb;
+        disp_drv.clear_cb = clear_cb;
+        disp_drv.monitor_cb = monitor_cb;
+        disp_drv.wait_cb = wait_cb;
+        disp_drv.clean_dcache_cb = clean_dcache_cb;
+        disp_drv.drv_update_cb = drv_update_cb;
+        disp_drv.render_start_cb = render_start_cb;
+
         Ok(Self {
             disp_drv,
             _buffer: draw_buffer,
