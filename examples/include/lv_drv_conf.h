@@ -167,7 +167,7 @@
  *  GTK drivers (monitor, mouse, keyboard
  *---------------------------------------*/
 #ifndef USE_GTK
-#  define USE_GTK       1
+#  define USE_GTK       0
 #endif
 
 /*----------------------------------------
