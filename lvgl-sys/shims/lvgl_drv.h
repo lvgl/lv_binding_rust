@@ -9,6 +9,10 @@ extern "C" {
 
 /* Displays */
 
+#if USE_SDL
+#include "lv_drivers/sdl/sdl.h"
+#endif
+
 #if USE_MONITOR
 #include "lv_drivers/display/monitor.h"
 #endif

@@ -9,6 +9,8 @@ on:
 env:
   CARGO_TERM_COLOR: always
   DEP_LV_CONFIG_PATH: /home/runner/work/lvgl-rs/lvgl-rs/examples/include
+  LVGL_INCLUDE: /usr/include,/usr/local/include
+  LVGL_LINK: SDL2
 
 jobs:
   build:
