@@ -11,7 +11,7 @@ static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
 #[cfg(feature = "drivers")]
 #[derive(Debug)]
 struct IgnoreMacros(HashSet<String>);
-
+#[cfg(feature = "drivers")]
 impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
     fn will_parse_macro(&self, name: &str) -> bindgen::callbacks::MacroParsingBehavior {
         if self.0.contains(name) {
@@ -30,6 +30,8 @@ fn main() {
 
     #[cfg(feature = "drivers")]
     let incl_extra = env::var("LVGL_INCLUDE").unwrap_or("".to_string());
+    #[cfg(feature = "drivers")]
+    let link_extra = env::var("LVGL_LINK").unwrap_or("".to_string());
 
     #[cfg(feature = "drivers")]
     let drivers = vendor.join("lv_drivers");
@@ -95,6 +97,12 @@ fn main() {
         conf_path
     };
 
+    #[cfg(feature = "drivers")]
+    {
+        println!("cargo:rerun-if-env-changed=LVGL_INCLUDE");
+        println!("cargo:rerun-if-env-changed=LVGL_LINK");
+    }
+
     let mut cfg = Build::new();
     add_c_files(&mut cfg, &lvgl_src);
     add_c_files(&mut cfg, &lv_config_dir);
@@ -122,6 +130,9 @@ fn main() {
         vendor.to_str().unwrap(),
         "-fvisibility=default",
     ];
+
+    //#[cfg(feature = "drivers")]
+    //incl_extra.split(',').for_each(|a| { cc_args.append(&mut vec!["-l"]); cc_args.append(&mut vec![a]) });
 
     // Set correct target triple for bindgen when cross-compiling
     let target = env::var("TARGET").expect("Cargo build scripts always have TARGET");
@@ -188,6 +199,12 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Can't write bindings!");
+    
+    #[cfg(feature = "drivers")]
+    link_extra.split(',').for_each(|a| {
+        println!("cargo:rustc-link-lib={a}");
+        //println!("cargo:rustc-link-search=")
+    })
 }
 
 fn add_c_files(build: &mut cc::Build, path: impl AsRef<Path>) {
