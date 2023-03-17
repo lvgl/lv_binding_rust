@@ -267,8 +267,6 @@ macro_rules! lv_drv_disp_uc1610 {
 
 #[cfg(test)]
 mod tests {
-    #[macro_use]
-    use super::*;
     use crate::tests;
     use crate::DrawBuffer;
 

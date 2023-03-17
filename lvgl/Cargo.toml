@@ -65,3 +65,8 @@ required-features = ["alloc", "embedded_graphics"]
 name = "arc"
 path = "../examples/arc.rs"
 required-features = ["alloc", "embedded_graphics"]
+
+[[example]]
+name = "sdl"
+path = "../examples/sdl.rs"
+required-features = ["alloc", "drivers"]

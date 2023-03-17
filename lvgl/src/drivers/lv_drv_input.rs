@@ -76,8 +76,6 @@ macro_rules! lv_drv_input_xpt2046 {
 
 #[cfg(test)]
 mod tests {
-    #[macro_use]
-    use super::*;
     use crate::*;
     use crate::tests;
     use crate::DrawBuffer;
