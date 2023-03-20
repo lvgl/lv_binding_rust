@@ -14,6 +14,8 @@ use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
 use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, Widget};
 use std::time::Duration;
+use std::time::Instant;
+use std::thread::sleep;
 
 #[allow(unused_assignments)]
 fn main() -> Result<(), LvError> {
@@ -71,6 +73,7 @@ fn main() -> Result<(), LvError> {
 
     let mut latest_touch_point = Point::new(0, 0);
     'running: loop {
+        let start = Instant::now();
         lvgl::task_handler();
         window.update(&sim_display);
 
@@ -97,7 +100,8 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-        lvgl::tick_inc(Duration::from_millis(15));
+        sleep(Duration::from_millis(15));
+        lvgl::tick_inc(Instant::now().duration_since(start));
     }
 
     Ok(())

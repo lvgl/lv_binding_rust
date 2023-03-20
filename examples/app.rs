@@ -34,6 +34,4 @@ fn main() {
             .unwrap();
     })
     .unwrap();
-
-    let label: Label = "Nice!".into();
 }

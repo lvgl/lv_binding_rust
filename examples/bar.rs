@@ -10,6 +10,8 @@ use lvgl::widgets::{Bar, Label};
 use lvgl::{Align, Animation, Color, Display, DrawBuffer, Event, LvError, Part, Widget};
 use std::cell::RefCell;
 use std::time::Duration;
+use std::time::Instant;
+use std::thread::sleep;
 
 fn main() -> Result<(), LvError> {
     const HOR_RES: u32 = 240;
@@ -64,6 +66,7 @@ fn main() -> Result<(), LvError> {
 
     let mut i = 0;
     'running: loop {
+        let start = Instant::now();
         if i > 100 {
             i = 0;
             lvgl::event_send(&mut bar, Event::Clicked)?;
@@ -80,8 +83,8 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-
-        lvgl::tick_inc(Duration::from_millis(10));
+        sleep(Duration::from_millis(15));
+        lvgl::tick_inc(Instant::now().duration_since(start));
     }
 
     Ok(())
