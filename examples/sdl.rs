@@ -1,7 +1,7 @@
 // Still WIP
-#![allow(unused_labels)]
-#![allow(unused_variables)]
-#![allow(unreachable_code)]
+//#![allow(unused_labels)]
+//#![allow(unused_variables)]
+//#![allow(unreachable_code)]
 
 use lvgl::LvResult;
 use lvgl::lv_drv_disp_sdl;
@@ -11,6 +11,8 @@ use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
 use lvgl::{Align, Color, DrawBuffer, Part, Widget};
 use std::time::Duration;
+use std::time::Instant;
+use std::thread::sleep;
 use cstr_core::CString;
 
 fn main() -> LvResult<()> {
@@ -20,7 +22,8 @@ fn main() -> LvResult<()> {
     lvgl::init();
     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
     let display = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES)?;
-    let input = lv_drv_input_pointer_sdl!();
+    let mut input = lv_drv_input_pointer_sdl!();
+    lvgl::indev_drv_register(&mut input);
 
     // Create screen and widgets
     let mut screen = display.get_scr_act()?;
@@ -52,9 +55,11 @@ fn main() -> LvResult<()> {
     })?;
 
     'running: loop {
+        let start = Instant::now();
         lvgl::task_handler();
-
-        lvgl::tick_inc(Duration::from_millis(15));
+        //println!("Loop");
+        sleep(Duration::from_millis(15));
+        lvgl::tick_inc(Instant::now().duration_since(start));
     }
 
     Ok(())

@@ -10,6 +10,8 @@ use lvgl::widgets::{Arc, Label};
 use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, Widget};
 use lvgl_sys;
 use std::time::Duration;
+use std::time::Instant;
+use std::thread::sleep;
 
 fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
     let mut info = lvgl_sys::lv_mem_monitor_t {
@@ -74,6 +76,7 @@ fn main() -> Result<(), LvError> {
     let mut i = 0;
 
     'running: loop {
+        let start = Instant::now();
         if i > 270 {
             forward = if forward { false } else { true };
             i = 1;
@@ -92,7 +95,8 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-        lvgl::tick_inc(Duration::from_millis(15));
+        sleep(Duration::from_millis(15));
+        lvgl::tick_inc(Instant::now().duration_since(start));
     }
     println!("meminfo end: {:?}", mem_info());
 

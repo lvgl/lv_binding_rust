@@ -11,6 +11,7 @@ use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, TextAlign, Widget};
 use lvgl_sys;
 use std::thread::sleep;
 use std::time::Duration;
+use std::time::Instant;
 
 fn main() -> Result<(), LvError> {
     const HOR_RES: u32 = 240;
@@ -53,7 +54,7 @@ fn main() -> Result<(), LvError> {
     style_time.set_text_align(TextAlign::Center);
     // Need to set font too
     time.add_style(Part::Main, &mut style_time)?;
-    time.set_align(Align::Center, 0, 0)?;
+    time.set_align(Align::Center, 0, 100)?;
     time.set_width(240)?;
     time.set_height(240)?;
 
@@ -71,6 +72,7 @@ fn main() -> Result<(), LvError> {
 
     let mut i = 0;
     'running: loop {
+        let start = Instant::now();
         if i > 59 {
             i = 0;
         }
@@ -89,7 +91,7 @@ fn main() -> Result<(), LvError> {
         }
         //println!("During run: {:?}", mem_info());
         sleep(Duration::from_secs(1));
-        lvgl::tick_inc(Duration::from_secs(1));
+        lvgl::tick_inc(Instant::now().duration_since(start));
     }
 
     //println!("Final part of demo app: {:?}", mem_info());
