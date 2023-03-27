@@ -1,9 +1,10 @@
 use cc::Build;
 use std::{
-    collections::HashSet,
     env,
     path::{Path, PathBuf},
 };
+#[cfg(feature = "drivers")]
+use std::collections::HashSet;
 
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
 
@@ -28,10 +29,12 @@ fn main() {
     let vendor = project_dir.join("vendor");
     let lvgl_src = vendor.join("lvgl").join("src");
 
+    // Some basic defaults; SDL2 is the only driver enabled in the provided
+    // driver config by default
     #[cfg(feature = "drivers")]
     let incl_extra = env::var("LVGL_INCLUDE").unwrap_or("".to_string());
     #[cfg(feature = "drivers")]
-    let link_extra = env::var("LVGL_LINK").unwrap_or("".to_string());
+    let link_extra = env::var("LVGL_LINK").unwrap_or("SDL2".to_string());
 
     #[cfg(feature = "drivers")]
     let drivers = vendor.join("lv_drivers");
