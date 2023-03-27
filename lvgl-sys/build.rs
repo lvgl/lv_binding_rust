@@ -1,10 +1,10 @@
 use cc::Build;
+#[cfg(feature = "drivers")]
+use std::collections::HashSet;
 use std::{
     env,
     path::{Path, PathBuf},
 };
-#[cfg(feature = "drivers")]
-use std::collections::HashSet;
 
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
 
@@ -29,10 +29,21 @@ fn main() {
     let vendor = project_dir.join("vendor");
     let lvgl_src = vendor.join("lvgl").join("src");
 
+    let current_dir = canonicalize(PathBuf::from(env::var("PWD").unwrap()));
+    let font_extra_src = {
+        if let Ok(p) = env::var("LVGL_FONTS_DIR") {
+            Some(canonicalize(PathBuf::from(p)))
+        } else if current_dir.join("fonts").exists() {
+            Some(current_dir.join("fonts"))
+        } else {
+            None
+        }
+    };
+
     // Some basic defaults; SDL2 is the only driver enabled in the provided
     // driver config by default
     #[cfg(feature = "drivers")]
-    let incl_extra = env::var("LVGL_INCLUDE").unwrap_or("".to_string());
+    let incl_extra = env::var("LVGL_INCLUDE").unwrap_or("/usr/include,/usr/local/include".to_string());
     #[cfg(feature = "drivers")]
     let link_extra = env::var("LVGL_LINK").unwrap_or("SDL2".to_string());
 
@@ -88,6 +99,10 @@ fn main() {
             );
         }
 
+        if let Some(p) = &font_extra_src {
+            println!("cargo:rerun-if-changed={}", p.to_str().unwrap())
+        }
+
         println!(
             "cargo:rerun-if-changed={}",
             conf_path.join("lv_conf.h").to_str().unwrap()
@@ -107,6 +122,9 @@ fn main() {
     }
 
     let mut cfg = Build::new();
+    if let Some(p) = &font_extra_src {
+        add_c_files(&mut cfg, p)
+    }
     add_c_files(&mut cfg, &lvgl_src);
     add_c_files(&mut cfg, &lv_config_dir);
     add_c_files(&mut cfg, &shims_dir);
@@ -118,6 +136,9 @@ fn main() {
         .include(&vendor)
         .warnings(false)
         .include(&lv_config_dir);
+    if let Some(p) = &font_extra_src {
+        cfg.includes(p);
+    }
     #[cfg(feature = "drivers")]
     cfg.include(&drivers);
     #[cfg(feature = "drivers")]
@@ -183,6 +204,7 @@ fn main() {
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings =
         bindgen::Builder::default().header(shims_dir.join("lvgl_sys.h").to_str().unwrap());
+    let bindings = add_font_headers(bindings, &font_extra_src);
     #[cfg(feature = "drivers")]
     let bindings = bindings
         .header(shims_dir.join("lvgl_drv.h").to_str().unwrap())
@@ -202,12 +224,33 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Can't write bindings!");
-    
+
     #[cfg(feature = "drivers")]
     link_extra.split(',').for_each(|a| {
         println!("cargo:rustc-link-lib={a}");
         //println!("cargo:rustc-link-search=")
     })
+}
+
+fn add_font_headers(
+    bindings: bindgen::Builder,
+    dir: &Option<impl AsRef<Path>>,
+) -> bindgen::Builder {
+    if let Some(p) = dir {
+        let mut temp = bindings;
+        for e in p.as_ref().read_dir().unwrap() {
+            let e = e.unwrap();
+            let path = e.path();
+            if !e.file_type().unwrap().is_dir()
+                && path.extension().and_then(|s| s.to_str()) == Some("h")
+            {
+                temp = temp.header(path.to_str().unwrap());
+            }
+        }
+        temp
+    } else {
+        bindings
+    }
 }
 
 fn add_c_files(build: &mut cc::Build, path: impl AsRef<Path>) {

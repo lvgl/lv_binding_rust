@@ -9,10 +9,11 @@
 //! [LVGL][1] bindings for Rust. A powerful and easy-to-use embedded GUI with many widgets, advanced visual effects, and
 //! low memory footprint. This crate is compatible with `#![no_std]` environments by default.
 //!
-//! [1]: https://docs.lvgl.io/v7/en/html/get-started/quick-overview.html
+//! [1]: https://docs.lvgl.io/8.3/get-started/index.html
 //!
 
 #![cfg_attr(not(test), no_std)]
+#![cfg_attr(feature = "nightly", feature(cfg_accessible))]
 
 #[macro_use]
 extern crate bitflags;
@@ -55,10 +56,11 @@ mod display;
 mod functions;
 mod support;
 
-pub mod input_device;
-pub mod widgets;
 #[cfg(feature = "drivers")]
 pub mod drivers;
+pub mod font;
+pub mod input_device;
+pub mod widgets;
 
 struct RunOnce(AtomicBool);
 

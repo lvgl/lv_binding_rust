@@ -2,7 +2,6 @@ use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 use embedded_graphics_simulator::{OutputSettingsBuilder, SimulatorDisplay, Window};
 use lvgl;
-use lvgl::widgets::Label;
 use lvgl::{Display, DrawBuffer};
 use std::cell::RefCell;
 

@@ -1,4 +1,25 @@
-use crate::{Box, Color, TextAlign};
+//! Styling for LVGL objects and widgets
+//! 
+//! Objects in LVGL can have associated styling information. After a `Style` is
+//! created and configured, it can be added to any object or widget:
+//! ```
+//! use lvgl::{Color, Widget};
+//! use lvgl::style::Style;
+//! 
+//! fn main() {
+//!     lvgl::init();
+//! 
+//!     let mut my_style = Style::default();
+//!     my_style.set_text_color(Color::from_rgb((0, 0, 0)));
+//! 
+//!     //my_widget.add_style(Part::Main, &mut my_style).unwrap();
+//!     // ...
+//! }
+//! ```
+//! All methods on the `Style` type directly lower to their C LVGL
+//! counterparts.
+
+use crate::{font::Font, Box, Color, TextAlign};
 use core::mem;
 use cty::c_uint;
 use paste::paste;
@@ -266,7 +287,7 @@ impl Style {
     gen_lv_style!(set_text_align, TextAlign);
     gen_lv_style!(set_text_color, Color);
     gen_lv_style!(set_text_decor, u8);
-    //gen_lv_style!(set_text_font, );
+    gen_lv_style!(set_text_font, Font);
     gen_lv_style!(set_text_letter_space, i16);
     gen_lv_style!(set_text_line_space, i16);
     gen_lv_style!(set_text_opa, Opacity);

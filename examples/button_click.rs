@@ -7,15 +7,15 @@ use embedded_graphics_simulator::{
 
 use lvgl;
 use lvgl::input_device::{
-    generic::InputDriver,
     pointer::{Pointer, PointerInputData},
+    InputDriver,
 };
 use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
 use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, Widget};
+use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
-use std::thread::sleep;
 
 #[allow(unused_assignments)]
 fn main() -> Result<(), LvError> {
@@ -39,8 +39,7 @@ fn main() -> Result<(), LvError> {
     let mut latest_touch_status = PointerInputData::Touch(Point::new(0, 0)).released().once();
 
     // Register a new input device that's capable of reading the current state of the input
-    let mut touch_screen = Pointer::new(|| latest_touch_status);
-    lvgl::indev_drv_register(&mut touch_screen)?;
+    let _touch_screen = Pointer::register(|| latest_touch_status, &display)?;
 
     // Create screen and widgets
     let mut screen = display.get_scr_act()?;
@@ -67,7 +66,6 @@ fn main() -> Result<(), LvError> {
                 btn_lbl.set_text(nt.as_c_str()).unwrap();
             }
             btn_state = !btn_state;
-            //btn.toggle().unwrap();
         }
     })?;
 

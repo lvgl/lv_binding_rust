@@ -9,9 +9,9 @@ use lvgl::style::Style;
 use lvgl::widgets::{Bar, Label};
 use lvgl::{Align, Animation, Color, Display, DrawBuffer, Event, LvError, Part, Widget};
 use std::cell::RefCell;
+use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
-use std::thread::sleep;
 
 fn main() -> Result<(), LvError> {
     const HOR_RES: u32 = 240;
@@ -58,7 +58,6 @@ fn main() -> Result<(), LvError> {
     let mut loading_lbl = Label::create(&mut screen)?;
     loading_lbl.set_text(CString::new("Loading...").unwrap().as_c_str())?;
     loading_lbl.set_align(Align::OutTopMid, 0, 0)?;
-    //loading_lbl.set_label_align(LabelAlign::Center)?;
 
     let mut loading_style = Style::default();
     loading_style.set_text_color(Color::from_rgb((0, 0, 0)));

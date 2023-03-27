@@ -9,9 +9,9 @@ use lvgl::style::Style;
 use lvgl::widgets::{Arc, Label};
 use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, Widget};
 use lvgl_sys;
+use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
-use std::thread::sleep;
 
 fn mem_info() -> lvgl_sys::lv_mem_monitor_t {
     let mut info = lvgl_sys::lv_mem_monitor_t {
