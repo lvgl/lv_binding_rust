@@ -25,7 +25,7 @@ fn main() -> Result<(), LvError> {
 
     // LVGL will render the graphics here first, and seed the rendered image to the
     // display. The buffer size can be set freely.
-    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES / 10) as usize }>::new();
+    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
     //
     // const NUMBER_OF_DISPLAYS: usize = 1;
     // static DISPLAY_REGISTRY: DisplayRegistry<NUMBER_OF_DISPLAYS> = DisplayRegistry::empty();
