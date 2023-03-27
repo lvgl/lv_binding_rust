@@ -1,0 +1,2 @@
+[build.env]
+passthrough = ["DEP_LV_CONFIG_PATH", "LVGL_INCLUDE", "LVGL_LINK"]
