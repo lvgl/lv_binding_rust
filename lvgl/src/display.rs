@@ -194,7 +194,7 @@ impl<'a, const N: usize> DisplayDriver<N> {
                 .ok_or(DisplayError::FailedToRegister)?,
         ) as *mut _;
 
-        disp_drv.user_data = Box::into_raw(Box::new(display_update_callback)) as *mut _;
+        disp_drv.user_data = Box::new(display_update_callback).into_raw() as *mut _;
 
         // Sets trampoline pointer to the function implementation that uses the `F` type for a
         // refresh buffer of size N specifically.
@@ -350,7 +350,8 @@ unsafe extern "C" fn disp_flush_trampoline<'a, F, const N: usize>(
         };
         callback(&update);
     }
-
+    // Not doing this causes a segfault in rust >= 1.69.0
+    *disp_drv = display_driver;
     // Indicate to LVGL that we are ready with the flushing
     lvgl_sys::lv_disp_flush_ready(disp_drv);
 }
