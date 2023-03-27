@@ -23,7 +23,7 @@ fn main() -> LvResult<()> {
     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
     let display = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES)?;
     let mut input = lv_drv_input_pointer_sdl!();
-    lvgl::indev_drv_register(&mut input);
+    lvgl::indev_drv_register(&mut input)?;
 
     // Create screen and widgets
     let mut screen = display.get_scr_act()?;
@@ -54,13 +54,11 @@ fn main() -> LvResult<()> {
         }
     })?;
 
-    'running: loop {
+    loop {
         let start = Instant::now();
         lvgl::task_handler();
         //println!("Loop");
         sleep(Duration::from_millis(15));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }
-
-    Ok(())
 }
