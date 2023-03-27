@@ -26,6 +26,7 @@ alloc = ["cstr_core/alloc"]
 lvgl_alloc = ["alloc"]
 use-vendored-config = ["lvgl-sys/use-vendored-config"]
 drivers = ["lvgl-sys/drivers"]
+nightly = []
 
 [build-dependencies]
 quote = "1.0.23"

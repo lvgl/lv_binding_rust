@@ -3,17 +3,17 @@
 //#![allow(unused_variables)]
 //#![allow(unreachable_code)]
 
-use lvgl::LvResult;
+use cstr_core::CString;
+use lvgl::input_device::InputDriver;
 use lvgl::lv_drv_disp_sdl;
 use lvgl::lv_drv_input_pointer_sdl;
-use lvgl::input_device::generic::InputDriver;
 use lvgl::style::Style;
 use lvgl::widgets::{Btn, Label};
+use lvgl::LvResult;
 use lvgl::{Align, Color, DrawBuffer, Part, Widget};
+use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
-use std::thread::sleep;
-use cstr_core::CString;
 
 fn main() -> LvResult<()> {
     const HOR_RES: u32 = 240;
@@ -22,8 +22,7 @@ fn main() -> LvResult<()> {
     lvgl::init();
     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
     let display = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES)?;
-    let mut input = lv_drv_input_pointer_sdl!();
-    lvgl::indev_drv_register(&mut input)?;
+    let _input = lv_drv_input_pointer_sdl!(display)?;
 
     // Create screen and widgets
     let mut screen = display.get_scr_act()?;
@@ -50,14 +49,12 @@ fn main() -> LvResult<()> {
                 btn_lbl.set_text(nt.as_c_str()).unwrap();
             }
             btn_state = !btn_state;
-            //btn.toggle().unwrap();
         }
     })?;
 
     loop {
         let start = Instant::now();
         lvgl::task_handler();
-        //println!("Loop");
         sleep(Duration::from_millis(15));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }

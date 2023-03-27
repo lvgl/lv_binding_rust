@@ -5,6 +5,7 @@ use embedded_graphics_simulator::{
     OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
 };
 use lvgl;
+use lvgl::font::Font;
 use lvgl::style::Style;
 use lvgl::widgets::Label;
 use lvgl::{Align, Color, Display, DrawBuffer, LvError, Part, TextAlign, Widget};
@@ -26,11 +27,6 @@ fn main() -> Result<(), LvError> {
     // LVGL will render the graphics here first, and seed the rendered image to the
     // display. The buffer size can be set freely.
     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
-    //
-    // const NUMBER_OF_DISPLAYS: usize = 1;
-    // static DISPLAY_REGISTRY: DisplayRegistry<NUMBER_OF_DISPLAYS> = DisplayRegistry::empty();
-    // // static DISPLAY_REGISTRY: SingleDisplayRegistry = DisplayRegistry::empty();
-    // let display = DISPLAY_REGISTRY.register_shared(&DRAW_BUFFER, shared_native_display.clone())?;
 
     // Register your display update callback with LVGL. The closure you pass here will be called
     // whenever LVGL has updates to be painted to the display.
@@ -52,9 +48,12 @@ fn main() -> Result<(), LvError> {
     let mut style_time = Style::default();
     style_time.set_text_color(Color::from_rgb((255, 255, 255)));
     style_time.set_text_align(TextAlign::Center);
-    // Need to set font too
+
+    // See font module documentation for an explanation of the unsafe block
+    style_time.set_text_font(unsafe { Font::new_raw(lvgl_sys::noto_sans_numeric_80) });
+
     time.add_style(Part::Main, &mut style_time)?;
-    time.set_align(Align::Center, 0, 100)?;
+    time.set_align(Align::Center, 0, 90)?;
     time.set_width(240)?;
     time.set_height(240)?;
 
@@ -89,26 +88,13 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-        //println!("During run: {:?}", mem_info());
         sleep(Duration::from_secs(1));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }
 
-    //println!("Final part of demo app: {:?}", mem_info());
+    println!("Final part of demo app: {:?}", mem_info());
 
     Ok(())
-}
-
-// Reference to native font for LVGL, defined in the file: "fonts_noto_sans_numeric_80.c"
-// TODO: Create a macro for defining a safe wrapper for fonts.
-// Maybe sometihng like:
-//
-// font_declare! {
-//     NotoSansNumeric80 = noto_sans_numeric_80;
-// };
-//
-extern "C" {
-    pub static mut noto_sans_numeric_80: lvgl_sys::lv_font_t;
 }
 
 fn mem_info() -> lvgl_sys::lv_mem_monitor_t {

@@ -19,7 +19,7 @@ macro_rules! lv_drv_disp_fbdev {
                 Some(lvgl_sys::fbdev_exit),
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -43,7 +43,7 @@ macro_rules! lv_drv_disp_drm {
                 Some(lvgl_sys::drm_exit),
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -67,7 +67,7 @@ macro_rules! lv_drv_disp_gtk {
                 None,
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -91,7 +91,7 @@ macro_rules! lv_drv_disp_sdl {
                 None,
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -142,7 +142,7 @@ macro_rules! lv_drv_disp_ili9341 {
                 None,
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -166,7 +166,7 @@ macro_rules! lv_drv_disp_r61581 {
                 None,
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -190,7 +190,7 @@ macro_rules! lv_drv_disp_sharp_mip {
                 None,
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -214,7 +214,7 @@ macro_rules! lv_drv_disp_ssd1963 {
                 None,
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -238,7 +238,7 @@ macro_rules! lv_drv_disp_st7565 {
                 None,
             )
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -262,7 +262,7 @@ macro_rules! lv_drv_disp_uc1610 {
                 None,
             )
         }
-    }
+    };
 }
 
 #[cfg(test)]

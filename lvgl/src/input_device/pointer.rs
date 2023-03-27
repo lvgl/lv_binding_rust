@@ -1,4 +1,4 @@
-use super::generic::{BufferStatus, Data, InputDriver, InputState};
+use super::{BufferStatus, Data, InputDriver, InputState};
 use crate::Box;
 use crate::{LvError, LvResult};
 use core::mem::MaybeUninit;
@@ -28,7 +28,7 @@ pub struct Pointer {
 }
 
 impl InputDriver<Pointer> for Pointer {
-    fn new<F>(handler: F) -> Self
+    fn register<F>(handler: F, _: &crate::Display) -> LvResult<Self>
     where
         F: Fn() -> BufferStatus,
     {
@@ -42,9 +42,15 @@ impl InputDriver<Pointer> for Pointer {
             indev_drv.user_data = Box::into_raw(Box::new(handler)) as *mut _;
             indev_drv
         };
-        Self {
+
+        let mut dev = Self {
             driver,
             descriptor: None,
+        };
+
+        match crate::indev_drv_register(&mut dev) {
+            Ok(()) => Ok(dev),
+            Err(e) => Err(e)
         }
     }
 
@@ -53,9 +59,12 @@ impl InputDriver<Pointer> for Pointer {
     }
 
     unsafe fn new_raw(
-        read_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, *mut lvgl_sys::lv_indev_data_t)>,
+        read_cb: Option<
+            unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, *mut lvgl_sys::lv_indev_data_t),
+        >,
         feedback_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, u8)>,
-    ) -> Self {
+        _: &crate::Display
+    ) -> LvResult<Self> {
         let driver = unsafe {
             let mut indev_drv = MaybeUninit::uninit();
             lvgl_sys::lv_indev_drv_init(indev_drv.as_mut_ptr());
@@ -65,9 +74,15 @@ impl InputDriver<Pointer> for Pointer {
             indev_drv.feedback_cb = feedback_cb;
             indev_drv
         };
-        Self {
+        
+        let mut dev = Self {
             driver,
             descriptor: None,
+        };
+
+        match crate::indev_drv_register(&mut dev) {
+            Ok(()) => Ok(dev),
+            Err(e) => Err(e),
         }
     }
 
