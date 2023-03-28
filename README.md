@@ -1,12 +1,5 @@
 <h1 align="center"> LVGL - Open-source Embedded GUI Library in Rust</h1>
 
-> This library is looking for a new maintainer. If you are intested in taking over the development, please open a
-> ticket. I would like to find someone committed and with genuine interest to continue the work that I have started
-> here. Initially, I will add the new maintainer as collaborator and after demonstrated interest, I will add
-> as admin, etc. If you have forked and continued the development, please link your work this might speed up the
-> process.
-
-
 ![Original LVGL demo image](lv_demo.png)
 
 <p align="center">
