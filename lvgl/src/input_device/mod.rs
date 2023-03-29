@@ -1,12 +1,12 @@
 //! Input driver logic and handling
-//! 
+//!
 //! LVGL supports 4 types of input device. The current status as to support in
 //! this library is:
 //! - Pointer: Fully supported
 //! - Keyboard: Unsupported
 //! - Button: Unsupported
 //! - Encoder: Unsupported
-//! 
+//!
 //! The general order of operations when creating an input device is
 //! initializing an instance of the desired device, setting a callback function
 //! (and any other parameters and functions, depending on type), and
@@ -16,7 +16,7 @@
 //! use lvgl::input_device::InputDriver;
 //! use lvgl::input_device::pointer::{Pointer, PointerInputData};
 //! use embedded_graphics::prelude::*;
-//! 
+//!
 //! fn main() {
 //!     // IMPORTANT: Initialize a display driver first!
 //!     // ...

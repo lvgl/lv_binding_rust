@@ -46,7 +46,7 @@ pub trait InputDriver<D> {
             unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, *mut lvgl_sys::lv_indev_data_t),
         >,
         feedback_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, u8)>,
-        display: &crate::Display
+        display: &crate::Display,
     ) -> LvResult<D>;
 
     unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()>;

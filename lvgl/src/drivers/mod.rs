@@ -6,14 +6,14 @@
 //!
 //! The `sdl` example shows how to use both input and display drivers to port
 //! the `button_click` example.
-//! 
+//!
 //! # Building
 //! To compile in support for drivers, ensure the `drivers` feature is enabled
 //! (this feature is enabled by default). Also ensure that the C configuration
 //! for the drivers is located at the same path as the configuration for LVGL
 //! itsel (i.e. the directory pointed to by `DEP_LV_CONFIG_PATH` contains both
 //! `lv_conf.h` and `lv_drv_conf.h`).
-//! 
+//!
 //! Depending on desired drivers, certain environment variables need to be set.
 //! `LVGL_INCLUDE` lists directories to be searched for headers during
 //! compilation, and `LVGL_LINK` lists libraries that will be linked in. By
@@ -32,7 +32,7 @@
 //! ```no_run
 //! use lvgl::DrawBuffer;
 //! use lvgl::lv_drv_disp_sdl;
-//! 
+//!
 //! fn main() {
 //!     const HOR_RES: u32 = 240;
 //!     const VER_RES: u32 = 240;
