@@ -117,5 +117,5 @@ required-features = ["alloc", "drivers"]
 
 [[example]]
 name = "rust_timer"
-path = "../examples/rust_timer.h"
+path = "../examples/rust_timer.rs"
 required-features = ["alloc", "embedded_graphics", "rust_timer"]

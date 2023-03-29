@@ -21,7 +21,9 @@ struct Clock {
 
 impl Default for Clock {
     fn default() -> Self {
-        Self { start: Instant::now() }
+        Self {
+            start: Instant::now(),
+        }
     }
 }
 

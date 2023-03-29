@@ -50,7 +50,7 @@ impl InputDriver<Pointer> for Pointer {
 
         match crate::indev_drv_register(&mut dev) {
             Ok(()) => Ok(dev),
-            Err(e) => Err(e)
+            Err(e) => Err(e),
         }
     }
 
@@ -63,7 +63,7 @@ impl InputDriver<Pointer> for Pointer {
             unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, *mut lvgl_sys::lv_indev_data_t),
         >,
         feedback_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, u8)>,
-        _: &crate::Display
+        _: &crate::Display,
     ) -> LvResult<Self> {
         let driver = unsafe {
             let mut indev_drv = MaybeUninit::uninit();
@@ -74,7 +74,7 @@ impl InputDriver<Pointer> for Pointer {
             indev_drv.feedback_cb = feedback_cb;
             indev_drv
         };
-        
+
         let mut dev = Self {
             driver,
             descriptor: None,

@@ -1,15 +1,15 @@
 //! Styling for LVGL objects and widgets
-//! 
+//!
 //! Objects in LVGL can have associated styling information. After a `Style` is
 //! created and configured, it can be added to any object or widget:
 //! ```
 //! use lvgl::{Color, Widget};
 //! use lvgl::style::Style;
-//! 
+//!
 //! fn main() {
 //!     let mut my_style = Style::default();
 //!     my_style.set_text_color(Color::from_rgb((0, 0, 0)));
-//! 
+//!
 //!     //my_widget.add_style(Part::Main, &mut my_style).unwrap();
 //!     // ...
 //! }

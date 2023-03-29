@@ -45,7 +45,8 @@ fn main() {
     // Some basic defaults; SDL2 is the only driver enabled in the provided
     // driver config by default
     #[cfg(feature = "drivers")]
-    let incl_extra = env::var("LVGL_INCLUDE").unwrap_or("/usr/include,/usr/local/include".to_string());
+    let incl_extra =
+        env::var("LVGL_INCLUDE").unwrap_or("/usr/include,/usr/local/include".to_string());
     #[cfg(feature = "drivers")]
     let link_extra = env::var("LVGL_LINK").unwrap_or("SDL2".to_string());
 
@@ -169,7 +170,9 @@ fn main() {
 
     let mut additional_args = Vec::new();
     if target.ends_with("emscripten") {
-        if let Ok(em_path) = env::var("EMSDK") {
+        match env::var("EMSDK") {
+            Ok(em_path) =>
+        {
             additional_args.push("-I".to_string());
             additional_args.push(format!(
                 "{}/upstream/emscripten/system/include/libc",
@@ -185,6 +188,8 @@ fn main() {
                 "{}/upstream/emscripten/system/include/SDL",
                 em_path
             ));
+        }
+        Err(_) => panic!("The EMSDK environment variable is not set. Has emscripten been properly initialized?")
         }
     }
 

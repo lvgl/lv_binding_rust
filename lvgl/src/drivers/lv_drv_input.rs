@@ -6,7 +6,7 @@ macro_rules! lv_drv_input_pointer_evdev {
             $crate::input_device::pointer::Pointer::new_raw(
                 Some(lvgl_sys::evdev_read),
                 None,
-                &$disp
+                &$disp,
             )
         }
     };
@@ -19,7 +19,7 @@ macro_rules! lv_drv_input_pointer_gtk {
             $crate::input_device::pointer::Pointer::new_raw(
                 Some(lvgl_sys::gtkdrv_mouse_read_cb),
                 None,
-                &$disp
+                &$disp,
             )
         }
     };
@@ -32,7 +32,7 @@ macro_rules! lv_drv_input_pointer_sdl {
             $crate::input_device::pointer::Pointer::new_raw(
                 Some(lvgl_sys::sdl_mouse_read),
                 None,
-                &$disp
+                &$disp,
             )
         }
     };
@@ -46,7 +46,7 @@ macro_rules! lv_drv_input_ad_touch {
             $crate::input_device::pointer::Pointer::new_raw(
                 Some(lvgl_sys::ad_touch_read),
                 None,
-                &$disp
+                &$disp,
             )
         }
     };
@@ -60,7 +60,7 @@ macro_rules! lv_drv_input_ft5406ee8 {
             $crate::input_device::pointer::Pointer::new_raw(
                 Some(lvgl_sys::ft5406ee8_read),
                 None,
-                &$disp
+                &$disp,
             )
         }
     };
@@ -71,7 +71,11 @@ macro_rules! lv_drv_input_xpt2046 {
     ($disp:ident) => {
         unsafe {
             lvgl_sys::xpt2046_init();
-            $crate::input_device::pointer::Pointer::new_raw(Some(lvgl_sys::xpt2046_read), None, &$disp)
+            $crate::input_device::pointer::Pointer::new_raw(
+                Some(lvgl_sys::xpt2046_read),
+                None,
+                &$disp,
+            )
         }
     };
 }
