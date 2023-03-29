@@ -12,7 +12,6 @@
 //! use lvgl::style::Style;
 //!
 //! fn main() {
-//!     lvgl::init();
 //!     let mut my_style = Style::default();
 //!     my_style.set_text_font(Font::montserrat_48());
 //!     // Use the style
@@ -36,7 +35,6 @@
 //! use lvgl::style::Style;
 //!
 //! fn main() {
-//!     lvgl::init();
 //!     let noto_80 = unsafe {
 //!         Font::new_raw(lvgl_sys::noto_sans_numeric_80)
 //!     };
