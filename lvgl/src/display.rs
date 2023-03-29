@@ -194,7 +194,7 @@ impl<'a, const N: usize> DisplayDriver<N> {
                 .ok_or(DisplayError::FailedToRegister)?,
         ) as *mut _;
 
-        disp_drv.user_data = Box::new(display_update_callback).into_raw() as *mut _;
+        disp_drv.user_data = Box::<F>::into_raw(Box::new(display_update_callback)) as *mut _;
 
         // Sets trampoline pointer to the function implementation that uses the `F` type for a
         // refresh buffer of size N specifically.

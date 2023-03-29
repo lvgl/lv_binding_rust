@@ -5,9 +5,9 @@ pub struct Font {
     inner: Box<lvgl_sys::lv_font_t>,
 }
 
-impl From<Font> for *const lvgl_sys::_lv_font_t {
+impl From<Font> for *const lvgl_sys::lv_font_t {
     fn from(value: Font) -> Self {
-        value.inner.into_raw()
+        Box::<lvgl_sys::lv_font_t>::into_raw(value.inner)
     }
 }
 
