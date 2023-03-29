@@ -48,6 +48,10 @@ lvgl_alloc = ["alloc"]
 # need any extra features, but the default config is quite conservative.
 use-vendored-config = ["lvgl-sys/use-vendored-config"]
 
+# Enables using a custom tick function in Rust for LVGL. See the documentation
+# on the timer module for usage notes.
+rust_timer = ["lvgl-sys/rust_timer"]
+
 # Enables some unstable features. Currently, only #[cfg_accessible] is used.
 # This feature will currently allow:
 # - Using built-in LVGL fonts other than the default
@@ -110,3 +114,8 @@ required-features = ["alloc", "embedded_graphics"]
 name = "sdl"
 path = "../examples/sdl.rs"
 required-features = ["alloc", "drivers"]
+
+[[example]]
+name = "rust_timer"
+path = "../examples/rust_timer.h"
+required-features = ["alloc", "embedded_graphics", "rust_timer"]
