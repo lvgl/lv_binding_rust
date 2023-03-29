@@ -28,6 +28,8 @@ fn main() {
     let shims_dir = project_dir.join("shims");
     let vendor = project_dir.join("vendor");
     let lvgl_src = vendor.join("lvgl").join("src");
+    #[cfg(feature = "rust_timer")]
+    let timer_shim = vendor.join("include").join("timer");
 
     let current_dir = canonicalize(PathBuf::from(env::var("PWD").unwrap()));
     let font_extra_src = {
@@ -139,6 +141,8 @@ fn main() {
     if let Some(p) = &font_extra_src {
         cfg.includes(p);
     }
+    #[cfg(feature = "rust_timer")]
+    cfg.include(&timer_shim);
     #[cfg(feature = "drivers")]
     cfg.include(&drivers);
     #[cfg(feature = "drivers")]
@@ -154,9 +158,6 @@ fn main() {
         vendor.to_str().unwrap(),
         "-fvisibility=default",
     ];
-
-    //#[cfg(feature = "drivers")]
-    //incl_extra.split(',').for_each(|a| { cc_args.append(&mut vec!["-l"]); cc_args.append(&mut vec![a]) });
 
     // Set correct target triple for bindgen when cross-compiling
     let target = env::var("TARGET").expect("Cargo build scripts always have TARGET");
@@ -209,6 +210,8 @@ fn main() {
     let bindings = bindings
         .header(shims_dir.join("lvgl_drv.h").to_str().unwrap())
         .parse_callbacks(Box::new(ignored_macros));
+    //#[cfg(feature = "rust_timer")]
+    //let bindings = bindings.header(shims_dir.join("rs_timer.h").to_str().unwrap());
     let bindings = bindings
         .generate_comments(false)
         .derive_default(true)

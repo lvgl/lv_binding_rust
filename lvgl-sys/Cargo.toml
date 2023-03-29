@@ -26,3 +26,4 @@ bindgen = "0.64.0"
 [features]
 use-vendored-config = []
 drivers = []
+rust_timer = []
