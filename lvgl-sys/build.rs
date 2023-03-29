@@ -204,11 +204,13 @@ fn main() {
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     let bindings =
         bindgen::Builder::default().header(shims_dir.join("lvgl_sys.h").to_str().unwrap());
-    let bindings = add_font_headers(bindings, &font_extra_src);
+    let bindings = add_c_headers(bindings, &font_extra_src);
     #[cfg(feature = "drivers")]
     let bindings = bindings
         .header(shims_dir.join("lvgl_drv.h").to_str().unwrap())
         .parse_callbacks(Box::new(ignored_macros));
+    #[cfg(feature = "drivers")]
+    let bindings = add_c_headers(bindings, &Some(incl_extra));
     let bindings = bindings
         .generate_comments(false)
         .derive_default(true)
@@ -232,7 +234,7 @@ fn main() {
     })
 }
 
-fn add_font_headers(
+fn add_c_headers(
     bindings: bindgen::Builder,
     dir: &Option<impl AsRef<Path>>,
 ) -> bindgen::Builder {
