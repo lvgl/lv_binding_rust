@@ -37,7 +37,6 @@
 //!     const HOR_RES: u32 = 240;
 //!     const VER_RES: u32 = 240;
 //!
-//!     lvgl::init();
 //!     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES / 2) as usize }>::new();
 //!     let display = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES).unwrap();
 //!     // ...
@@ -58,7 +57,6 @@
 //! use lvgl::lv_drv_input_pointer_sdl;
 //!
 //! fn main() {
-//!     lvgl::init();
 //!     // IMPORTANT: Initialize a display driver first!
 //!     // ...
 //!     let _input = lv_drv_input_pointer_sdl!(display);

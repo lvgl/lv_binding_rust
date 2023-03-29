@@ -7,8 +7,6 @@
 //! use lvgl::style::Style;
 //! 
 //! fn main() {
-//!     lvgl::init();
-//! 
 //!     let mut my_style = Style::default();
 //!     my_style.set_text_color(Color::from_rgb((0, 0, 0)));
 //! 

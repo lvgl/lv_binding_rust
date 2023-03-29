@@ -18,15 +18,49 @@ embedded-graphics = { version = "0.7.1", optional = true }
 cstr_core = { version = "0.2.6", default-features = false, features = ["alloc"] }
 bitflags = "1.3.2"
 paste = "1.0.11"
+ctor = "0.2.0"
 
 [features]
 default = ["embedded_graphics", "drivers"]
+
+# Enable the embedded_graphics crate as a backend for graphics and input
+# devices. This is the 'legacy' method (supported in LVGL 0.5.2 and below) and
+# requires some manual configuration. See the examples directory for usage
+# examples, and see the documentation on Display and on input devices.
 embedded_graphics = ["embedded-graphics"]
-alloc = ["cstr_core/alloc"]
-lvgl_alloc = ["alloc"]
-use-vendored-config = ["lvgl-sys/use-vendored-config"]
+
+# Enable interop with the lv_drivers project as a graphics and input backend.
+# See the documentation on the drivers module, and the sdl example for a
+# practical example.
 drivers = ["lvgl-sys/drivers"]
+
+# Enable using the alloc crate internally on platforms that support it. Check
+# if your platform supports this crate before enabling.
+alloc = ["cstr_core/alloc"]
+
+# Sets the LVGL allocator as Rust's global allocator. This places ALL memory in
+# LVGL-handled space, and may require growing the memory pool in lv_conf.h
+# above the default.
+lvgl_alloc = ["alloc"]
+
+# Ignores the DEP_LV_CONFIG_PATH environment variable and instead selects the
+# LVGL config that comes bundled with the lvgl-sys crate. Useful if you don't
+# need any extra features, but the default config is quite conservative.
+use-vendored-config = ["lvgl-sys/use-vendored-config"]
+
+# Enables some unstable features. Currently, only #[cfg_accessible] is used.
+# This feature will currently allow:
+# - Using built-in LVGL fonts other than the default
 nightly = []
+
+# Disables auto-initializing LVGL.
+# !!! WARNING !!!
+# Enabling this feature and forgetting to call lvgl::init() before doing
+# anything at all with LVGL *will* cause undefined behaviour and probably a
+# segault. Only enable this if you're really, seriously, absolutely certain
+# that you need it. Unless you're doing something particularly exotic, this is
+# *not* needed, nor would it make anything measurably faster.
+unsafe_no_ctor = []
 
 [build-dependencies]
 quote = "1.0.23"
@@ -71,3 +105,8 @@ required-features = ["alloc", "embedded_graphics"]
 name = "sdl"
 path = "../examples/sdl.rs"
 required-features = ["alloc", "drivers"]
+
+[[example]]
+name = "memtest"
+path = "../examples/memtest.rs"
+required-features = ["lvgl_alloc"]

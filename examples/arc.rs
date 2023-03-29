@@ -34,7 +34,6 @@ fn main() -> Result<(), LvError> {
     const HOR_RES: u32 = 240;
     const VER_RES: u32 = 240;
 
-    lvgl::init();
     println!("meminfo init: {:?}", mem_info());
     let mut sim_display: SimulatorDisplay<Rgb565> =
         SimulatorDisplay::new(Size::new(HOR_RES, VER_RES));

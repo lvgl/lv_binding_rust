@@ -28,7 +28,6 @@ extern crate alloc;
 // That is because we use `Box` to send memory references to LVGL. Since the global allocator, when
 // `lvgl_alloc` feature is enabled, is the LVGL memory manager then everything is in LVGL
 // managed memory anyways. In that case we can use the Rust's provided Box definition.
-//
 #[cfg(feature = "lvgl_alloc")]
 use ::alloc::boxed::Box;
 
@@ -41,7 +40,6 @@ pub(crate) mod mem;
 // When LVGL allocator is not used on the Rust code, we need a way to add objects to the LVGL
 // managed memory. We implement a very simple `Box` that has the minimal features to copy memory
 // safely to the LVGL managed memory.
-//
 #[cfg(not(feature = "lvgl_alloc"))]
 use crate::mem::Box;
 
@@ -76,14 +74,27 @@ impl RunOnce {
     }
 }
 
+#[cfg(feature = "unsafe_no_ctor")]
 static LVGL_INITIALIZED: RunOnce = RunOnce::new();
 
 /// Initializes LVGL. Call at the start of the program.
+#[cfg(feature = "unsafe_no_ctor")]
 pub fn init() {
     if LVGL_INITIALIZED.swap_and_check() {
         unsafe {
             lvgl_sys::lv_init();
         }
+    }
+}
+
+#[cfg(not(feature = "unsafe_no_ctor"))]
+use ctor::ctor;
+
+#[cfg(not(feature = "unsafe_no_ctor"))]
+#[ctor]
+fn init() {
+    unsafe {
+        lvgl_sys::lv_init();
     }
 }
 

@@ -21,9 +21,6 @@ fn main() {
 
     let shared_native_display = RefCell::new(embedded_graphics_display);
 
-    // LVGL usage
-    lvgl::init();
-
     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
 
     let display = Display::register(buffer, HOR_RES, VER_RES, |refresh| {

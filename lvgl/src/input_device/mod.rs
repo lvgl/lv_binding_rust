@@ -18,7 +18,6 @@
 //! use embedded_graphics::prelude::*;
 //! 
 //! fn main() {
-//!     lvgl::init();
 //!     // IMPORTANT: Initialize a display driver first!
 //!     // ...
 //!     // Define the initial state of your input
