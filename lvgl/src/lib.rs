@@ -74,11 +74,11 @@ impl RunOnce {
     }
 }
 
-#[cfg(feature = "unsafe_no_ctor")]
+#[cfg(feature = "unsafe_no_autoinit")]
 static LVGL_INITIALIZED: RunOnce = RunOnce::new();
 
 /// Initializes LVGL. Call at the start of the program.
-#[cfg(feature = "unsafe_no_ctor")]
+#[cfg(feature = "unsafe_no_autoinit")]
 pub fn init() {
     if LVGL_INITIALIZED.swap_and_check() {
         unsafe {
@@ -87,11 +87,8 @@ pub fn init() {
     }
 }
 
-#[cfg(not(feature = "unsafe_no_ctor"))]
-use ctor::ctor;
-
-#[cfg(not(feature = "unsafe_no_ctor"))]
-#[ctor]
+#[cfg(not(feature = "unsafe_no_autoinit"))]
+#[ctor::ctor]
 fn init() {
     unsafe {
         lvgl_sys::lv_init();
@@ -104,6 +101,7 @@ pub(crate) mod tests {
     use crate::display::{Display, DrawBuffer};
 
     pub(crate) fn initialize_test() {
+        #[cfg(feature = "unsafe_no_autoinit")]
         init();
 
         static ONCE_INIT: RunOnce = RunOnce::new();

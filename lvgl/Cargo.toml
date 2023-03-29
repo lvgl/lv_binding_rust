@@ -60,7 +60,12 @@ nightly = []
 # segault. Only enable this if you're really, seriously, absolutely certain
 # that you need it. Unless you're doing something particularly exotic, this is
 # *not* needed, nor would it make anything measurably faster.
-unsafe_no_ctor = []
+#
+# However, if you're running baremetal or on a platform that ctor doesn't
+# support (https://github.com/mmastrac/rust-ctor/blob/master/ctor/src/lib.rs),
+# this feature should be enabled. Remember to call lvgl::init() in your main
+# function before constructing or using anything LVGL-related.
+unsafe_no_autoinit = []
 
 [build-dependencies]
 quote = "1.0.23"
@@ -105,8 +110,3 @@ required-features = ["alloc", "embedded_graphics"]
 name = "sdl"
 path = "../examples/sdl.rs"
 required-features = ["alloc", "drivers"]
-
-[[example]]
-name = "memtest"
-path = "../examples/memtest.rs"
-required-features = ["lvgl_alloc"]

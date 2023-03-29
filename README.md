@@ -44,6 +44,9 @@ $ cargo add lvgl
 The build requires the environment variable bellow to be set:
 
 - `DEP_LV_CONFIG_PATH`: Path to the directory containing the `lv_conf.h` header file used for configuration of LVGL library.
+- (Optional) `LVGL_FONTS_DIR`: Directory for custom fonts generated for use in LVGL. See the documentation for usage.
+- (Optional) `LVGL_INCLUDE`: C headers to include during the build if using the `drivers` feature, comma-separated. The default is `/usr/include,/usr/local/include`.
+- (Optional) `LVGL_LINK`: C libraries to link in during the build if using the `drivers` feature, comma-separated. The default is `SDL2`.
 
 We recommend the `lv_conf.h` file to be in your project's root directory. If so, the command to build your project would be:
 ```shell script
@@ -59,6 +62,8 @@ for `no_std`, so we need to use a workaround to build "lvgl-rs". The mainstrem i
 ```shell
 $ DEP_LV_CONFIG_PATH=`pwd` cargo build -Zfeatures=build_dep
 ```
+
+The `unsafe_no_autoinit` feature must also be enabled when building for baremetal targets. See its documentation in `Cargo.toml` for notes on usage.
 ### LVGL Global Allocator
 
 A [global allocator](https://doc.rust-lang.org/std/alloc/trait.GlobalAlloc.html) for Rust leveraging the

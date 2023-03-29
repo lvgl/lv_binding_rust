@@ -181,6 +181,7 @@ mod test {
 
     #[test]
     fn clone_object_in_lv_mem() {
+        #[cfg(feature = "unsafe_no_autoinit")]
         crate::init();
 
         let v1 = Box::new(5);
