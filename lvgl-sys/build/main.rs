@@ -6,6 +6,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+mod config;
+
 static CONFIG_NAME: &str = "DEP_LV_CONFIG_PATH";
 
 // See https://github.com/rust-lang/rust-bindgen/issues/687#issuecomment-450750547
