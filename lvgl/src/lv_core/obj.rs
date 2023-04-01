@@ -1,5 +1,5 @@
 //! Native LVGL objects
-//! 
+//!
 //! Objects are individual elements of a displayed surface, similar to widgets.
 //! Specifically, an object can either be a widget or a screen. Screen objects
 //! are special in that they do not have a parent object and do not implement

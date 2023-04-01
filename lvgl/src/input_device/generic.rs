@@ -42,9 +42,9 @@ pub trait InputDriver<D> {
     fn get_driver(&mut self) -> &mut lvgl_sys::lv_indev_drv_t;
 
     /// Creates a new `InputDriver` from raw parts.
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// The provided functions must not themselves cause undefined behavior
     /// when called by LVGL.
     unsafe fn new_raw(
@@ -56,9 +56,9 @@ pub trait InputDriver<D> {
     ) -> LvResult<D>;
 
     /// Sets the descriptor for the input driver wrapper.
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// `descriptor` must point to an initialized but unregistered and unused
     /// instance of an `lv_indev_t`, and must also be aligned.
     unsafe fn set_descriptor(&mut self, descriptor: *mut lvgl_sys::lv_indev_t) -> LvResult<()>;

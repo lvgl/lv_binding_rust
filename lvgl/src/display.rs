@@ -55,9 +55,9 @@ impl<'a> Display {
     }
 
     /// Registers a display from raw functions and values.
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// `hor_res` and `ver_res` must be nonzero, and the provided functions
     /// must not themselves cause undefined behavior.
     pub unsafe fn register_raw<const N: usize>(
@@ -314,14 +314,13 @@ mod embedded_graphics_impl {
 
             // We use iterators here to ensure that the Rust compiler can apply all possible
             // optimizations at compile time.
-            ys.enumerate()
-                .flat_map(move |(iy, y)| {
-                    xs.clone().map(move |(ix, x)| {
-                        let color_len = x_len * iy + ix;
-                        let raw_color = self.colors[color_len];
-                        Pixel(Point::new(x as i32, y as i32), raw_color.into())
-                    })
+            ys.enumerate().flat_map(move |(iy, y)| {
+                xs.clone().map(move |(ix, x)| {
+                    let color_len = x_len * iy + ix;
+                    let raw_color = self.colors[color_len];
+                    Pixel(Point::new(x as i32, y as i32), raw_color.into())
                 })
+            })
         }
     }
 }
