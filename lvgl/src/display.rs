@@ -178,6 +178,7 @@ impl<const N: usize> DrawBuffer<N> {
     }
 }
 
+#[repr(C)]
 pub(crate) struct DisplayDriver<const N: usize> {
     pub(crate) disp_drv: lvgl_sys::lv_disp_drv_t,
     _buffer: DrawBuffer<N>,
