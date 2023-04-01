@@ -25,7 +25,7 @@ fn main() -> Result<(), LvError> {
 
     // LVGL will render the graphics here first, and seed the rendered image to the
     // display. The buffer size can be set freely.
-    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
+    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
 
     // Register your display update callback with LVGL. The closure you pass here will be called
     // whenever LVGL has updates to be painted to the display.

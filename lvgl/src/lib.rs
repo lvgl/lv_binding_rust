@@ -109,7 +109,7 @@ pub(crate) mod tests {
 
         static ONCE_INIT: RunOnce = RunOnce::new();
         const REFRESH_BUFFER_SIZE: usize = 64 * 64 / 10;
-        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::new();
+        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
 
         if ONCE_INIT.swap_and_check() {
             let _ = Display::register(buffer, 240, 240, |_| {}).unwrap();

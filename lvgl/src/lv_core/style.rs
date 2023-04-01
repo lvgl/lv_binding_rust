@@ -6,13 +6,11 @@
 //! use lvgl::{Color, Widget};
 //! use lvgl::style::Style;
 //!
-//! fn main() {
-//!     let mut my_style = Style::default();
-//!     my_style.set_text_color(Color::from_rgb((0, 0, 0)));
+//! let mut my_style = Style::default();
+//! my_style.set_text_color(Color::from_rgb((0, 0, 0)));
 //!
-//!     //my_widget.add_style(Part::Main, &mut my_style).unwrap();
-//!     // ...
-//! }
+//! //my_widget.add_style(Part::Main, &mut my_style).unwrap();
+//! // ...
 //! ```
 //! All methods on the `Style` type directly lower to their C LVGL
 //! counterparts.
@@ -44,19 +42,19 @@ impl Default for Style {
 
 bitflags! {
     pub struct Opacity: u32 {
-        const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP as u32;
-        const OPA_0 = lvgl_sys::LV_OPA_0 as u32;
-        const OPA_10 = lvgl_sys::LV_OPA_10 as u32;
-        const OPA_20 = lvgl_sys::LV_OPA_20 as u32;
-        const OPA_30 = lvgl_sys::LV_OPA_30 as u32;
-        const OPA_40 = lvgl_sys::LV_OPA_40 as u32;
-        const OPA_50 = lvgl_sys::LV_OPA_50 as u32;
-        const OPA_60 = lvgl_sys::LV_OPA_60 as u32;
-        const OPA_70 = lvgl_sys::LV_OPA_70 as u32;
-        const OPA_80 = lvgl_sys::LV_OPA_80 as u32;
-        const OPA_90 = lvgl_sys::LV_OPA_90 as u32;
-        const OPA_100 = lvgl_sys::LV_OPA_100 as u32;
-        const OPA_COVER = lvgl_sys::LV_OPA_COVER as u32;
+        const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP;
+        const OPA_0 = lvgl_sys::LV_OPA_0;
+        const OPA_10 = lvgl_sys::LV_OPA_10;
+        const OPA_20 = lvgl_sys::LV_OPA_20;
+        const OPA_30 = lvgl_sys::LV_OPA_30;
+        const OPA_40 = lvgl_sys::LV_OPA_40;
+        const OPA_50 = lvgl_sys::LV_OPA_50;
+        const OPA_60 = lvgl_sys::LV_OPA_60;
+        const OPA_70 = lvgl_sys::LV_OPA_70;
+        const OPA_80 = lvgl_sys::LV_OPA_80;
+        const OPA_90 = lvgl_sys::LV_OPA_90;
+        const OPA_100 = lvgl_sys::LV_OPA_100;
+        const OPA_COVER = lvgl_sys::LV_OPA_COVER;
     }
 }
 
@@ -68,117 +66,117 @@ impl From<Opacity> for u8 {
 
 bitflags! {
     pub struct StyleProp: u32 {
-        const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV as u32;
+        const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV;
 
         /*Group 0*/
-        const WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_WIDTH as u32;
-        const MIN_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_MIN_WIDTH as u32;
-        const MAX_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_MAX_WIDTH as u32;
-        const HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_HEIGHT as u32;
-        const MIN_HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_MIN_HEIGHT as u32;
-        const MAX_HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_MAX_HEIGHT as u32;
-        const X = lvgl_sys::lv_style_prop_t_LV_STYLE_X as u32;
-        const Y = lvgl_sys::lv_style_prop_t_LV_STYLE_Y as u32;
-        const ALIGN = lvgl_sys::lv_style_prop_t_LV_STYLE_ALIGN as u32;
-        const TRANSFORM_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_WIDTH as u32;
-        const TRANSFORM_HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_HEIGHT as u32;
-        const TRANSLATE_X = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSLATE_X as u32;
-        const TRANSLATE_Y = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSLATE_Y as u32;
-        const TRANSFORM_ZOOM = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_ZOOM as u32;
-        const TRANSFORM_ANGLE = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_ANGLE as u32;
+        const WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_WIDTH;
+        const MIN_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_MIN_WIDTH;
+        const MAX_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_MAX_WIDTH;
+        const HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_HEIGHT;
+        const MIN_HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_MIN_HEIGHT;
+        const MAX_HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_MAX_HEIGHT;
+        const X = lvgl_sys::lv_style_prop_t_LV_STYLE_X;
+        const Y = lvgl_sys::lv_style_prop_t_LV_STYLE_Y;
+        const ALIGN = lvgl_sys::lv_style_prop_t_LV_STYLE_ALIGN;
+        const TRANSFORM_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_WIDTH;
+        const TRANSFORM_HEIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_HEIGHT;
+        const TRANSLATE_X = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSLATE_X;
+        const TRANSLATE_Y = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSLATE_Y;
+        const TRANSFORM_ZOOM = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_ZOOM;
+        const TRANSFORM_ANGLE = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSFORM_ANGLE;
 
         /*Group 1*/
-        const PAD_TOP = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_TOP as u32;
-        const PAD_BOTTOM = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_BOTTOM as u32;
-        const PAD_LEFT = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_LEFT as u32;
-        const PAD_RIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_RIGHT as u32;
-        const PAD_ROW = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_ROW as u32;
-        const PAD_COLUMN = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_COLUMN as u32;
+        const PAD_TOP = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_TOP;
+        const PAD_BOTTOM = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_BOTTOM;
+        const PAD_LEFT = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_LEFT;
+        const PAD_RIGHT = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_RIGHT;
+        const PAD_ROW = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_ROW;
+        const PAD_COLUMN = lvgl_sys::lv_style_prop_t_LV_STYLE_PAD_COLUMN;
 
         /*Group 2*/
-        const BG_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_COLOR as u32;
+        const BG_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_COLOR;
         //const BG_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_COLOR_FILTERED as u32;
-        const BG_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_OPA as u32;
-        const BG_GRAD_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_GRAD_COLOR as u32;
+        const BG_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_OPA;
+        const BG_GRAD_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_GRAD_COLOR;
         //const BG_GRAD_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_GRAD_COLOR_FILTERED as u32;
-        const BG_GRAD_DIR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_GRAD_DIR as u32;
-        const BG_MAIN_STOP = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_MAIN_STOP as u32;
-        const BG_GRAD_STOP = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_GRAD_STOP as u32;
+        const BG_GRAD_DIR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_GRAD_DIR;
+        const BG_MAIN_STOP = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_MAIN_STOP;
+        const BG_GRAD_STOP = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_GRAD_STOP;
 
-        const BG_IMG_SRC = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_SRC as u32;
-        const BG_IMG_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_OPA as u32;
-        const BG_IMG_RECOLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_RECOLOR as u32;
+        const BG_IMG_SRC = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_SRC;
+        const BG_IMG_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_OPA;
+        const BG_IMG_RECOLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_RECOLOR;
         //const BG_IMG_RECOLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_RECOLOR_FILTERED as u32;
-        const BG_IMG_RECOLOR_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_RECOLOR_OPA as u32;
-        const BG_IMG_TILED = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_TILED as u32;
+        const BG_IMG_RECOLOR_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_RECOLOR_OPA;
+        const BG_IMG_TILED = lvgl_sys::lv_style_prop_t_LV_STYLE_BG_IMG_TILED;
 
         /*Group 3*/
-        const BORDER_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_COLOR as u32;
+        const BORDER_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_COLOR;
         //const BORDER_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_COLOR_FILTERED as u32;
-        const BORDER_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_OPA as u32;
-        const BORDER_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_WIDTH as u32;
-        const BORDER_SIDE = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_SIDE as u32;
-        const BORDER_POST = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_POST as u32;
+        const BORDER_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_OPA;
+        const BORDER_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_WIDTH;
+        const BORDER_SIDE = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_SIDE;
+        const BORDER_POST = lvgl_sys::lv_style_prop_t_LV_STYLE_BORDER_POST;
 
-        const OUTLINE_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_WIDTH as u32;
-        const OUTLINE_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_COLOR as u32;
+        const OUTLINE_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_WIDTH;
+        const OUTLINE_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_COLOR;
         //const OUTLINE_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_COLOR_FILTERED as u32;
-        const OUTLINE_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_OPA as u32;
-        const OUTLINE_PAD = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_PAD as u32;
+        const OUTLINE_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_OPA;
+        const OUTLINE_PAD = lvgl_sys::lv_style_prop_t_LV_STYLE_OUTLINE_PAD;
 
         /*Group 4*/
-        const SHADOW_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_WIDTH as u32;
-        const SHADOW_OFS_X = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_OFS_X as u32;
-        const SHADOW_OFS_Y = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_OFS_Y as u32;
-        const SHADOW_SPREAD = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_SPREAD as u32;
-        const SHADOW_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_COLOR as u32;
+        const SHADOW_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_WIDTH;
+        const SHADOW_OFS_X = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_OFS_X;
+        const SHADOW_OFS_Y = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_OFS_Y;
+        const SHADOW_SPREAD = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_SPREAD;
+        const SHADOW_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_COLOR;
         //const SHADOW_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_COLOR_FILTERED as u32;
-        const SHADOW_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_OPA as u32;
+        const SHADOW_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_SHADOW_OPA;
 
-        const IMG_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_IMG_OPA as u32;
-        const IMG_RECOLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_IMG_RECOLOR as u32;
+        const IMG_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_IMG_OPA;
+        const IMG_RECOLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_IMG_RECOLOR;
         //const IMG_RECOLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_IMG_RECOLOR_FILTERED as u32;
-        const IMG_RECOLOR_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_IMG_RECOLOR_OPA as u32;
+        const IMG_RECOLOR_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_IMG_RECOLOR_OPA;
 
-        const LINE_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_WIDTH as u32;
-        const LINE_DASH_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_DASH_WIDTH as u32;
-        const LINE_DASH_GAP = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_DASH_GAP as u32;
-        const LINE_ROUNDED = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_ROUNDED as u32;
-        const LINE_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_COLOR as u32;
+        const LINE_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_WIDTH;
+        const LINE_DASH_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_DASH_WIDTH;
+        const LINE_DASH_GAP = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_DASH_GAP;
+        const LINE_ROUNDED = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_ROUNDED;
+        const LINE_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_COLOR;
         //const LINE_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_COLOR_FILTERED as u32;
-        const LINE_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_OPA as u32;
+        const LINE_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_LINE_OPA;
 
         /*Group 5*/
-        const ARC_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_WIDTH as u32;
-        const ARC_ROUNDED = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_ROUNDED as u32;
-        const ARC_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_COLOR as u32;
+        const ARC_WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_WIDTH;
+        const ARC_ROUNDED = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_ROUNDED;
+        const ARC_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_COLOR;
         //const ARC_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_COLOR_FILTERED as u32;
-        const ARC_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_OPA as u32;
-        const ARC_IMG_SRC = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_IMG_SRC as u32;
+        const ARC_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_OPA;
+        const ARC_IMG_SRC = lvgl_sys::lv_style_prop_t_LV_STYLE_ARC_IMG_SRC;
 
-        const TEXT_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_COLOR as u32;
+        const TEXT_COLOR = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_COLOR;
         //const TEXT_COLOR_FILTERED = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_COLOR_FILTERED as u32;
-        const TEXT_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_OPA as u32;
-        const TEXT_FONT = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_FONT as u32;
-        const TEXT_LETTER_SPACE = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_LETTER_SPACE as u32;
-        const TEXT_LINE_SPACE = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_LINE_SPACE as u32;
-        const TEXT_DECOR = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_DECOR as u32;
-        const TEXT_ALIGN = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_ALIGN as u32;
+        const TEXT_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_OPA;
+        const TEXT_FONT = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_FONT;
+        const TEXT_LETTER_SPACE = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_LETTER_SPACE;
+        const TEXT_LINE_SPACE = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_LINE_SPACE;
+        const TEXT_DECOR = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_DECOR;
+        const TEXT_ALIGN = lvgl_sys::lv_style_prop_t_LV_STYLE_TEXT_ALIGN;
 
         /*Group 6*/
-        const RADIUS = lvgl_sys::lv_style_prop_t_LV_STYLE_RADIUS as u32;
-        const CLIP_CORNER = lvgl_sys::lv_style_prop_t_LV_STYLE_CLIP_CORNER as u32;
-        const OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_OPA as u32;
-        const COLOR_FILTER_DSC = lvgl_sys::lv_style_prop_t_LV_STYLE_COLOR_FILTER_DSC as u32;
-        const COLOR_FILTER_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_COLOR_FILTER_OPA as u32;
-        const ANIM_TIME = lvgl_sys::lv_style_prop_t_LV_STYLE_ANIM_TIME as u32;
-        const ANIM_SPEED = lvgl_sys::lv_style_prop_t_LV_STYLE_ANIM_SPEED as u32;
-        const TRANSITION = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSITION as u32;
-        const BLEND_MODE = lvgl_sys::lv_style_prop_t_LV_STYLE_BLEND_MODE as u32;
-        const LAYOUT = lvgl_sys::lv_style_prop_t_LV_STYLE_LAYOUT as u32;
-        const BASE_DIR = lvgl_sys::lv_style_prop_t_LV_STYLE_BASE_DIR as u32;
+        const RADIUS = lvgl_sys::lv_style_prop_t_LV_STYLE_RADIUS;
+        const CLIP_CORNER = lvgl_sys::lv_style_prop_t_LV_STYLE_CLIP_CORNER;
+        const OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_OPA;
+        const COLOR_FILTER_DSC = lvgl_sys::lv_style_prop_t_LV_STYLE_COLOR_FILTER_DSC;
+        const COLOR_FILTER_OPA = lvgl_sys::lv_style_prop_t_LV_STYLE_COLOR_FILTER_OPA;
+        const ANIM_TIME = lvgl_sys::lv_style_prop_t_LV_STYLE_ANIM_TIME;
+        const ANIM_SPEED = lvgl_sys::lv_style_prop_t_LV_STYLE_ANIM_SPEED;
+        const TRANSITION = lvgl_sys::lv_style_prop_t_LV_STYLE_TRANSITION;
+        const BLEND_MODE = lvgl_sys::lv_style_prop_t_LV_STYLE_BLEND_MODE;
+        const LAYOUT = lvgl_sys::lv_style_prop_t_LV_STYLE_LAYOUT;
+        const BASE_DIR = lvgl_sys::lv_style_prop_t_LV_STYLE_BASE_DIR;
 
-        const PROP_ANY = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_ANY as u32;
+        const PROP_ANY = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_ANY;
     }
 }
 

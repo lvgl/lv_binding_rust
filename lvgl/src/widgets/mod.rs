@@ -1,5 +1,5 @@
 //! Widget-specific features
-//! 
+//!
 //! Widgets represent individual elements on the screen. Each widget has
 //! associated information, namely its parent widget and its styling data. A
 //! widget with no parent will have a screen as its parent. Style data is

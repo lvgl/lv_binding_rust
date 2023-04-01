@@ -34,14 +34,12 @@
 //! use lvgl::font::Font;
 //! use lvgl::style::Style;
 //!
-//! fn main() {
-//!     let noto_80 = unsafe {
-//!         Font::new_raw(lvgl_sys::noto_sans_numeric_80)
-//!     };
-//!     let mut my_style = Style::default();
-//!     my_style.set_text_font(noto_80);
-//!     // Use the style
-//! }
+//! let noto_80 = unsafe {
+//!     Font::new_raw(lvgl_sys::noto_sans_numeric_80)
+//! };
+//! let mut my_style = Style::default();
+//! my_style.set_text_font(noto_80);
+//! // Use the style
 //! ```
 //! This operation is inherently unsafe as it instantiates and uses arbitrary
 //! data structures that the Rust compiler can't check.

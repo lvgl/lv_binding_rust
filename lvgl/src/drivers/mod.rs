@@ -33,14 +33,12 @@
 //! use lvgl::DrawBuffer;
 //! use lvgl::lv_drv_disp_sdl;
 //!
-//! fn main() {
-//!     const HOR_RES: u32 = 240;
-//!     const VER_RES: u32 = 240;
+//! const HOR_RES: u32 = 240;
+//! const VER_RES: u32 = 240;
 //!
-//!     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES / 2) as usize }>::new();
-//!     let display = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES).unwrap();
-//!     // ...
-//! }
+//! let buffer = DrawBuffer::<{ (HOR_RES * VER_RES / 2) as usize }>::default();
+//! let display = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES).unwrap();
+//! // ...
 //! ```
 //!
 //! # Input drivers
