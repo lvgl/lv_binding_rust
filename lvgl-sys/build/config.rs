@@ -15,6 +15,15 @@ enum ColorMixRoundOFS {
     R254 = 254,
 }
 
+enum LogLevel {
+    Trace,
+    Info,
+    Warn,
+    Error,
+    User,
+    None,
+}
+
 pub struct LvConfig {
     // Color
     color_depth: ColorDepth,
@@ -52,6 +61,50 @@ pub struct LvConfig {
     dither_gradient_error_diffusion: bool,
     disp_rot_max_buf: u128,
     // GPU
+    use_gpu_arm2d: bool,
+    use_gpu_stm32_dma2d: bool,
+    gpu_dma2d_cmsis_include: String,
+    use_gpu_swm341_dma2d: bool,
+    gpu_dma2d_swm341_include: String,
+    use_gpu_nxp_pxp: bool,
+    use_gpu_nxp_pxp_auto_init: bool,
+    use_gpu_nxp_vg_lite: bool,
+    use_gpu_sdl: bool,
+    gpu_sdl_include_path: String,
+    gpu_sdl_lru_size: u128,
+    gpu_sdl_custom_blend_mode: String,
+    // Logging
+    use_log: bool,
+    log_level: LogLevel,
+    log_printf: bool,
+    log_trace_mem: bool,
+    log_trace_timer: bool,
+    log_trace_indev: bool,
+    log_trace_disp_refr: bool,
+    log_trace_event: bool,
+    log_trace_obj_create: bool,
+    log_trace_layout: bool,
+    log_trace_anim: bool,
+    // Asserts
+    use_assert_null: bool,
+    use_assert_malloc: bool,
+    use_assert_style: bool,
+    use_assert_mem_integrity: bool,
+    use_assert_obj: bool,
+    assert_handler_include: String,
+    assert_handler: String,
+    // Others
+    use_perf_monitor: bool,
+    use_perf_monitor_pos: u8, // FIXME
+    use_mem_monitor: bool,
+    use_mem_monitor_pos: u8, // FIXME
+    use_refr_debugger: bool,
+    sprintf_custom: bool,
+    sprintf_custom_include: String,
+    snprintf: String,
+    vsnprintf: String,
+    sprintf_use_float: bool,
+    use_user_data: bool,
     
 }
 
