@@ -84,9 +84,9 @@ impl From<Color> for Rgb565 {
     }
 }
 
-impl Into<lvgl_sys::lv_color_t> for Color {
-    fn into(self) -> lvgl_sys::lv_color_t {
-        self.raw
+impl From<Color> for lvgl_sys::lv_color_t {
+    fn from(val: Color) -> Self {
+        val.raw
     }
 }
 
@@ -138,17 +138,17 @@ impl<S> TryFrom<lvgl_sys::lv_event_code_t> for Event<S> {
     type Error = ();
 
     fn try_from(value: lvgl_sys::lv_event_code_t) -> Result<Self, Self::Error> {
-        const LV_EVENT_PRESSED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESSED as u32;
-        const LV_EVENT_PRESSING: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESSING as u32;
-        const LV_EVENT_PRESS_LOST: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESS_LOST as u32;
-        const LV_EVENT_SHORT_CLICKED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_SHORT_CLICKED as u32;
-        const LV_EVENT_CLICKED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_CLICKED as u32;
-        const LV_EVENT_LONG_PRESSED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED as u32;
+        const LV_EVENT_PRESSED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESSED;
+        const LV_EVENT_PRESSING: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESSING;
+        const LV_EVENT_PRESS_LOST: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_PRESS_LOST;
+        const LV_EVENT_SHORT_CLICKED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_SHORT_CLICKED;
+        const LV_EVENT_CLICKED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_CLICKED;
+        const LV_EVENT_LONG_PRESSED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED;
         const LV_EVENT_LONG_PRESSED_REPEAT: u32 =
-            lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED_REPEAT as u32;
-        const LV_EVENT_RELEASED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_RELEASED as u32;
+            lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED_REPEAT;
+        const LV_EVENT_RELEASED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_RELEASED;
 
-        match value as u32 {
+        match value {
             LV_EVENT_PRESSED => Ok(Event::Pressed),
             LV_EVENT_PRESSING => Ok(Event::Pressing),
             LV_EVENT_PRESS_LOST => Ok(Event::PressLost),

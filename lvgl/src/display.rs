@@ -51,26 +51,32 @@ impl<'a> Display {
     }
 
     pub fn get_scr_act(&self) -> Result<Obj> {
-        Ok(get_str_act(Some(&self))?)
+        Ok(get_str_act(Some(self))?)
     }
 
+    /// Registers a display from raw functions and values.
+    /// 
+    /// # Safety
+    /// 
+    /// `hor_res` and `ver_res` must be nonzero, and the provided functions
+    /// must not themselves cause undefined behavior.
     pub unsafe fn register_raw<const N: usize>(
         draw_buffer: DrawBuffer<N>,
         hor_res: u32,
         ver_res: u32,
         flush_cb: Option<
             unsafe extern "C" fn(
-                *mut lvgl_sys::_lv_disp_drv_t,
+                *mut lvgl_sys::lv_disp_drv_t,
                 *const lvgl_sys::lv_area_t,
                 *mut lvgl_sys::lv_color16_t,
             ),
         >,
         rounder_cb: Option<
-            unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, *mut lvgl_sys::lv_area_t),
+            unsafe extern "C" fn(*mut lvgl_sys::lv_disp_drv_t, *mut lvgl_sys::lv_area_t),
         >,
         set_px_cb: Option<
             unsafe extern "C" fn(
-                *mut lvgl_sys::_lv_disp_drv_t,
+                *mut lvgl_sys::lv_disp_drv_t,
                 *mut u8,
                 lvgl_sys::lv_coord_t,
                 lvgl_sys::lv_coord_t,
@@ -79,12 +85,12 @@ impl<'a> Display {
                 lvgl_sys::lv_opa_t,
             ),
         >,
-        clear_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, *mut u8, u32)>,
-        monitor_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t, u32, u32)>,
-        wait_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
-        clean_dcache_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
-        drv_update_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
-        render_start_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
+        clear_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::lv_disp_drv_t, *mut u8, u32)>,
+        monitor_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::lv_disp_drv_t, u32, u32)>,
+        wait_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::lv_disp_drv_t)>,
+        clean_dcache_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::lv_disp_drv_t)>,
+        drv_update_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::lv_disp_drv_t)>,
+        render_start_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::lv_disp_drv_t)>,
         drop: Option<unsafe extern "C" fn()>,
     ) -> Result<Self> {
         let mut display_driver = DisplayDriver::new_raw(
@@ -139,15 +145,16 @@ pub struct DrawBuffer<const N: usize> {
     refresh_buffer: RefCell<[MaybeUninit<lvgl_sys::lv_color_t>; N]>,
 }
 
-impl<const N: usize> DrawBuffer<N> {
-    /// Initializes an empty `DrawBuffer`.
-    pub fn new() -> Self {
+impl<const N: usize> Default for DrawBuffer<N> {
+    fn default() -> Self {
         Self {
             initialized: RunOnce::new(),
             refresh_buffer: RefCell::new([MaybeUninit::uninit(); N]),
         }
     }
+}
 
+impl<const N: usize> DrawBuffer<N> {
     fn get_ptr(&self) -> Option<Box<lvgl_sys::lv_disp_draw_buf_t>> {
         if self.initialized.swap_and_check() {
             // TODO: needs to be 'static somehow
@@ -308,14 +315,13 @@ mod embedded_graphics_impl {
             // We use iterators here to ensure that the Rust compiler can apply all possible
             // optimizations at compile time.
             ys.enumerate()
-                .map(move |(iy, y)| {
+                .flat_map(move |(iy, y)| {
                     xs.clone().map(move |(ix, x)| {
                         let color_len = x_len * iy + ix;
                         let raw_color = self.colors[color_len];
                         Pixel(Point::new(x as i32, y as i32), raw_color.into())
                     })
                 })
-                .flatten()
         }
     }
 }
@@ -332,11 +338,9 @@ unsafe extern "C" fn disp_flush_trampoline<'a, F, const N: usize>(
         let callback = &mut *(display_driver.user_data as *mut F);
 
         let mut colors = [Color::default(); N];
-        let mut color_len = 0;
-        for color in &mut colors {
+        for (color_len, color) in colors.iter_mut().enumerate() {
             let lv_color = *color_p.add(color_len);
             *color = Color::from_raw(lv_color);
-            color_len += 1;
         }
 
         let update = DisplayRefresh {

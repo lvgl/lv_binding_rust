@@ -275,7 +275,7 @@ mod tests {
         const HOR_RES: u32 = 240;
         const VER_RES: u32 = 240;
         tests::initialize_test();
-        let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
+        let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
         let _disp = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES).unwrap();
     }
 }

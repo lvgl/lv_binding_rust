@@ -24,7 +24,7 @@ fn main() -> Result<(), LvError> {
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Meter Example", &output_settings);
 
-    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::new();
+    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
 
     let display = Display::register(buffer, HOR_RES, VER_RES, |refresh| {
         sim_display
