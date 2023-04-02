@@ -1,7 +1,7 @@
 [package]
 name = "lvgl-sys"
 description = "Raw bindings to the LVGL C library."
-version = "0.6.1"
+version = "0.6.2"
 authors = ["Rafael Caricio <crates.lvgl-sys@caric.io>"]
 edition = "2021"
 license = "MIT"
