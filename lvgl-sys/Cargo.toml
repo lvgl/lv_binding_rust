@@ -1,7 +1,7 @@
 [package]
 name = "lvgl-sys"
 description = "Raw bindings to the LVGL C library."
-version = "0.6.0"
+version = "0.6.1"
 authors = ["Rafael Caricio <crates.lvgl-sys@caric.io>"]
 edition = "2021"
 license = "MIT"
@@ -12,6 +12,13 @@ categories = ["external-ffi-bindings", "embedded", "gui", "no-std"]
 keywords = ["littlevgl", "lvgl"]
 build = "build.rs"
 links = "lvgl"
+exclude = [
+    "vendor/lvgl/demos",
+    "vendor/lvgl/tests",
+    "vendor/lvgl/examples",
+    "vendor/lvgl/docs",
+    "vendor/lvgl/scripts"
+]
 
 [lib]
 name = "lvgl_sys"
