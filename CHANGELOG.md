@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0]
+
 ### Added
 
 - Support pointer input devices #62
@@ -84,7 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No (direct) dependency on `clang-rs`
 
-[Unreleased]: https://github.com/rafaelcaricio/lvgl-rs/compare/0.5.2..HEAD
+[Unreleased]: https://github.com/rafaelcaricio/lvgl-rs/compare/0.6.0..HEAD
+[0.6.0]: https://github.com/rafaelcaricio/lvgl-rs/compare/0.5.2..0.6.0
 [0.5.2]: https://github.com/rafaelcaricio/lvgl-rs/compare/0.4.0..0.5.2
 [0.4.0]: https://github.com/rafaelcaricio/lvgl-rs/compare/0.3.1..0.4.0
 [0.3.1]: https://github.com/rafaelcaricio/lvgl-rs/compare/0.3.0..0.3.1
