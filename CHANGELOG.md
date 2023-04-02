@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support pointer input devices #62
+- Enable interop with [`lv_drivers`](https://github.com/lvgl/lv_drivers) #64
+- Allow using both custom and built-in fonts #76
+- Support setting the LVGL timer from Rust #81
+- Support building from Windows #55
+- Enable using the vendored LVGL config #56
+- Allow screen switching #57
+- Add examples for #64 and #81
+- Add a lot of documentation
+
+### Fixed
+
+- Example README now properly specifies how to run
+- No more undefined behavior if LVGL is not properly initialized
+- Fixed various miscompilations and counts of undefined behavior
+
+### Changed
+
+- Changed core API entirely #51
+- Updated LVGL to 8.3.5 #67
+- Updated dependencies #61
+
+### Removed
+
+- The `UI` struct and its related API
+
 ## [0.5.2] - 2021-03-06
 
 ### Added
@@ -14,16 +42,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expose RGB values from Color #29
 - Make lvgl possible to compile to WASM using Emscripten #31 (complete example available at [lvgl-rs-wasm](https://github.com/rafaelcaricio/lvgl-rs-wasm) and [live](https://rafaelcaricio.github.io/lvgl-rs-wasm/) on the web)
 
+### Fixed
+
+- Fix documentation generation, now we will be visible in docs.rs website 🥳 #41 
+- Fix compiler error when running the examples #40
+
 ### Changed
 
 - Updated README:
   - Added a hint to install SDL2 before running the demos on macOS #36
   - Add system dependencies for compilation #41
-
-### Fixed
-
-- Fix documentation generation, now we will be visible in docs.rs website 🥳 #41 
-- Fix compiler error when running the examples #40
 
 ## [0.4.0] - 2020-06-19
 

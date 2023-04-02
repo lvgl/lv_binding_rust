@@ -110,9 +110,9 @@ List of LVGL features that impacts the library usage in general.
 - [x] Events: You can listen and trigger events in widget objects.
 - [x] Styles: You can set styles in any exposed object. We are still missing the possibility of defining global base styles.
 - [x] Input Devices: Input devices supported by [`lv_drivers`](https://github.com/lvgl/lv_drivers)
-      can be used, and custom handlers can be specified for [`embedded_graphics`](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/).
+      can be used, and custom handlers can be specified for [`embedded_graphics`](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/). Currently, only pointer input devices are supported.
       **Note:** [`lv_drivers`](https://github.com/lvgl/lv_drivers) support is currently experimental.
-- [x] Fonts: All fonts built-in to LVGL can be used on nightly Rust if the `nightly` feature is enabled. Custom fonts can also be specified as TTF or encoded into a C file (see [the example `include`](https://github.com/rafaelcaricio/lvgl-rs/tree/master/examples/include)).
+- [x] Fonts: All fonts built-in to LVGL can be used on nightly Rust if the `nightly` feature is enabled. Custom fonts can also be encoded into a C file (see the documentation on the `font` module).
 - [ ] Images
 - [ ] File system
 - [ ] Animations
