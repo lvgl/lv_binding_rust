@@ -120,19 +120,19 @@ unsafe extern "C" fn read_input<F>(
                 (*data).state = match b {
                     InputState::Pressed(Data::Encoder(d)) => {
                         (*data).enc_diff = match d {
-                            EncoderInputData::Press => 0,
-                            EncoderInputData::LongPress => 1,
-                            EncoderInputData::TurnLeft => 2,
-                            EncoderInputData::TurnRight => 3,
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
                     InputState::Released(Data::Encoder(d)) => {
                         (*data).enc_diff = match d {
-                            EncoderInputData::Press => 0,
-                            EncoderInputData::LongPress => 1,
-                            EncoderInputData::TurnLeft => 2,
-                            EncoderInputData::TurnRight => 3,
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
@@ -144,19 +144,19 @@ unsafe extern "C" fn read_input<F>(
                 (*data).state = match b {
                     InputState::Pressed(Data::Encoder(d)) => {
                         (*data).enc_diff = match d {
-                            EncoderInputData::Press => 0,
-                            EncoderInputData::LongPress => 1,
-                            EncoderInputData::TurnLeft => 2,
-                            EncoderInputData::TurnRight => 3,
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
                     InputState::Released(Data::Encoder(d)) => {
                         (*data).enc_diff = match d {
-                            EncoderInputData::Press => 0,
-                            EncoderInputData::LongPress => 1,
-                            EncoderInputData::TurnLeft => 2,
-                            EncoderInputData::TurnRight => 3,
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
