@@ -58,6 +58,13 @@ impl InputDriver<Pointer> for Pointer {
         self.driver.as_mut()
     }
 
+    fn get_descriptor(&mut self) -> Option<&mut lvgl_sys::lv_indev_t> {
+        match self.descriptor {
+            Some(d) => unsafe { d.as_mut() },
+            None => None
+        }
+    }
+
     unsafe fn new_raw(
         read_cb: Option<
             unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, *mut lvgl_sys::lv_indev_data_t),
