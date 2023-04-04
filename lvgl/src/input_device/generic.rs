@@ -52,6 +52,9 @@ pub trait InputDriver<D> {
     /// Returns a pointer to the underlying raw driver.
     fn get_driver(&mut self) -> &mut lvgl_sys::lv_indev_drv_t;
 
+    /// Returns a pointer to the descriptor.
+    fn get_descriptor(&mut self) -> Option<&mut lvgl_sys::lv_indev_t>;
+
     /// Creates a new `InputDriver` from raw parts.
     ///
     /// # Safety
