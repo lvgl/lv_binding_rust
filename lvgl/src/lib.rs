@@ -43,6 +43,15 @@ pub(crate) mod mem;
 #[cfg(not(feature = "lvgl_alloc"))]
 use crate::mem::Box;
 
+#[cfg(not(feature = "embedded_graphics"))]
+pub mod point;
+
+#[cfg(not(feature = "embedded_graphics"))]
+use crate::point::Point;
+
+#[cfg(feature = "embedded_graphics")]
+use embedded_graphics::geometry::Point;
+
 use core::sync::atomic::{AtomicBool, Ordering};
 
 pub use display::*;

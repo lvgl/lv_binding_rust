@@ -1,3 +1,4 @@
+use super::encoder::*;
 use super::pointer::*;
 use crate::LvResult;
 
@@ -5,22 +6,27 @@ use crate::LvResult;
 /// based on the concrete type of the input device driver
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum Data {
+    /// Pointer-specific data.
     Pointer(PointerInputData),
+    /// Encoder-specific data.
+    Encoder(EncoderInputData),
 }
 
 /// Boolean states for an input.
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum InputState {
-    Released(Data),
+    /// Input device key is currently pressed down.
     Pressed(Data),
+    /// Input device key is currently released.
+    Released(Data),
 }
 
 impl InputState {
-    /// Represents a non-buffered input device.
+    /// Represents an input device with one entry in the buffer.
     pub fn once(self) -> BufferStatus {
         BufferStatus::Once(self)
     }
-    /// Represents a buffered input device.
+    /// Represents an input device with multiple entries in the buffer.
     pub fn and_continued(self) -> BufferStatus {
         BufferStatus::Buffered(self)
     }
@@ -29,16 +35,21 @@ impl InputState {
 /// Boolean buffering states for an input device driver.
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub enum BufferStatus {
+    /// One instance of `InputState` remains to be read.
     Once(InputState),
+    /// Multiple instances of `InputState` remain to be read.
     Buffered(InputState),
 }
 
 /// A generic input driver trait.
 pub trait InputDriver<D> {
+    /// Creates an instance of a given input device, given a handler function.
+    /// A `Display` must already have been created.
     fn register<F>(handler: F, display: &crate::Display) -> LvResult<D>
     where
         F: Fn() -> BufferStatus;
 
+    /// Returns a pointer to the underlying raw driver.
     fn get_driver(&mut self) -> &mut lvgl_sys::lv_indev_drv_t;
 
     /// Creates a new `InputDriver` from raw parts.

@@ -33,4 +33,5 @@
 mod generic;
 pub use generic::*;
 
+pub mod encoder;
 pub mod pointer;

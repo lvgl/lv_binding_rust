@@ -43,8 +43,7 @@ fn main() {
                 None
             }
         };
-    }
-    else {
+    } else {
         font_extra_src = None
     }
 
