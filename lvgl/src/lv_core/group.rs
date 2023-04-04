@@ -56,3 +56,23 @@ impl Drop for Group {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{Display, DrawBuffer};
+    use crate::widgets::Btn;
+
+    #[test]
+    fn group_test() {
+        const HOR_RES: u32 = 240;
+        const VER_RES: u32 = 240;
+
+        let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
+        let display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
+        let mut screen = display.get_scr_act().unwrap();
+        let mut group = Group::default();
+        let btn = Btn::create(&mut screen).unwrap();
+        group.add_obj(&btn).unwrap();
+    }
+}
