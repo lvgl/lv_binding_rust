@@ -188,9 +188,6 @@ pub enum PointerEvent {
     DragThrowBegin,
 }
 
-//pub(crate) unsafe extern "C" fn event_callback<T, F>(
-//obj: *mut lvgl_sys::lv_obj_t,
-//event: lvgl_sys::lv_event_code_t,
 pub(crate) unsafe extern "C" fn event_callback<T, F>(event: *mut lvgl_sys::lv_event_t)
 where
     T: Widget + Sized,

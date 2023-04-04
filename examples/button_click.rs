@@ -89,7 +89,6 @@ fn main() -> Result<(), LvError> {
                     point,
                 } => {
                     println!("Clicked on: {:?}", point);
-                    // Send a event to the button directly
                     latest_touch_point = point.clone();
                     latest_touch_status = PointerInputData::Touch(point).pressed().once();
                 }

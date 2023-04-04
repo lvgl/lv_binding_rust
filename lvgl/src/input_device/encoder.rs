@@ -1,34 +1,35 @@
 use super::{BufferStatus, Data, InputDriver, InputState};
-use crate::Point;
 use crate::Box;
 use crate::{LvError, LvResult};
 use core::mem::MaybeUninit;
 
-/// Pointer-specific input data. Contains the point clicked and the key.
+/// Encoder-specific input data. Contains the event.
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
-pub enum PointerInputData {
-    Touch(Point),
-    Key(u32),
+pub enum EncoderInputData {
+    Press,
+    LongPress,
+    TurnLeft,
+    TurnRight,
 }
 
-impl PointerInputData {
+impl EncoderInputData {
     pub fn pressed(self) -> InputState {
-        InputState::Pressed(Data::Pointer(self))
+        InputState::Pressed(Data::Encoder(self))
     }
 
     pub fn released(self) -> InputState {
-        InputState::Released(Data::Pointer(self))
+        InputState::Released(Data::Encoder(self))
     }
 }
 
-/// Represents a pointer-type input driver.
-pub struct Pointer {
+/// Represents an encoder-type input driver.
+pub struct Encoder {
     pub(crate) driver: Box<lvgl_sys::lv_indev_drv_t>,
     pub(crate) descriptor: Option<*mut lvgl_sys::lv_indev_t>,
 }
 
-impl InputDriver<Pointer> for Pointer {
-    fn register<F>(handler: F, _: &crate::Display) -> LvResult<Self>
+impl InputDriver<Encoder> for Encoder {
+    fn register<F>(handler: F, _: &crate::Display) -> LvResult<Encoder>
     where
         F: Fn() -> BufferStatus,
     {
@@ -36,7 +37,7 @@ impl InputDriver<Pointer> for Pointer {
             let mut indev_drv = MaybeUninit::uninit();
             lvgl_sys::lv_indev_drv_init(indev_drv.as_mut_ptr());
             let mut indev_drv = Box::new(indev_drv.assume_init());
-            indev_drv.type_ = lvgl_sys::lv_indev_type_t_LV_INDEV_TYPE_POINTER;
+            indev_drv.type_ = lvgl_sys::lv_indev_type_t_LV_INDEV_TYPE_ENCODER;
             indev_drv.read_cb = Some(read_input::<F>);
             indev_drv.feedback_cb = Some(feedback);
             indev_drv.user_data = Box::into_raw(Box::new(handler)) as *mut _;
@@ -60,16 +61,16 @@ impl InputDriver<Pointer> for Pointer {
 
     unsafe fn new_raw(
         read_cb: Option<
-            unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, *mut lvgl_sys::lv_indev_data_t),
+            unsafe extern "C" fn(*mut lvgl_sys::lv_indev_drv_t, *mut lvgl_sys::lv_indev_data_t),
         >,
-        feedback_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_indev_drv_t, u8)>,
+        feedback_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::lv_indev_drv_t, u8)>,
         _: &crate::Display,
-    ) -> LvResult<Self> {
+    ) -> LvResult<Encoder> {
         let driver = unsafe {
             let mut indev_drv = MaybeUninit::uninit();
             lvgl_sys::lv_indev_drv_init(indev_drv.as_mut_ptr());
             let mut indev_drv = Box::new(indev_drv.assume_init());
-            indev_drv.type_ = lvgl_sys::lv_indev_type_t_LV_INDEV_TYPE_POINTER;
+            indev_drv.type_ = lvgl_sys::lv_indev_type_t_LV_INDEV_TYPE_ENCODER;
             indev_drv.read_cb = read_cb;
             indev_drv.feedback_cb = feedback_cb;
             indev_drv
@@ -110,55 +111,49 @@ unsafe extern "C" fn read_input<F>(
         (*data).continue_reading = match info {
             BufferStatus::Once(b) => {
                 (*data).state = match b {
-                    InputState::Pressed(d) => {
-                        match d {
-                            Data::Pointer(PointerInputData::Touch(point)) => {
-                                (*data).point.x = point.x as lvgl_sys::lv_coord_t;
-                                (*data).point.y = point.y as lvgl_sys::lv_coord_t;
-                            }
-                            Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
-                        }
+                    InputState::Pressed(Data::Encoder(d)) => {
+                        (*data).enc_diff = match d {
+                            EncoderInputData::Press => 0,
+                            EncoderInputData::LongPress => 1,
+                            EncoderInputData::TurnLeft => 2,
+                            EncoderInputData::TurnRight => 3,
+                        };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
-                    InputState::Released(d) => {
-                        match d {
-                            Data::Pointer(PointerInputData::Touch(point)) => {
-                                (*data).point.x = point.x as lvgl_sys::lv_coord_t;
-                                (*data).point.y = point.y as lvgl_sys::lv_coord_t;
-                            }
-                            Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
-                        }
+                    InputState::Released(Data::Encoder(d)) => {
+                        (*data).enc_diff = match d {
+                            EncoderInputData::Press => 0,
+                            EncoderInputData::LongPress => 1,
+                            EncoderInputData::TurnLeft => 2,
+                            EncoderInputData::TurnRight => 3,
+                        };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
+                    _ => panic!("Non-encoder data returned from encoder device!"),
                 };
                 false
             }
             BufferStatus::Buffered(b) => {
                 (*data).state = match b {
-                    InputState::Pressed(d) => {
-                        match d {
-                            Data::Pointer(PointerInputData::Touch(point)) => {
-                                (*data).point.x = point.x as lvgl_sys::lv_coord_t;
-                                (*data).point.y = point.y as lvgl_sys::lv_coord_t;
-                            }
-                            Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
-                        }
+                    InputState::Pressed(Data::Encoder(d)) => {
+                        (*data).enc_diff = match d {
+                            EncoderInputData::Press => 0,
+                            EncoderInputData::LongPress => 1,
+                            EncoderInputData::TurnLeft => 2,
+                            EncoderInputData::TurnRight => 3,
+                        };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
-                    InputState::Released(d) => {
-                        match d {
-                            Data::Pointer(PointerInputData::Touch(point)) => {
-                                (*data).point.x = point.x as lvgl_sys::lv_coord_t;
-                                (*data).point.y = point.y as lvgl_sys::lv_coord_t;
-                            }
-                            Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
-                        }
+                    InputState::Released(Data::Encoder(d)) => {
+                        (*data).enc_diff = match d {
+                            EncoderInputData::Press => 0,
+                            EncoderInputData::LongPress => 1,
+                            EncoderInputData::TurnLeft => 2,
+                            EncoderInputData::TurnRight => 3,
+                        };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
+                    _ => panic!("Non-encoder data returned from encoder device!"),
                 };
                 true
             }
@@ -214,19 +209,17 @@ mod test {
     // We cannot test right now by having instances of UI global state... :(
     // I need to find a way to test while having global state...
     
-    fn pointer_input_device() {
+    fn encoder_input_device() {
         const HOR_RES: u32 = 240;
         const VER_RES: u32 = 240;
 
         let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
         let display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
 
-        fn read_touchpad_device() -> BufferStatus {
-            PointerInputData::Touch(Point::new(120, 23))
-                .pressed()
-                .once()
+        fn read_encoder_device() -> BufferStatus {
+            EncoderInputData::Press.pressed().once()
         }
 
-        let _touch_screen = Pointer::register(|| read_touchpad_device(), &display).unwrap();
+        let _encoder = Encoder::register(|| read_encoder_device(), &display).unwrap();
     }
 }
