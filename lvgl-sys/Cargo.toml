@@ -2,7 +2,7 @@
 name = "lvgl-sys"
 description = "Raw bindings to the LVGL C library."
 version = "0.6.2"
-authors = ["Rafael Caricio <crates.lvgl-sys@caric.io>"]
+authors = ["Rafael Caricio <crates.lvgl-sys@caric.io>", "Nia Espera <a5b6@riseup.net>"]
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/rafaelcaricio/lvgl-rs"

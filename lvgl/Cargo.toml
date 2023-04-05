@@ -2,7 +2,7 @@
 name = "lvgl"
 description = "LVGL bindings for Rust. A powerful and easy-to-use embedded GUI with many widgets, advanced visual effects (opacity, antialiasing, animations) and low memory requirements (16K RAM, 64K Flash)."
 version = "0.6.2"
-authors = ["Rafael Caricio <crates.lvgl@caric.io>"]
+authors = ["Rafael Caricio <crates.lvgl@caric.io>", "Nia Espera <a5b6@riseup.net>"]
 edition = "2021"
 repository = "https://github.com/rafaelcaricio/lvgl-rs"
 license = "MIT"
