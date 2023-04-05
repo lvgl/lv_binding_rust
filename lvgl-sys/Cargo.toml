@@ -17,7 +17,8 @@ exclude = [
     "vendor/lvgl/tests",
     "vendor/lvgl/examples",
     "vendor/lvgl/docs",
-    "vendor/lvgl/scripts"
+    "vendor/lvgl/scripts",
+    "vendor/lvgl/env_support",
 ]
 
 [lib]
