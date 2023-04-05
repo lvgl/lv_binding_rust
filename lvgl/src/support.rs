@@ -28,6 +28,18 @@ impl From<DisplayError> for LvError {
     }
 }
 
+impl From<LvError> for DisplayError {
+    fn from(err: LvError) -> Self {
+        use DisplayError::*;
+        match err {
+            LvError::InvalidReference => FailedToRegister,
+            LvError::Uninitialized => NotAvailable,
+            LvError::LvOOMemory => FailedToRegister,
+            LvError::AlreadyInUse => FailedToRegister,
+        }
+    }
+}
+
 /// An LVGL color. Equivalent to `lv_color_t`.
 #[derive(Copy, Clone, Default)]
 pub struct Color {
@@ -198,7 +210,7 @@ where
     // convert the lv_event_code_t to lvgl-rs Event type
     if let Ok(code) = code.try_into() {
         if let Some(obj_ptr) = NonNull::new(obj) {
-            let object = T::from_raw(obj_ptr);
+            let object = T::from_raw(obj_ptr).unwrap();
             // get the pointer from the Rust callback closure FnMut provided by users
             let user_closure = &mut *((*obj).user_data as *mut F);
             // call user callback closure

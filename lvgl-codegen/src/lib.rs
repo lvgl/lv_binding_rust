@@ -113,7 +113,7 @@ impl Rusty for LvFunc {
                             parent.raw()?.as_mut(),
                         );
                         if let Some(raw) = core::ptr::NonNull::new(ptr) {
-                            let core = <crate::Obj as crate::Widget>::from_raw(raw);
+                            let core = <crate::Obj as crate::Widget>::from_raw(raw).unwrap();
                             Ok(Self { core })
                         } else {
                             Err(crate::LvError::InvalidReference)
@@ -656,7 +656,7 @@ mod test {
                             parent.raw()?.as_mut(),
                         );
                         if let Some(raw) = core::ptr::NonNull::new(ptr) {
-                            let core = <crate::Obj as crate::Widget>::from_raw(raw);
+                            let core = <crate::Obj as crate::Widget>::from_raw(raw).unwrap();
                             Ok(Self { core })
                         } else {
                             Err(crate::LvError::InvalidReference)

@@ -35,12 +35,12 @@ impl NativeObject for Obj {
 }
 
 /// A wrapper for all LVGL common operations on generic objects.
-pub trait Widget: NativeObject {
+pub trait Widget: NativeObject + Sized {
     type SpecialEvent;
     type Part: Into<lvgl_sys::lv_part_t>;
 
     /// Construct an instance of the object from a raw pointer.
-    fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self;
+    fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
 
     /// Adds a `Style` to a given widget.
     fn add_style(&mut self, part: Self::Part, style: &mut Style) -> LvResult<()> {
@@ -112,8 +112,8 @@ impl Widget for Obj {
     type SpecialEvent = u32;
     type Part = Part;
 
-    fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
-        Self { raw: raw.as_ptr() }
+    fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
+        Some(Self { raw: raw.as_ptr() })
     }
 }
 
@@ -177,10 +177,10 @@ macro_rules! define_object {
             type SpecialEvent = $event_type;
             type Part = $part_type;
 
-            fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Self {
-                Self {
-                    core: $crate::Obj::from_raw(raw_pointer),
-                }
+            fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
+                Some(Self {
+                    core: $crate::Obj::from_raw(raw_pointer).unwrap(),
+                })
             }
         }
     };
