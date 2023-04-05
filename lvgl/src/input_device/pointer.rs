@@ -1,6 +1,6 @@
 use super::{BufferStatus, Data, InputDriver, InputState};
-use crate::Point;
 use crate::Box;
+use crate::Point;
 use crate::{LvError, LvResult};
 use core::mem::MaybeUninit;
 
@@ -61,7 +61,7 @@ impl InputDriver<Pointer> for Pointer {
     fn get_descriptor(&mut self) -> Option<&mut lvgl_sys::lv_indev_t> {
         match self.descriptor {
             Some(d) => unsafe { d.as_mut() },
-            None => None
+            None => None,
         }
     }
 
@@ -124,7 +124,7 @@ unsafe extern "C" fn read_input<F>(
                                 (*data).point.y = point.y as lvgl_sys::lv_coord_t;
                             }
                             Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
+                            _ => panic!("Non-pointer data returned from pointer device!"),
                         }
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
@@ -135,7 +135,7 @@ unsafe extern "C" fn read_input<F>(
                                 (*data).point.y = point.y as lvgl_sys::lv_coord_t;
                             }
                             Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
+                            _ => panic!("Non-pointer data returned from pointer device!"),
                         }
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
@@ -151,7 +151,7 @@ unsafe extern "C" fn read_input<F>(
                                 (*data).point.y = point.y as lvgl_sys::lv_coord_t;
                             }
                             Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
+                            _ => panic!("Non-pointer data returned from pointer device!"),
                         }
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
@@ -162,7 +162,7 @@ unsafe extern "C" fn read_input<F>(
                                 (*data).point.y = point.y as lvgl_sys::lv_coord_t;
                             }
                             Data::Pointer(PointerInputData::Key(_)) => {}
-                            _ => panic!("Non-pointer data returned from pointer device!")
+                            _ => panic!("Non-pointer data returned from pointer device!"),
                         }
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
@@ -218,9 +218,6 @@ mod test {
     }
 
     #[test]
-    // We cannot test right now by having instances of UI global state... :(
-    // I need to find a way to test while having global state...
-    
     fn pointer_input_device() {
         const HOR_RES: u32 = 240;
         const VER_RES: u32 = 240;

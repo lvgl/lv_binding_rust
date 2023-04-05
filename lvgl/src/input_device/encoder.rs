@@ -62,7 +62,7 @@ impl InputDriver<Encoder> for Encoder {
     fn get_descriptor(&mut self) -> Option<&mut lvgl_sys::lv_indev_t> {
         match self.descriptor {
             Some(d) => unsafe { d.as_mut() },
-            None => None
+            None => None,
         }
     }
 
@@ -119,20 +119,20 @@ unsafe extern "C" fn read_input<F>(
             BufferStatus::Once(b) => {
                 (*data).state = match b {
                     InputState::Pressed(Data::Encoder(d)) => {
-                        (*data).enc_diff = match d {
-                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
-                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
+                        (*data).key = match d {
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT,
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT,
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
                     InputState::Released(Data::Encoder(d)) => {
-                        (*data).enc_diff = match d {
-                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
-                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
+                        (*data).key = match d {
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT,
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT,
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
@@ -143,20 +143,20 @@ unsafe extern "C" fn read_input<F>(
             BufferStatus::Buffered(b) => {
                 (*data).state = match b {
                     InputState::Pressed(Data::Encoder(d)) => {
-                        (*data).enc_diff = match d {
-                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
-                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
+                        (*data).key = match d {
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT,
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT,
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_PRESSED
                     }
                     InputState::Released(Data::Encoder(d)) => {
-                        (*data).enc_diff = match d {
-                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER.try_into().unwrap(),
-                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT.try_into().unwrap(),
-                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT.try_into().unwrap(),
+                        (*data).key = match d {
+                            EncoderInputData::Press => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::LongPress => lvgl_sys::LV_KEY_ENTER,
+                            EncoderInputData::TurnLeft => lvgl_sys::LV_KEY_LEFT,
+                            EncoderInputData::TurnRight => lvgl_sys::LV_KEY_RIGHT,
                         };
                         lvgl_sys::lv_indev_state_t_LV_INDEV_STATE_RELEASED
                     }
@@ -213,9 +213,6 @@ mod test {
     }
 
     #[test]
-    // We cannot test right now by having instances of UI global state... :(
-    // I need to find a way to test while having global state...
-    
     fn encoder_input_device() {
         const HOR_RES: u32 = 240;
         const VER_RES: u32 = 240;
