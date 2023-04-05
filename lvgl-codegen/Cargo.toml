@@ -2,7 +2,7 @@
 name = "lvgl-codegen"
 version = "0.6.2"
 description = "Code generation based on LVGL source code"
-authors = ["Rafael Caricio <crates.lvgl@caric.io>"]
+authors = ["Rafael Caricio <crates.lvgl@caric.io>", "Nia Espera <a5b6@riseup.net>"]
 readme = "README.md"
 edition = "2021"
 license = "MIT"
