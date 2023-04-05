@@ -28,7 +28,7 @@ fn main() -> LvResult<()> {
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((0, 0, 0)));
-    screen.add_style(Part::Main, &mut screen_style)?;
+    screen.as_mut().add_style(Part::Main, &mut screen_style)?;
     // Create the button
     let mut button = Btn::create(&mut screen)?;
     button.set_align(Align::LeftMid, 30, 0)?;

@@ -1,6 +1,7 @@
 use crate::functions::CoreError;
-use crate::{disp_drv_register, disp_get_default, get_str_act, RunOnce};
-use crate::{Box, Color, Obj};
+use crate::{disp_drv_register, disp_get_default, get_str_act, RunOnce, NativeObject, LvResult};
+use crate::Screen;
+use crate::{Box, Color};
 use core::cell::RefCell;
 use core::convert::TryInto;
 use core::mem::MaybeUninit;
@@ -50,8 +51,18 @@ impl<'a> Display {
         Ok(disp_drv_register(&mut display_diver, None)?)
     }
 
-    pub fn get_scr_act(&self) -> Result<Obj> {
-        Ok(get_str_act(Some(self))?)
+    /// Returns the current active screen.
+    pub fn get_scr_act(&self) -> Result<Screen> {
+        Ok(get_str_act(Some(self))?.try_into()?)
+    }
+
+    /// Sets a `Screen` as currently active.
+    pub fn set_scr_act(&mut self, screen: Screen) -> LvResult<()> {
+        let scr_ptr = unsafe { screen.raw()?.as_mut() };
+        unsafe {
+            lvgl_sys::lv_disp_load_scr(scr_ptr)
+        }
+        Ok(())
     }
 
     /// Registers a display from raw functions and values.
@@ -131,8 +142,8 @@ pub(crate) struct DefaultDisplay {}
 
 impl DefaultDisplay {
     /// Gets the active screen of the default display.
-    pub(crate) fn get_scr_act() -> Result<Obj> {
-        Ok(get_str_act(None)?)
+    pub(crate) fn get_scr_act() -> Result<Screen> {
+        Ok(get_str_act(None)?.try_into()?)
     }
 }
 

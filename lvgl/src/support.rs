@@ -28,6 +28,18 @@ impl From<DisplayError> for LvError {
     }
 }
 
+impl From<LvError> for DisplayError {
+    fn from(err: LvError) -> Self {
+        use DisplayError::*;
+        match err {
+            LvError::InvalidReference => FailedToRegister,
+            LvError::Uninitialized => NotAvailable,
+            LvError::LvOOMemory => FailedToRegister,
+            LvError::AlreadyInUse => FailedToRegister,
+        }
+    }
+}
+
 /// An LVGL color. Equivalent to `lv_color_t`.
 #[derive(Copy, Clone, Default)]
 pub struct Color {
