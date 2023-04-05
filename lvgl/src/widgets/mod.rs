@@ -9,6 +9,7 @@
 mod bar;
 mod label;
 mod meter;
+mod keyboard;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -17,3 +18,4 @@ use crate::NativeObject;
 pub use bar::*;
 pub use label::*;
 pub use meter::*;
+pub use keyboard::*;
