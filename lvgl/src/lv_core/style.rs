@@ -60,7 +60,7 @@ bitflags! {
 
 impl From<Opacity> for u8 {
     fn from(self_: Opacity) -> u8 {
-        self_.bits as u8
+        self_.bits() as u8
     }
 }
 
