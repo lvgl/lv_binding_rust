@@ -38,7 +38,7 @@ fn main() -> Result<(), LvError> {
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((255, 255, 255)));
     screen_style.set_radius(0);
-    screen.as_mut().add_style(Part::Main, &mut screen_style)?;
+    screen.add_style(Part::Main, &mut screen_style)?;
 
     // Create the bar object
     let mut bar = Bar::create(&mut screen)?;

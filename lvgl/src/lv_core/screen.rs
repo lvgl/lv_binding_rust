@@ -1,4 +1,4 @@
-use crate::{LvError, NativeObject, Obj};
+use crate::{Part, LvError, NativeObject, Obj, Widget};
 
 /// An LVGL screen.
 pub struct Screen {
@@ -14,6 +14,18 @@ impl Default for Screen {
 impl NativeObject for Screen {
     fn raw(&self) -> crate::LvResult<core::ptr::NonNull<lvgl_sys::lv_obj_t>> {
         self.raw.raw()
+    }
+}
+
+impl Widget for Screen {
+    type SpecialEvent = u32;
+    type Part = Part;
+
+    fn from_raw(raw: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
+        match Self::try_from(Obj::from_raw(raw)?) {
+            Ok(s) => Some(s),
+            Err(_) => None,
+        }
     }
 }
 

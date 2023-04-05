@@ -41,7 +41,7 @@ fn main() -> Result<(), LvError> {
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((0, 0, 0)));
     screen_style.set_radius(0);
-    screen.as_mut().add_style(Part::Main, &mut screen_style)?;
+    screen.add_style(Part::Main, &mut screen_style)?;
 
     let mut time = Label::from("20:46");
     let mut style_time = Style::default();

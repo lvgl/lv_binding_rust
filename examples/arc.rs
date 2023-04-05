@@ -52,7 +52,7 @@ fn main() -> Result<(), LvError> {
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((255, 255, 255)));
     screen_style.set_radius(0);
-    screen.as_mut().add_style(Part::Main, &mut screen_style)?;
+    screen.add_style(Part::Main, &mut screen_style)?;
 
     // Create the arc object
     let mut arc = Arc::create(&mut screen)?;
