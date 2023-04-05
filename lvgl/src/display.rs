@@ -57,7 +57,7 @@ impl<'a> Display {
     }
 
     /// Sets a `Screen` as currently active.
-    pub fn set_scr_act(&mut self, screen: Screen) -> LvResult<()> {
+    pub fn set_scr_act(&mut self, screen: &mut Screen) -> LvResult<()> {
         let scr_ptr = unsafe { screen.raw()?.as_mut() };
         unsafe {
             lvgl_sys::lv_disp_load_scr(scr_ptr)

@@ -196,7 +196,6 @@ macro_rules! gen_lv_style {
     };
 }
 
-// TODO: Move this into lvgl-codegen
 impl Style {
     gen_lv_style!(set_align, u8);
     //gen_lv_style!(set_anim, );

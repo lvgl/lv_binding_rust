@@ -57,3 +57,22 @@ impl AsMut<Obj> for Screen {
         &mut self.raw
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{Display, DrawBuffer};
+
+    #[test]
+    fn screen_test() {
+        const HOR_RES: u32 = 240;
+        const VER_RES: u32 = 240;
+
+        let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
+        let mut display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
+        let mut screen_old = display.get_scr_act().unwrap();
+        let mut screen_new = Screen::default();
+        display.set_scr_act(&mut screen_new).unwrap();
+        display.set_scr_act(&mut screen_old).unwrap();
+    }
+}
