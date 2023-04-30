@@ -105,7 +105,20 @@ pub struct LvConfig {
     vsnprintf: String,
     sprintf_use_float: bool,
     use_user_data: bool,
-    
+    enable_gc: bool,
+    gc_include: String,
+    big_endian_system: bool,
+    attribute_tick_inc: Option<String>,
+    attribute_timer_handler: Option<String>,
+    attribute_flush_ready: Option<String>,
+    attribute_mem_align_size: u32,
+    attribute_mem_align: Option<String>,
+    attribute_large_const: Option<String>,
+    attribute_large_ram_array: Option<String>,
+    attribute_fast_mem: Option<String>,
+    attribute_dma: Option<String>,
+    export_const_int: u8, //FIXME
+    use_large_coord: bool,
 }
 
 pub struct DrvConfig {
