@@ -79,7 +79,7 @@ impl<'a> Display {
             unsafe extern "C" fn(
                 *mut lvgl_sys::lv_disp_drv_t,
                 *const lvgl_sys::lv_area_t,
-                *mut lvgl_sys::lv_color16_t,
+                *mut lvgl_sys::lv_color_t,
             ),
         >,
         rounder_cb: Option<
@@ -232,7 +232,7 @@ impl<'a, const N: usize> DisplayDriver<N> {
             unsafe extern "C" fn(
                 *mut lvgl_sys::_lv_disp_drv_t,
                 *const lvgl_sys::lv_area_t,
-                *mut lvgl_sys::lv_color16_t,
+                *mut lvgl_sys::lv_color_t,
             ),
         >,
         rounder_cb: Option<
