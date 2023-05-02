@@ -101,6 +101,7 @@ impl From<Layout> for u16 {
 
 /// A coordinate array, for use with `set_grid_*_dsc_array()` methods on
 /// `Style` objects.
+#[derive(Clone)]
 pub struct CoordDesc {
     inner: Box<[i16; 3]>
 }
@@ -111,6 +112,11 @@ impl CoordDesc {
         Self {
             inner: Box::new([x, y, z])
         }
+    }
+
+    /// Returns the values contained.
+    pub fn values(&self) -> [i16; 3] {
+        *self.clone().inner
     }
 }
 
