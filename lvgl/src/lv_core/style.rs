@@ -15,7 +15,7 @@
 //! All methods on the `Style` type directly lower to their C LVGL
 //! counterparts.
 
-use crate::{font::Font, Box, Color, TextAlign};
+use crate::{font::Font, Align, Box, Color, TextAlign};
 use core::mem;
 use cty::c_uint;
 use paste::paste;
@@ -24,6 +24,8 @@ pub enum Themes {
     Pretty,
 }
 
+/// An LVGL `lv_style_t`. Allows for styling objects. Once created, a `Style`
+/// should be configured and then added to an object.
 #[derive(Clone)]
 pub struct Style {
     pub(crate) raw: Box<lvgl_sys::lv_style_t>,
@@ -41,6 +43,7 @@ impl Default for Style {
 }
 
 bitflags! {
+    /// Represents possible opacities for use on `Style` objects.
     pub struct Opacity: u32 {
         const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP;
         const OPA_0 = lvgl_sys::LV_OPA_0;
@@ -59,12 +62,80 @@ bitflags! {
 }
 
 impl From<Opacity> for u8 {
-    fn from(self_: Opacity) -> u8 {
-        self_.bits() as u8
+    fn from(value: Opacity) -> u8 {
+        value.bits() as u8
+    }
+}
+
+/// Represents a `Layout`, to be used with the `set_layout()` method on `Style`
+/// objects.
+pub struct Layout {
+    inner: u16
+}
+
+impl Layout {
+    /// Generates an `LV_LAYOUT_FLEX`
+    pub fn flex() -> Self {
+        Self {
+            inner: unsafe {
+                lvgl_sys::LV_LAYOUT_FLEX
+            }
+        }
+    }
+
+    /// Generates an `LV_LAYOUT_GRID`
+    pub fn grid() -> Self {
+        Self {
+            inner: unsafe {
+                lvgl_sys::LV_LAYOUT_GRID
+            }
+        }
+    }
+}
+
+impl From<Layout> for u16 {
+    fn from(value: Layout) -> Self {
+        value.inner
+    }
+}
+
+/// A coordinate array, for use with `set_grid_*_dsc_array()` methods on
+/// `Style` objects.
+#[derive(Clone)]
+#[repr(C)]
+pub struct CoordDesc<const N: usize> {
+    inner: [i16; N],
+    tail: i16,
+}
+
+impl<const N: usize> CoordDesc<N> {
+    /// Generates a `CoordDesc` from values.
+    /// 
+    /// # Safety
+    /// 
+    /// `N` must be at least as long as LVGL expects. See the LVGL docs for
+    /// details.
+    pub unsafe fn from_values(values: [i16; N], is_grid: bool) -> Self {
+        Self {
+            inner: values,
+            tail: if is_grid { lvgl_sys::LV_GRID_TEMPLATE_LAST.try_into().unwrap() } else { 0b0 }
+        }
+    }
+
+    /// Returns the values contained.
+    pub fn values(&self) -> [i16; N] {
+        self.clone().inner
+    }
+}
+
+impl<const N: usize> From<&CoordDesc<N>> for *const i16 {
+    fn from(value: &CoordDesc<N>) -> Self {
+        value as *const _ as *const i16 
     }
 }
 
 bitflags! {
+    /// Various constants relevant for `Style` parameters 
     pub struct StyleProp: u32 {
         const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV;
 
@@ -196,8 +267,24 @@ macro_rules! gen_lv_style {
     };
 }
 
+macro_rules! gen_lv_style_generic {
+    ($func_name:ident,$vty:ty) => {
+        paste! {
+            #[inline]
+            pub fn $func_name<const N: usize>(&mut self, value: &$vty<N>) {
+                unsafe {
+                    lvgl_sys::[<lv_style_ $func_name>](
+                        self.raw.as_mut(),
+                        value.into(),
+                    );
+                }
+            }
+        }
+    };
+}
+
 impl Style {
-    gen_lv_style!(set_align, u8);
+    gen_lv_style!(set_align, Align);
     //gen_lv_style!(set_anim, );
     //gen_lv_style!(set_anim_speed, );
     //gen_lv_style!(set_anim_time, );
@@ -241,14 +328,14 @@ impl Style {
     gen_lv_style!(set_grid_cell_x_align, i16);
     gen_lv_style!(set_grid_cell_y_align, i16);
     gen_lv_style!(set_grid_column_align, c_uint);
-    //gen_lv_style!(set_grid_column_dsc_array, );
+    gen_lv_style_generic!(set_grid_column_dsc_array, CoordDesc);
     gen_lv_style!(set_grid_row_align, c_uint);
-    //gen_lv_style!(set_grid_row_dsc_array, );
+    gen_lv_style_generic!(set_grid_row_dsc_array, CoordDesc);
     gen_lv_style!(set_height, i16);
     gen_lv_style!(set_img_opa, Opacity);
     gen_lv_style!(set_img_recolor, Color);
     gen_lv_style!(set_img_recolor_opa, Opacity);
-    gen_lv_style!(set_layout, u16);
+    gen_lv_style!(set_layout, Layout);
     gen_lv_style!(set_line_color, Color);
     gen_lv_style!(set_line_dash_gap, i16);
     gen_lv_style!(set_line_dash_width, i16);
