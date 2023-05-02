@@ -59,8 +59,58 @@ bitflags! {
 }
 
 impl From<Opacity> for u8 {
-    fn from(self_: Opacity) -> u8 {
-        self_.bits() as u8
+    fn from(value: Opacity) -> u8 {
+        value.bits() as u8
+    }
+}
+
+/// Represents a `Layout`, to be used with the `set_layout()` method on `Style`
+/// objects.
+pub struct Layout {
+    inner: u16
+}
+
+impl Layout {
+    pub fn flex() -> Self {
+        Self {
+            inner: unsafe {
+                lvgl_sys::LV_LAYOUT_FLEX
+            }
+        }
+    }
+
+    pub fn grid() -> Self {
+        Self {
+            inner: unsafe {
+                lvgl_sys::LV_LAYOUT_GRID
+            }
+        }
+    }
+}
+
+impl From<Layout> for u16 {
+    fn from(value: Layout) -> Self {
+        value.inner
+    }
+}
+
+/// A coordinate array, for use with `set_grid_*_dsc_array()` methods on
+/// `Style` objects.
+pub struct CoordDesc {
+    inner: Box<[i16; 3]>
+}
+
+impl CoordDesc {
+    pub fn from_values(x: i16, y: i16, z: i16) -> Self {
+        Self {
+            inner: Box::new([x, y, z])
+        }
+    }
+}
+
+impl From<CoordDesc> for *const i16 {
+    fn from(value: CoordDesc) -> Self {
+        value.inner.as_ptr()
     }
 }
 
@@ -241,14 +291,14 @@ impl Style {
     gen_lv_style!(set_grid_cell_x_align, i16);
     gen_lv_style!(set_grid_cell_y_align, i16);
     gen_lv_style!(set_grid_column_align, c_uint);
-    //gen_lv_style!(set_grid_column_dsc_array, );
+    gen_lv_style!(set_grid_column_dsc_array, CoordDesc);
     gen_lv_style!(set_grid_row_align, c_uint);
-    //gen_lv_style!(set_grid_row_dsc_array, );
+    gen_lv_style!(set_grid_row_dsc_array, CoordDesc);
     gen_lv_style!(set_height, i16);
     gen_lv_style!(set_img_opa, Opacity);
     gen_lv_style!(set_img_recolor, Color);
     gen_lv_style!(set_img_recolor_opa, Opacity);
-    gen_lv_style!(set_layout, u16);
+    gen_lv_style!(set_layout, Layout);
     gen_lv_style!(set_line_color, Color);
     gen_lv_style!(set_line_dash_gap, i16);
     gen_lv_style!(set_line_dash_width, i16);
