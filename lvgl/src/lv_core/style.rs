@@ -102,26 +102,31 @@ impl From<Layout> for u16 {
 /// A coordinate array, for use with `set_grid_*_dsc_array()` methods on
 /// `Style` objects.
 #[derive(Clone)]
-pub struct CoordDesc {
-    inner: Box<[i16; 3]>
+pub struct CoordDesc<const N: usize> {
+    inner: Box<[i16; N]>
 }
 
-impl CoordDesc {
-    /// Generates a `CoordDesc` from 3 values.
-    pub fn from_values(x: i16, y: i16, z: i16) -> Self {
+impl<const N: usize> CoordDesc<N> {
+    /// Generates a `CoordDesc` from values.
+    /// 
+    /// # Safety
+    /// 
+    /// `N` must be at least as long as LVGL expects. See the LVGL docs for
+    /// details.
+    pub unsafe fn from_values(values: [i16; N]) -> Self {
         Self {
-            inner: Box::new([x, y, z])
+            inner: Box::new(values)
         }
     }
 
     /// Returns the values contained.
-    pub fn values(&self) -> [i16; 3] {
+    pub fn values(&self) -> [i16; N] {
         *self.clone().inner
     }
 }
 
-impl From<CoordDesc> for *const i16 {
-    fn from(value: CoordDesc) -> Self {
+impl<const N: usize> From<CoordDesc<N>> for *const i16 {
+    fn from(value: CoordDesc<N>) -> Self {
         value.inner.as_ptr()
     }
 }
@@ -259,6 +264,22 @@ macro_rules! gen_lv_style {
     };
 }
 
+macro_rules! gen_lv_style_generic {
+    ($func_name:ident,$vty:ty) => {
+        paste! {
+            #[inline]
+            pub fn $func_name<const N: usize>(&mut self, value: $vty<N>) {
+                unsafe {
+                    lvgl_sys::[<lv_style_ $func_name>](
+                        self.raw.as_mut(),
+                        value.into(),
+                    );
+                }
+            }
+        }
+    };
+}
+
 impl Style {
     gen_lv_style!(set_align, Align);
     //gen_lv_style!(set_anim, );
@@ -304,9 +325,9 @@ impl Style {
     gen_lv_style!(set_grid_cell_x_align, i16);
     gen_lv_style!(set_grid_cell_y_align, i16);
     gen_lv_style!(set_grid_column_align, c_uint);
-    gen_lv_style!(set_grid_column_dsc_array, CoordDesc);
+    gen_lv_style_generic!(set_grid_column_dsc_array, CoordDesc);
     gen_lv_style!(set_grid_row_align, c_uint);
-    gen_lv_style!(set_grid_row_dsc_array, CoordDesc);
+    gen_lv_style_generic!(set_grid_row_dsc_array, CoordDesc);
     gen_lv_style!(set_height, i16);
     gen_lv_style!(set_img_opa, Opacity);
     gen_lv_style!(set_img_recolor, Color);
