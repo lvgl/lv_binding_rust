@@ -102,8 +102,10 @@ impl From<Layout> for u16 {
 /// A coordinate array, for use with `set_grid_*_dsc_array()` methods on
 /// `Style` objects.
 #[derive(Clone)]
+#[repr(C)]
 pub struct CoordDesc<const N: usize> {
-    inner: Box<[i16; N]>
+    inner: [i16; N],
+    tail: i16,
 }
 
 impl<const N: usize> CoordDesc<N> {
@@ -113,21 +115,22 @@ impl<const N: usize> CoordDesc<N> {
     /// 
     /// `N` must be at least as long as LVGL expects. See the LVGL docs for
     /// details.
-    pub unsafe fn from_values(values: [i16; N]) -> Self {
+    pub unsafe fn from_values(values: [i16; N], is_grid: bool) -> Self {
         Self {
-            inner: Box::new(values)
+            inner: values,
+            tail: if is_grid { lvgl_sys::LV_GRID_TEMPLATE_LAST.try_into().unwrap() } else { 0b0 }
         }
     }
 
     /// Returns the values contained.
     pub fn values(&self) -> [i16; N] {
-        *self.clone().inner
+        self.clone().inner
     }
 }
 
-impl<const N: usize> From<CoordDesc<N>> for *const i16 {
-    fn from(value: CoordDesc<N>) -> Self {
-        value.inner.as_ptr()
+impl<const N: usize> From<&CoordDesc<N>> for *const i16 {
+    fn from(value: &CoordDesc<N>) -> Self {
+        value as *const _ as *const i16 
     }
 }
 
@@ -268,7 +271,7 @@ macro_rules! gen_lv_style_generic {
     ($func_name:ident,$vty:ty) => {
         paste! {
             #[inline]
-            pub fn $func_name<const N: usize>(&mut self, value: $vty<N>) {
+            pub fn $func_name<const N: usize>(&mut self, value: &$vty<N>) {
                 unsafe {
                     lvgl_sys::[<lv_style_ $func_name>](
                         self.raw.as_mut(),
