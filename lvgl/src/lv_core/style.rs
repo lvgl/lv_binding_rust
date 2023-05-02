@@ -15,7 +15,7 @@
 //! All methods on the `Style` type directly lower to their C LVGL
 //! counterparts.
 
-use crate::{font::Font, Box, Color, TextAlign};
+use crate::{font::Font, Align, Box, Color, TextAlign};
 use core::mem;
 use cty::c_uint;
 use paste::paste;
@@ -24,6 +24,8 @@ pub enum Themes {
     Pretty,
 }
 
+/// An LVGL `lv_style_t`. Allows for styling objects. Once created, a `Style`
+/// should be configured and then added to an object.
 #[derive(Clone)]
 pub struct Style {
     pub(crate) raw: Box<lvgl_sys::lv_style_t>,
@@ -41,6 +43,7 @@ impl Default for Style {
 }
 
 bitflags! {
+    /// Represents possible opacities for use on `Style` objects.
     pub struct Opacity: u32 {
         const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP;
         const OPA_0 = lvgl_sys::LV_OPA_0;
@@ -71,6 +74,7 @@ pub struct Layout {
 }
 
 impl Layout {
+    /// Generates an `LV_LAYOUT_FLEX`
     pub fn flex() -> Self {
         Self {
             inner: unsafe {
@@ -79,6 +83,7 @@ impl Layout {
         }
     }
 
+    /// Generates an `LV_LAYOUT_GRID`
     pub fn grid() -> Self {
         Self {
             inner: unsafe {
@@ -101,6 +106,7 @@ pub struct CoordDesc {
 }
 
 impl CoordDesc {
+    /// Generates a `CoordDesc` from 3 values.
     pub fn from_values(x: i16, y: i16, z: i16) -> Self {
         Self {
             inner: Box::new([x, y, z])
@@ -115,6 +121,7 @@ impl From<CoordDesc> for *const i16 {
 }
 
 bitflags! {
+    /// Various constants relevant for `Style` parameters 
     pub struct StyleProp: u32 {
         const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV;
 
@@ -247,7 +254,7 @@ macro_rules! gen_lv_style {
 }
 
 impl Style {
-    gen_lv_style!(set_align, u8);
+    gen_lv_style!(set_align, Align);
     //gen_lv_style!(set_anim, );
     //gen_lv_style!(set_anim_speed, );
     //gen_lv_style!(set_anim_time, );
