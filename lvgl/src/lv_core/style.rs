@@ -88,25 +88,21 @@ impl From<GridAlign> for c_uint {
 /// Represents a `Layout`, to be used with the `set_layout()` method on `Style`
 /// objects.
 pub struct Layout {
-    inner: u16
+    inner: u16,
 }
 
 impl Layout {
     /// Generates an `LV_LAYOUT_FLEX`
     pub fn flex() -> Self {
         Self {
-            inner: unsafe {
-                lvgl_sys::LV_LAYOUT_FLEX
-            }
+            inner: unsafe { lvgl_sys::LV_LAYOUT_FLEX },
         }
     }
 
     /// Generates an `LV_LAYOUT_GRID`
     pub fn grid() -> Self {
         Self {
-            inner: unsafe {
-                lvgl_sys::LV_LAYOUT_GRID
-            }
+            inner: unsafe { lvgl_sys::LV_LAYOUT_GRID },
         }
     }
 }
@@ -128,15 +124,19 @@ pub struct CoordDesc<const N: usize> {
 
 impl<const N: usize> CoordDesc<N> {
     /// Generates a `CoordDesc` from values.
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// `N` must be at least as long as LVGL expects. See the LVGL docs for
     /// details.
     pub unsafe fn from_values(values: [i16; N], is_grid: bool) -> Self {
         Self {
             inner: values,
-            tail: if is_grid { lvgl_sys::LV_GRID_TEMPLATE_LAST.try_into().unwrap() } else { 0b0 }
+            tail: if is_grid {
+                lvgl_sys::LV_GRID_TEMPLATE_LAST.try_into().unwrap()
+            } else {
+                0b0
+            },
         }
     }
 
@@ -148,12 +148,12 @@ impl<const N: usize> CoordDesc<N> {
 
 impl<const N: usize> From<&CoordDesc<N>> for *const i16 {
     fn from(value: &CoordDesc<N>) -> Self {
-        value as *const _ as *const i16 
+        value as *const _ as *const i16
     }
 }
 
 bitflags! {
-    /// Various constants relevant for `Style` parameters 
+    /// Various constants relevant for `Style` parameters
     pub struct StyleProp: u32 {
         const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV;
 

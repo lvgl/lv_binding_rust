@@ -29,9 +29,7 @@ pub struct Obj {
 impl Obj {
     pub fn create(parent: &mut impl NativeObject) -> LvResult<Self> {
         unsafe {
-            let ptr = lvgl_sys::lv_obj_create(
-                parent.raw()?.as_mut(),
-            );
+            let ptr = lvgl_sys::lv_obj_create(parent.raw()?.as_mut());
             if ptr::NonNull::new(ptr).is_some() {
                 Ok(Self { raw: ptr })
             } else {
