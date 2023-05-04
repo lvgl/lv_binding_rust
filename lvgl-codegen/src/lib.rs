@@ -121,13 +121,9 @@ impl Rusty for LvFunc {
                     }
                 }
 
-                pub fn create_at(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
-                    Ok(Self::create(parent)?)
-                }
-
                 pub fn new() -> crate::LvResult<Self> {
                     let mut parent = crate::display::DefaultDisplay::get_scr_act()?;
-                    Ok(Self::create_at(&mut parent)?)
+                    Self::create(&mut parent)
                 }
 
             });
@@ -664,13 +660,9 @@ mod test {
                     }
                 }
 
-                pub fn create_at(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
-                    Ok(Self::create(parent)?)
-                }
-
                 pub fn new() -> crate::LvResult<Self> {
                     let mut parent = crate::display::DefaultDisplay::get_scr_act()?;
-                    Ok(Self::create_at(&mut parent)?)
+                    Self::create(&mut parent)
                 }
             }
         };

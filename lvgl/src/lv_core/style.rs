@@ -67,6 +67,24 @@ impl From<Opacity> for u8 {
     }
 }
 
+bitflags! {
+    pub struct GridAlign: c_uint {
+        const START = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_START;
+        const CENTER = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_CENTER;
+        const END = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_END;
+        const STRETCH = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_STRETCH;
+        const SPACE_AROUND = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_SPACE_AROUND;
+        const SPACE_BETWEEN = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_SPACE_BETWEEN;
+        const SPACE_EVENLY = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_SPACE_EVENLY;
+    }
+}
+
+impl From<GridAlign> for c_uint {
+    fn from(value: GridAlign) -> Self {
+        value.bits() as c_uint
+    }
+}
+
 /// Represents a `Layout`, to be used with the `set_layout()` method on `Style`
 /// objects.
 pub struct Layout {
@@ -327,9 +345,9 @@ impl Style {
     gen_lv_style!(set_grid_cell_row_span, i16);
     gen_lv_style!(set_grid_cell_x_align, i16);
     gen_lv_style!(set_grid_cell_y_align, i16);
-    gen_lv_style!(set_grid_column_align, c_uint);
+    gen_lv_style!(set_grid_column_align, GridAlign);
     gen_lv_style_generic!(set_grid_column_dsc_array, CoordDesc);
-    gen_lv_style!(set_grid_row_align, c_uint);
+    gen_lv_style!(set_grid_row_align, GridAlign);
     gen_lv_style_generic!(set_grid_row_dsc_array, CoordDesc);
     gen_lv_style!(set_height, i16);
     gen_lv_style!(set_img_opa, Opacity);
