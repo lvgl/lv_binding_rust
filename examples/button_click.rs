@@ -68,13 +68,12 @@ fn main() -> Result<(), LvError> {
         }
     })?;
 
-    let mut latest_touch_point = Point::new(0, 0);
     'running: loop {
         let start = Instant::now();
         lvgl::task_handler();
         window.update(&sim_display);
 
-        let mut events = window.events().peekable();
+        let events = window.events().peekable();
 
         for event in events {
             match event {
@@ -83,7 +82,6 @@ fn main() -> Result<(), LvError> {
                     point,
                 } => {
                     println!("Clicked on: {:?}", point);
-                    latest_touch_point = point.clone();
                     latest_touch_status = PointerInputData::Touch(point).pressed().once();
                 }
                 SimulatorEvent::MouseButtonUp {
