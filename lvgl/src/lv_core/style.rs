@@ -67,28 +67,48 @@ impl From<Opacity> for u8 {
     }
 }
 
+bitflags! {
+    pub struct GridAlign: c_uint {
+        const START = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_START;
+        const CENTER = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_CENTER;
+        const END = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_END;
+        const STRETCH = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_STRETCH;
+        const SPACE_AROUND = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_SPACE_AROUND;
+        const SPACE_BETWEEN = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_SPACE_BETWEEN;
+        const SPACE_EVENLY = lvgl_sys::lv_grid_align_t_LV_GRID_ALIGN_SPACE_EVENLY;
+    }
+}
+
+impl From<GridAlign> for c_uint {
+    fn from(value: GridAlign) -> Self {
+        value.bits() as c_uint
+    }
+}
+
+impl From<GridAlign> for i16 {
+    fn from(value: GridAlign) -> Self {
+        value.bits() as i16
+    }
+}
+
 /// Represents a `Layout`, to be used with the `set_layout()` method on `Style`
 /// objects.
 pub struct Layout {
-    inner: u16
+    inner: u16,
 }
 
 impl Layout {
     /// Generates an `LV_LAYOUT_FLEX`
     pub fn flex() -> Self {
         Self {
-            inner: unsafe {
-                lvgl_sys::LV_LAYOUT_FLEX
-            }
+            inner: unsafe { lvgl_sys::LV_LAYOUT_FLEX },
         }
     }
 
     /// Generates an `LV_LAYOUT_GRID`
     pub fn grid() -> Self {
         Self {
-            inner: unsafe {
-                lvgl_sys::LV_LAYOUT_GRID
-            }
+            inner: unsafe { lvgl_sys::LV_LAYOUT_GRID },
         }
     }
 }
@@ -110,15 +130,19 @@ pub struct CoordDesc<const N: usize> {
 
 impl<const N: usize> CoordDesc<N> {
     /// Generates a `CoordDesc` from values.
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// `N` must be at least as long as LVGL expects. See the LVGL docs for
     /// details.
     pub unsafe fn from_values(values: [i16; N], is_grid: bool) -> Self {
         Self {
             inner: values,
-            tail: if is_grid { lvgl_sys::LV_GRID_TEMPLATE_LAST.try_into().unwrap() } else { 0b0 }
+            tail: if is_grid {
+                lvgl_sys::LV_GRID_TEMPLATE_LAST.try_into().unwrap()
+            } else {
+                0b0
+            },
         }
     }
 
@@ -130,12 +154,12 @@ impl<const N: usize> CoordDesc<N> {
 
 impl<const N: usize> From<&CoordDesc<N>> for *const i16 {
     fn from(value: &CoordDesc<N>) -> Self {
-        value as *const _ as *const i16 
+        value as *const _ as *const i16
     }
 }
 
 bitflags! {
-    /// Various constants relevant for `Style` parameters 
+    /// Various constants relevant for `Style` parameters
     pub struct StyleProp: u32 {
         const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV;
 
@@ -325,11 +349,11 @@ impl Style {
     gen_lv_style!(set_grid_cell_column_span, i16);
     gen_lv_style!(set_grid_cell_row_pos, i16);
     gen_lv_style!(set_grid_cell_row_span, i16);
-    gen_lv_style!(set_grid_cell_x_align, i16);
-    gen_lv_style!(set_grid_cell_y_align, i16);
-    gen_lv_style!(set_grid_column_align, c_uint);
+    gen_lv_style!(set_grid_cell_x_align, GridAlign);
+    gen_lv_style!(set_grid_cell_y_align, GridAlign);
+    gen_lv_style!(set_grid_column_align, GridAlign);
     gen_lv_style_generic!(set_grid_column_dsc_array, CoordDesc);
-    gen_lv_style!(set_grid_row_align, c_uint);
+    gen_lv_style!(set_grid_row_align, GridAlign);
     gen_lv_style_generic!(set_grid_row_dsc_array, CoordDesc);
     gen_lv_style!(set_height, i16);
     gen_lv_style!(set_img_opa, Opacity);
