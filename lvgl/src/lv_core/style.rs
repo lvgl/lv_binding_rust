@@ -85,6 +85,12 @@ impl From<GridAlign> for c_uint {
     }
 }
 
+impl From<GridAlign> for i16 {
+    fn from(value: GridAlign) -> Self {
+        value.bits() as i16
+    }
+}
+
 /// Represents a `Layout`, to be used with the `set_layout()` method on `Style`
 /// objects.
 pub struct Layout {
@@ -343,8 +349,8 @@ impl Style {
     gen_lv_style!(set_grid_cell_column_span, i16);
     gen_lv_style!(set_grid_cell_row_pos, i16);
     gen_lv_style!(set_grid_cell_row_span, i16);
-    gen_lv_style!(set_grid_cell_x_align, i16);
-    gen_lv_style!(set_grid_cell_y_align, i16);
+    gen_lv_style!(set_grid_cell_x_align, GridAlign);
+    gen_lv_style!(set_grid_cell_y_align, GridAlign);
     gen_lv_style!(set_grid_column_align, GridAlign);
     gen_lv_style_generic!(set_grid_column_dsc_array, CoordDesc);
     gen_lv_style!(set_grid_row_align, GridAlign);
