@@ -68,35 +68,33 @@ fn main() -> Result<(), LvError> {
         }
     })?;
 
-    let mut latest_touch_point = Point::new(0, 0);
     'running: loop {
         let start = Instant::now();
         lvgl::task_handler();
         window.update(&sim_display);
 
-        let mut events = window.events().peekable();
-
-        if events.peek().is_none() {
-            latest_touch_status = PointerInputData::Touch(latest_touch_point.clone())
-                .released()
-                .once();
-        }
+        let events = window.events().peekable();
 
         for event in events {
             match event {
-                SimulatorEvent::MouseButtonUp {
+                SimulatorEvent::MouseButtonDown {
                     mouse_btn: _,
                     point,
                 } => {
                     println!("Clicked on: {:?}", point);
-                    latest_touch_point = point.clone();
                     latest_touch_status = PointerInputData::Touch(point).pressed().once();
+                }
+                SimulatorEvent::MouseButtonUp {
+                    mouse_btn: _,
+                    point,
+                } => {
+                    latest_touch_status = PointerInputData::Touch(point).released().once();
                 }
                 SimulatorEvent::Quit => break 'running,
                 _ => {}
             }
         }
-        sleep(Duration::from_millis(15));
+        sleep(Duration::from_millis(5));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }
 

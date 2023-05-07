@@ -54,7 +54,7 @@ fn main() -> LvResult<()> {
     loop {
         let start = Instant::now();
         lvgl::task_handler();
-        sleep(Duration::from_millis(15));
+        sleep(Duration::from_millis(5));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }
 }

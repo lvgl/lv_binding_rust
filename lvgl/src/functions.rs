@@ -42,11 +42,9 @@ pub(crate) fn get_str_act(disp: Option<&Display>) -> Result<Obj> {
                 .unwrap_or(ptr::null_mut() as *mut lvgl_sys::lv_disp_t),
         )
     };
-    match Obj::from_raw(
-        NonNull::new(scr_ptr).ok_or(CoreError::ResourceNotAvailable)?,
-    ) {
+    match Obj::from_raw(NonNull::new(scr_ptr).ok_or(CoreError::ResourceNotAvailable)?) {
         Some(o) => Ok(o),
-        None => Err(CoreError::OperationFailed)
+        None => Err(CoreError::OperationFailed),
     }
 }
 

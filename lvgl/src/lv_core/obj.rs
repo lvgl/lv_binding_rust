@@ -2,8 +2,8 @@
 //!
 //! Objects are individual elements of a displayed surface, similar to widgets.
 //! Specifically, an object can either be a widget or a screen. Screen objects
-//! are special in that they do not have a parent object and do not implement
-//! the `Widget` trait, but do implement `NativeObject`.
+//! are special in that they do not have a parent object but do still implement
+//! `NativeObject`.
 
 use crate::lv_core::style::Style;
 use crate::{Align, LvError, LvResult};
@@ -22,6 +22,26 @@ pub struct Obj {
     // We use a raw pointer here because we do not control this memory address, it is controlled
     // by LVGL's global state.
     raw: *mut lvgl_sys::lv_obj_t,
+}
+
+// We need to manually impl methods on Obj since widget codegen is defined in
+// terms of Obj
+impl Obj {
+    pub fn create(parent: &mut impl NativeObject) -> LvResult<Self> {
+        unsafe {
+            let ptr = lvgl_sys::lv_obj_create(parent.raw()?.as_mut());
+            if ptr::NonNull::new(ptr).is_some() {
+                Ok(Self { raw: ptr })
+            } else {
+                Err(LvError::InvalidReference)
+            }
+        }
+    }
+
+    pub fn new() -> crate::LvResult<Self> {
+        let mut parent = crate::display::DefaultDisplay::get_scr_act()?;
+        Self::create(&mut parent)
+    }
 }
 
 impl NativeObject for Obj {

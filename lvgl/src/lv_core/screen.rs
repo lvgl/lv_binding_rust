@@ -1,13 +1,15 @@
-use crate::{Part, LvError, NativeObject, Obj, Widget};
+use crate::{LvError, NativeObject, Obj, Part, Widget};
 
 /// An LVGL screen.
 pub struct Screen {
-    raw: Obj
+    raw: Obj,
 }
 
 impl Default for Screen {
     fn default() -> Self {
-        Self { raw: Obj::default() }
+        Self {
+            raw: Obj::default(),
+        }
     }
 }
 
