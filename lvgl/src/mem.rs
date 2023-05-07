@@ -1,5 +1,6 @@
 use core::mem;
 use core::ops::{Deref, DerefMut};
+use core::pin::Pin;
 use core::ptr::NonNull;
 
 /// Places a sized `T` into LVGL memory.
@@ -39,6 +40,18 @@ impl<T> Box<T> {
         let b = mem::ManuallyDrop::new(self);
         b.0.as_ptr()
     }
+
+    pub fn pin(value: T) -> Pin<Self> {
+        unsafe { Pin::new_unchecked(Box::new(value)) }
+    }
+
+    //pub fn leak(mut self) -> &'static mut T {
+    //    let ret = self.as_mut() as *mut T;
+    //    core::mem::forget(self);
+    //    unsafe {
+    //        &mut *ret
+    //    }
+    //}
 }
 
 impl<T> Drop for Box<T> {

@@ -1,13 +1,12 @@
 use crate::functions::CoreError;
 use crate::Screen;
-use crate::{disp_drv_register, disp_get_default, get_str_act, LvResult, NativeObject, RunOnce};
+use crate::{disp_drv_register, disp_get_default, get_str_act, LvResult, NativeObject};
 use crate::{Box, Color};
-use core::cell::RefCell;
 use core::convert::TryInto;
-use core::mem::MaybeUninit;
+use core::mem::{ManuallyDrop, MaybeUninit};
+use core::pin::Pin;
 use core::ptr::NonNull;
 use core::{ptr, result};
-use lvgl_sys::_lv_disp_draw_buf_t;
 
 /// Error in interacting with a `Display`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -48,7 +47,9 @@ impl<'a> Display {
         let disp_p = &mut display_diver.disp_drv;
         disp_p.hor_res = hor_res.try_into().unwrap_or(240);
         disp_p.ver_res = ver_res.try_into().unwrap_or(240);
-        Ok(disp_drv_register(&mut display_diver, None)?)
+        let ret = Ok(disp_drv_register(&mut display_diver, None)?);
+        //display_diver.disp_drv.leak();
+        ret
     }
 
     /// Returns the current active screen.
@@ -149,67 +150,58 @@ impl DefaultDisplay {
 /// entire number of pixels on the screen, in which case the screen will be
 /// drawn to multiple times per frame.
 pub struct DrawBuffer<const N: usize> {
-    //inner: NonNull<lvgl_sys::lv_disp_draw_buf_t>,
-    initialized: RunOnce,
-    refresh_buffer: RefCell<[MaybeUninit<lvgl_sys::lv_color_t>; N]>,
+    draw_buf: Pin<Box<lvgl_sys::lv_disp_draw_buf_t>>,
+    _refresh_buffer: Pin<Box<[MaybeUninit<lvgl_sys::lv_color_t>; N]>>,
 }
 
 impl<const N: usize> Default for DrawBuffer<N> {
     fn default() -> Self {
+        let mut buf = Box::pin([MaybeUninit::uninit(); N]);
         Self {
-            initialized: RunOnce::new(),
-            refresh_buffer: RefCell::new([MaybeUninit::uninit(); N]),
+            draw_buf: Box::pin(unsafe {
+                let mut inner: MaybeUninit<lvgl_sys::lv_disp_draw_buf_t> = MaybeUninit::uninit();
+                let raw_ptr = buf.as_mut_ptr() as *mut _;
+                lvgl_sys::lv_disp_draw_buf_init(
+                    inner.as_mut_ptr(),
+                    raw_ptr,
+                    ptr::null_mut(),
+                    N as u32,
+                );
+                inner.assume_init()
+            }),
+            _refresh_buffer: buf,
         }
     }
 }
 
 impl<const N: usize> DrawBuffer<N> {
-    fn get_ptr(&self) -> Option<Box<lvgl_sys::lv_disp_draw_buf_t>> {
-        if self.initialized.swap_and_check() {
-            // TODO: needs to be 'static somehow
-            // Cannot be in the DrawBuffer struct because the type `lv_disp_buf_t` contains a raw
-            // pointer and raw pointers are not Send and consequently cannot be in `static` variables.
-            let mut inner: MaybeUninit<lvgl_sys::lv_disp_draw_buf_t> = MaybeUninit::uninit();
-            let primary_buffer_guard = &self.refresh_buffer;
-            let draw_buf = unsafe {
-                lvgl_sys::lv_disp_draw_buf_init(
-                    inner.as_mut_ptr(),
-                    primary_buffer_guard.borrow_mut().as_mut_ptr() as *mut _,
-                    ptr::null_mut(),
-                    N as u32,
-                );
-                inner.assume_init()
-            };
-            Some(Box::new(draw_buf))
-        } else {
-            None
-        }
+    fn get_ptr(&mut self) -> &mut lvgl_sys::lv_disp_draw_buf_t {
+        &mut self.draw_buf
     }
 }
 
 #[repr(C)]
 pub(crate) struct DisplayDriver<const N: usize> {
-    pub(crate) disp_drv: lvgl_sys::lv_disp_drv_t,
+    pub(crate) disp_drv: Pin<Box<lvgl_sys::lv_disp_drv_t>>,
     _buffer: DrawBuffer<N>,
 }
 
 impl<'a, const N: usize> DisplayDriver<N> {
-    pub fn new<F>(draw_buffer: DrawBuffer<N>, display_update_callback: F) -> Result<Self>
+    pub fn new<F>(
+        mut draw_buffer: DrawBuffer<N>,
+        display_update_callback: F,
+    ) -> Result<ManuallyDrop<Self>>
     where
         F: FnMut(&DisplayRefresh<N>) + 'a,
     {
-        let mut disp_drv = unsafe {
+        let mut disp_drv = Box::pin(unsafe {
             let mut inner = MaybeUninit::uninit();
             lvgl_sys::lv_disp_drv_init(inner.as_mut_ptr());
             inner.assume_init()
-        };
+        });
 
         // Safety: The variable `draw_buffer` is statically allocated, no need to worry about this being dropped.
-        disp_drv.draw_buf = Box::<_lv_disp_draw_buf_t>::into_raw(
-            draw_buffer
-                .get_ptr()
-                .ok_or(DisplayError::FailedToRegister)?,
-        ) as *mut _;
+        disp_drv.draw_buf = draw_buffer.get_ptr() as *mut _;
 
         disp_drv.user_data = Box::<F>::into_raw(Box::new(display_update_callback)) as *mut _;
 
@@ -218,14 +210,14 @@ impl<'a, const N: usize> DisplayDriver<N> {
         disp_drv.flush_cb = Some(disp_flush_trampoline::<F, N>);
 
         // We do not store any memory that can be accidentally deallocated by on the Rust side.
-        Ok(Self {
+        Ok(ManuallyDrop::new(Self {
             disp_drv,
             _buffer: draw_buffer,
-        })
+        }))
     }
 
     pub unsafe fn new_raw(
-        draw_buffer: DrawBuffer<N>,
+        mut draw_buffer: DrawBuffer<N>,
         flush_cb: Option<
             unsafe extern "C" fn(
                 *mut lvgl_sys::_lv_disp_drv_t,
@@ -253,18 +245,14 @@ impl<'a, const N: usize> DisplayDriver<N> {
         clean_dcache_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
         drv_update_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
         render_start_cb: Option<unsafe extern "C" fn(*mut lvgl_sys::_lv_disp_drv_t)>,
-    ) -> Result<Self> {
-        let mut disp_drv = unsafe {
+    ) -> Result<ManuallyDrop<Self>> {
+        let mut disp_drv = Box::pin(unsafe {
             let mut inner = MaybeUninit::uninit();
             lvgl_sys::lv_disp_drv_init(inner.as_mut_ptr());
             inner.assume_init()
-        };
+        });
 
-        disp_drv.draw_buf = Box::<_lv_disp_draw_buf_t>::into_raw(
-            draw_buffer
-                .get_ptr()
-                .ok_or(DisplayError::FailedToRegister)?,
-        ) as *mut _;
+        disp_drv.draw_buf = draw_buffer.get_ptr() as *mut _;
 
         //disp_drv.user_data = Box::into_raw(Box::new(display_update_callback)) as *mut _;
 
@@ -278,10 +266,10 @@ impl<'a, const N: usize> DisplayDriver<N> {
         disp_drv.drv_update_cb = drv_update_cb;
         disp_drv.render_start_cb = render_start_cb;
 
-        Ok(Self {
+        Ok(ManuallyDrop::new(Self {
             disp_drv,
             _buffer: draw_buffer,
-        })
+        }))
     }
 }
 
