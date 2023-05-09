@@ -52,8 +52,6 @@ use crate::point::Point;
 #[cfg(feature = "embedded_graphics")]
 use embedded_graphics::geometry::Point;
 
-use core::sync::atomic::{AtomicBool, Ordering};
-
 pub use display::*;
 pub use functions::*;
 pub use lv_core::*;
@@ -72,6 +70,7 @@ pub mod widgets;
 #[cfg(feature = "rust_timer")]
 pub mod timer;
 
+/*
 struct RunOnce(AtomicBool);
 
 impl RunOnce {
@@ -85,6 +84,7 @@ impl RunOnce {
             .is_ok()
     }
 }
+*/
 
 #[cfg(feature = "unsafe_no_autoinit")]
 static LVGL_INITIALIZED: RunOnce = RunOnce::new();
@@ -109,8 +109,22 @@ fn init() {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::*;
     use crate::display::{Display, DrawBuffer};
+    use core::sync::atomic::{AtomicBool, Ordering};
+
+    struct RunOnce(AtomicBool);
+
+    impl RunOnce {
+        const fn new() -> Self {
+            Self(AtomicBool::new(false))
+        }
+
+        fn swap_and_check(&self) -> bool {
+            self.0
+                .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
+                .is_ok()
+        }
+    }
 
     pub(crate) fn initialize_test() {
         #[cfg(feature = "unsafe_no_autoinit")]

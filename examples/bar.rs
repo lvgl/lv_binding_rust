@@ -16,7 +16,8 @@ fn main() -> Result<(), LvError> {
     const HOR_RES: u32 = 240;
     const VER_RES: u32 = 240;
 
-    let mut sim_display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(HOR_RES, VER_RES));
+    let mut sim_display: SimulatorDisplay<Rgb565> =
+        SimulatorDisplay::new(Size::new(HOR_RES, VER_RES));
 
     let output_settings = OutputSettingsBuilder::new().scale(2).build();
     let mut window = Window::new("Bar Example", &output_settings);
@@ -24,9 +25,7 @@ fn main() -> Result<(), LvError> {
     let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
 
     let display = Display::register(buffer, HOR_RES, VER_RES, |refresh| {
-        sim_display
-            .draw_iter(refresh.as_pixels())
-            .unwrap();
+        sim_display.draw_iter(refresh.as_pixels()).unwrap();
     })?;
 
     let mut screen = display.get_scr_act()?;
