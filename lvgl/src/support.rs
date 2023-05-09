@@ -139,6 +139,9 @@ pub enum Event<T> {
     /// case, `Event<_>::PressLost` is sent.
     Released,
 
+    /// Called when an underlying value is changed e.g. position of a `Slider`.
+    ValueChanged,
+
     /// Pointer-like input devices events (E.g. mouse or touchpad)
     Pointer(PointerEvent),
 
@@ -159,6 +162,7 @@ impl<S> TryFrom<lvgl_sys::lv_event_code_t> for Event<S> {
         const LV_EVENT_LONG_PRESSED_REPEAT: u32 =
             lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED_REPEAT;
         const LV_EVENT_RELEASED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_RELEASED;
+        const LV_EVENT_VALUE_CHANGED: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_VALUE_CHANGED;
 
         match value {
             LV_EVENT_PRESSED => Ok(Event::Pressed),
@@ -169,6 +173,7 @@ impl<S> TryFrom<lvgl_sys::lv_event_code_t> for Event<S> {
             LV_EVENT_LONG_PRESSED => Ok(Event::LongPressed),
             LV_EVENT_LONG_PRESSED_REPEAT => Ok(Event::LongPressedRepeat),
             LV_EVENT_RELEASED => Ok(Event::Released),
+            LV_EVENT_VALUE_CHANGED => Ok(Event::ValueChanged),
             _ => Err(()),
         }
     }
@@ -185,6 +190,7 @@ impl<S> From<Event<S>> for lvgl_sys::lv_event_code_t {
             Event::LongPressed => lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED,
             Event::LongPressedRepeat => lvgl_sys::lv_event_code_t_LV_EVENT_LONG_PRESSED_REPEAT,
             Event::Released => lvgl_sys::lv_event_code_t_LV_EVENT_RELEASED,
+            Event::ValueChanged => lvgl_sys::lv_event_code_t_LV_EVENT_VALUE_CHANGED,
             // TODO: handle all types...
             _ => lvgl_sys::lv_event_code_t_LV_EVENT_CLICKED,
         };
