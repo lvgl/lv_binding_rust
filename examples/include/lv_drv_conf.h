@@ -1,6 +1,6 @@
 /**
  * @file lv_drv_conf.h
- * Configuration file for v8.3.0
+ * Configuration file for v9.0.0-dev
  */
 
 /*
@@ -110,6 +110,9 @@
 
 /*Open two windows to test multi display support*/
 #  define SDL_DUAL_DISPLAY            0
+
+/* Window Title  */
+#  define SDL_WINDOW_TITLE "TFT Simulator"
 #endif
 
 /*-------------------
@@ -316,7 +319,7 @@
  *  Linux frame buffer device (/dev/fbx)
  *-----------------------------------------*/
 #ifndef USE_FBDEV
-#  define USE_FBDEV           1
+#  define USE_FBDEV           0
 #endif
 
 #if USE_FBDEV
