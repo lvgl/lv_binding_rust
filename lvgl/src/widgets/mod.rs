@@ -11,6 +11,7 @@ mod keyboard;
 mod label;
 mod meter;
 mod slider;
+mod table;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -21,3 +22,4 @@ pub use keyboard::*;
 pub use label::*;
 pub use meter::*;
 pub use slider::*;
+pub use table::*;
