@@ -10,7 +10,7 @@ repository = "https://github.com/rafaelcaricio/lvgl-rs"
 readme = "README.md"
 categories = ["external-ffi-bindings", "embedded", "gui", "no-std"]
 keywords = ["littlevgl", "lvgl"]
-build = "build.rs"
+build = "build/main.rs"
 links = "lvgl"
 exclude = [
     "vendor/lvgl/demos",
@@ -30,6 +30,7 @@ cty = "0.2.2"
 [build-dependencies]
 cc = "1.0.79"
 bindgen = "0.64.0"
+serde = { version = "1.0.159", features = ["derive"] }
 
 [features]
 use-vendored-config = []
