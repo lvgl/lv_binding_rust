@@ -16,9 +16,9 @@ lvgl-sys = { version = "0.6.2", path = "../lvgl-sys" }
 cty = "0.2.2"
 embedded-graphics = { version = "0.8.0", optional = true }
 cstr_core = { version = "0.2.6", default-features = false, features = ["alloc"] }
-bitflags = "2.0.2"
+bitflags = "2.3.2"
 paste = "1.0.12"
-ctor = "0.2.0"
+ctor = "0.2.2"
 
 [features]
 default = ["embedded_graphics", "drivers"]
