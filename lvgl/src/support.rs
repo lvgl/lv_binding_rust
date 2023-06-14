@@ -142,8 +142,7 @@ pub enum Event<T> {
     /// Called when an underlying value is changed e.g. position of a `Slider`.
     ValueChanged,
 
-
-    /// 
+    ///
     DrawMain,
 
     ///
@@ -151,22 +150,22 @@ pub enum Event<T> {
 
     ///
     DrawMainEnd,
-    
+
     ///
     DrawPartBegin,
 
     ///
     DrawPartEnd,
-    
+
     ///
     DrawPost,
-    
+
     ///
     DrawPostBegin,
-    
-    /// 
+
+    ///
     DrawPostEnd,
-    
+
     /// Called on focus
     Focused,
 
@@ -199,7 +198,6 @@ impl<S> TryFrom<lvgl_sys::lv_event_code_t> for Event<S> {
         const LV_EVENT_DRAW_POST: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_DRAW_POST;
         const LV_EVENT_DRAW_POST_BEGIN: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_DRAW_POST_BEGIN;
         const LV_EVENT_DRAW_POST_END: u32 = lvgl_sys::lv_event_code_t_LV_EVENT_DRAW_POST_END;
-        
 
         match value {
             LV_EVENT_PRESSED => Ok(Event::Pressed),
@@ -216,9 +214,9 @@ impl<S> TryFrom<lvgl_sys::lv_event_code_t> for Event<S> {
             LV_EVENT_DRAW_MAIN_END => Ok(Event::DrawMainEnd),
             LV_EVENT_DRAW_PART_BEGIN => Ok(Event::DrawPartBegin),
             LV_EVENT_DRAW_PART_END => Ok(Event::DrawPartEnd),
-            LV_EVENT_DRAW_POST=> Ok(Event::DrawPost),
+            LV_EVENT_DRAW_POST => Ok(Event::DrawPost),
             LV_EVENT_DRAW_POST_BEGIN => Ok(Event::DrawPostBegin),
-            LV_EVENT_DRAW_POST_END=> Ok(Event::DrawPostEnd),
+            LV_EVENT_DRAW_POST_END => Ok(Event::DrawPostEnd),
             _ => Err(()),
         }
     }
