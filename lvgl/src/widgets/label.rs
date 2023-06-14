@@ -1,5 +1,6 @@
-//use crate::widgets::Label;
-//use crate::{LvResult, NativeObject};
+use crate::widgets::Label;
+use crate::{LabelLongMode, LvResult, NativeObject};
+
 #[cfg(feature = "alloc")]
 mod alloc_imp {
     use crate::widgets::Label;
@@ -28,4 +29,18 @@ mod alloc_imp {
     //         Ok(label)
     //     }
     // }
+}
+
+impl Label {
+    pub fn set_long_mode(&mut self, long_mode: LabelLongMode) -> LvResult<()> {
+        unsafe {
+            Ok(lvgl_sys::lv_label_set_long_mode(self.raw()?.as_mut(), long_mode.into()))
+        }
+    }
+
+    pub fn get_long_mode(&self) -> LvResult<u8> {
+        unsafe {
+            Ok(lvgl_sys::lv_label_get_long_mode(self.raw()?.as_ref()))
+        }
+    }
 }
