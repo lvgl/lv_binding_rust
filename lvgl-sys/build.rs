@@ -227,7 +227,6 @@ fn main() {
         .derive_default(true)
         .layout_tests(false)
         .use_core()
-        .rustfmt_bindings(true)
         .ctypes_prefix("cty")
         .clang_args(&cc_args)
         .clang_args(&additional_args)
