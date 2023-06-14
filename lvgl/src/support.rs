@@ -364,6 +364,23 @@ impl From<Animation> for lvgl_sys::lv_anim_enable_t {
     }
 }
 
+#[repr(u32)]
+pub enum LabelLongMode {
+    Clip = lvgl_sys::LV_LABEL_LONG_CLIP,
+    Dot = lvgl_sys::LV_LABEL_LONG_DOT,
+    Scroll = lvgl_sys::LV_LABEL_LONG_SCROLL,
+    ScrollCircular = lvgl_sys::LV_LABEL_LONG_SCROLL_CIRCULAR,
+    Wrap = lvgl_sys::LV_LABEL_LONG_WRAP,
+}
+
+impl Into<u8> for LabelLongMode {
+    fn into(self) -> u8 {
+        unsafe {
+            (self as u32).try_into().unwrap_unchecked()
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
