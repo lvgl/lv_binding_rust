@@ -375,9 +375,7 @@ pub enum LabelLongMode {
 
 impl Into<u8> for LabelLongMode {
     fn into(self) -> u8 {
-        unsafe {
-            (self as u32).try_into().unwrap_unchecked()
-        }
+        unsafe { (self as u32).try_into().unwrap_unchecked() }
     }
 }
 

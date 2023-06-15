@@ -65,8 +65,8 @@ mod support;
 pub mod drivers;
 pub mod font;
 pub mod input_device;
-pub mod widgets;
 pub mod misc;
+pub mod widgets;
 
 #[cfg(feature = "rust_timer")]
 pub mod timer;
