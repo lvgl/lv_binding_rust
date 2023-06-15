@@ -91,6 +91,42 @@ impl From<GridAlign> for i16 {
     }
 }
 
+bitflags! {
+    pub struct FlexAlign: c_uint {
+        const START = lvgl_sys::lv_flex_align_t_LV_FLEX_ALIGN_START;
+        const CENTER = lvgl_sys::lv_flex_align_t_LV_FLEX_ALIGN_CENTER;
+        const END = lvgl_sys::lv_flex_align_t_LV_FLEX_ALIGN_END;
+        const SPACE_AROUND = lvgl_sys::lv_flex_align_t_LV_FLEX_ALIGN_SPACE_AROUND;
+        const SPACE_BETWEEN = lvgl_sys::lv_flex_align_t_LV_FLEX_ALIGN_SPACE_BETWEEN;
+        const SPACE_EVENLY = lvgl_sys::lv_flex_align_t_LV_FLEX_ALIGN_SPACE_EVENLY;
+    }
+}
+
+impl From<FlexAlign> for c_uint {
+    fn from(value: FlexAlign) -> Self {
+        value.bits() as c_uint
+    }
+}
+
+bitflags! {
+    pub struct FlexFlow: c_uint {
+        const COLUMN = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_COLUMN;
+        const COLUMN_REVERSE = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_COLUMN_REVERSE;
+        const COLUMN_WRAP = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_COLUMN_WRAP;
+        const COLUMN_WRAP_REVERSE = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
+        const ROW = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_ROW;
+        const ROW_REVERSE = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_ROW_REVERSE;
+        const ROW_WRAP = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_ROW_WRAP;
+        const ROW_WRAP_REVERSE = lvgl_sys::lv_flex_flow_t_LV_FLEX_FLOW_ROW_WRAP_REVERSE;
+    }
+}
+
+impl From<FlexFlow> for c_uint {
+    fn from(value: FlexFlow) -> Self {
+        value.bits() as c_uint
+    }
+}
+
 /// Represents a `Layout`, to be used with the `set_layout()` method on `Style`
 /// objects.
 pub struct Layout {
@@ -340,11 +376,11 @@ impl Style {
     gen_lv_style!(set_clip_corner, bool);
     //gen_lv_style!(set_color_filter_dsc, );
     gen_lv_style!(set_color_filter_opa, Opacity);
-    gen_lv_style!(set_flex_cross_place, c_uint);
-    gen_lv_style!(set_flex_flow, c_uint);
+    gen_lv_style!(set_flex_flow, FlexFlow);
     gen_lv_style!(set_flex_grow, u8);
-    gen_lv_style!(set_flex_main_place, c_uint);
-    gen_lv_style!(set_flex_track_place, c_uint);
+    gen_lv_style!(set_flex_main_place, FlexAlign);
+    gen_lv_style!(set_flex_cross_place, FlexAlign);
+    gen_lv_style!(set_flex_track_place, FlexAlign);
     gen_lv_style!(set_grid_cell_column_pos, i16);
     gen_lv_style!(set_grid_cell_column_span, i16);
     gen_lv_style!(set_grid_cell_row_pos, i16);
