@@ -7,10 +7,8 @@
 
 use crate::lv_core::style::Style;
 use crate::{Align, LvError, LvResult};
+use core::fmt::{self, Debug};
 use core::ptr;
-
-use core::fmt;
-use core::fmt::Debug;
 
 /// Represents a native LVGL object.
 pub trait NativeObject {
@@ -42,6 +40,7 @@ impl Obj {
         unsafe {
             let ptr = lvgl_sys::lv_obj_create(parent.raw()?.as_mut());
             if ptr::NonNull::new(ptr).is_some() {
+                //(*ptr).user_data = Box::new(UserDataObj::empty()).into_raw() as *mut _;
                 Ok(Self { raw: ptr })
             } else {
                 Err(LvError::InvalidReference)
@@ -71,7 +70,13 @@ pub trait Widget: NativeObject + Sized {
     type Part: Into<lvgl_sys::lv_part_t>;
 
     /// Construct an instance of the object from a raw pointer.
-    fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
+    ///
+    /// # Safety
+    ///
+    /// If the pointer is derived from a Rust-instantiated `obj` such as via
+    /// calling `.raw()`, only the `obj` that survives longest may be dropped
+    /// and the caller is responsible for ensuring data races do not occur.
+    unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
 
     /// Adds a `Style` to a given widget.
     fn add_style(&mut self, part: Self::Part, style: &mut Style) -> LvResult<()> {
@@ -143,7 +148,7 @@ impl Widget for Obj {
     type SpecialEvent = u32;
     type Part = Part;
 
-    fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
+    unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
         Some(Self { raw: raw.as_ptr() })
     }
 }
@@ -175,8 +180,6 @@ macro_rules! define_object {
             core: $crate::Obj,
         }
 
-        unsafe impl Send for $item {}
-
         impl $item {
             pub fn on_event<F>(&mut self, f: F) -> $crate::LvResult<()>
             where
@@ -184,10 +187,8 @@ macro_rules! define_object {
             {
                 use $crate::NativeObject;
                 unsafe {
-                    let mut raw = self.raw()?;
-                    let obj = raw.as_mut();
-                    let user_closure = $crate::Box::new(f);
-                    obj.user_data = $crate::Box::into_raw(user_closure) as *mut cty::c_void;
+                    let obj = self.raw()?.as_mut();
+                    obj.user_data = $crate::Box::into_raw($crate::Box::new(f)) as *mut _;
                     lvgl_sys::lv_obj_add_event_cb(
                         obj,
                         lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),
@@ -209,7 +210,9 @@ macro_rules! define_object {
             type SpecialEvent = $event_type;
             type Part = $part_type;
 
-            fn from_raw(raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
+            unsafe fn from_raw(
+                raw_pointer: core::ptr::NonNull<lvgl_sys::lv_obj_t>,
+            ) -> Option<Self> {
                 Some(Self {
                     core: $crate::Obj::from_raw(raw_pointer).unwrap(),
                 })

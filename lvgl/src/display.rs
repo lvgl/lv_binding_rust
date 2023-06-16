@@ -374,32 +374,28 @@ mod tests {
 
     #[test]
     fn get_scr_act_return_display() {
-        tests::initialize_test();
+        tests::initialize_test(true);
         let _screen = get_str_act(None).expect("We can get the active screen");
     }
 
     #[test]
     fn get_default_display() {
-        tests::initialize_test();
+        tests::initialize_test(true);
         let display = Display::default();
-
         let _screen_direct = display
             .get_scr_act()
             .expect("Return screen directly from the display instance");
-
         let _screen_default =
             DefaultDisplay::get_scr_act().expect("Return screen from the default display");
     }
 
     #[test]
     fn register_display_directly() -> Result<()> {
-        tests::initialize_test();
+        crate::tests::initialize_test(true);
         let display = Display::default();
-
         let _screen = display
             .get_scr_act()
             .expect("Return screen directly from the display instance");
-
         Ok(())
     }
 }

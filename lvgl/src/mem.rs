@@ -41,6 +41,19 @@ impl<T> Box<T> {
         b.0.as_ptr()
     }
 
+    pub unsafe fn from_raw(ptr: *mut T) -> Self {
+        assert_eq!(
+            ptr as usize % mem::align_of::<T>(),
+            0,
+            "Memory address not aligned!"
+        );
+        Self({
+            NonNull::new(ptr).unwrap_or_else(|| {
+                panic!("Pointer was null");
+            })
+        })
+    }
+
     pub fn pin(value: T) -> Pin<Self> {
         unsafe { Pin::new_unchecked(Box::new(value)) }
     }
@@ -112,35 +125,19 @@ mod test {
     use crate::*;
     use std::vec::Vec;
 
-    /*
-    fn init() {
-        unsafe {
-            lvgl_sys::lv_init();
-        };
-    }
-    */
-
-    fn teardown() {
-        unsafe {
-            lvgl_sys::lv_deinit();
-        }
-    }
-
     #[test]
     fn place_value_in_lv_mem() {
-        tests::initialize_test();
+        tests::initialize_test(false);
 
         let v = Box::new(5);
         drop(v);
         let v = Box::new(10);
         drop(v);
-
-        teardown();
     }
 
     #[test]
     fn place_complex_value_in_lv_mem() {
-        tests::initialize_test();
+        tests::initialize_test(false);
 
         #[repr(C)]
         #[derive(Debug)]
@@ -188,14 +185,11 @@ mod test {
 
         // If this fails, we are leaking memory! BOOM! \o/
         assert_eq!(initial_mem_info.free_size, final_info.free_size);
-
-        teardown();
     }
 
     #[test]
     fn clone_object_in_lv_mem() {
-        #[cfg(feature = "unsafe_no_autoinit")]
-        crate::init();
+        crate::tests::initialize_test(false);
 
         let v1 = Box::new(5);
         let v2 = v1.clone();

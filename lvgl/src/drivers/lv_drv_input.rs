@@ -84,16 +84,12 @@ macro_rules! lv_drv_input_xpt2046 {
 mod tests {
     use crate::input_device::InputDriver;
     use crate::tests;
-    use crate::DrawBuffer;
     use crate::*;
 
     #[test]
     fn gtk_test() {
-        const HOR_RES: u32 = 240;
-        const VER_RES: u32 = 240;
-        tests::initialize_test();
-        let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
-        let disp = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES).unwrap();
+        tests::initialize_test(true);
+        let disp = Display::default();
         let _input = lv_drv_input_pointer_sdl!(disp);
     }
 }

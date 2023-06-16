@@ -113,9 +113,9 @@ List of LVGL features that impacts the library usage in general.
       can be used, and custom handlers can be specified for [`embedded_graphics`](https://docs.rs/embedded-graphics/0.6.2/embedded_graphics/). Currently, only pointer input devices are supported.
       **Note:** [`lv_drivers`](https://github.com/lvgl/lv_drivers) support is currently experimental.
 - [x] Fonts: All fonts built-in to LVGL can be used on nightly Rust if the `nightly` feature is enabled. Custom fonts can also be encoded into a C file (see the documentation on the `font` module).
+- [x] Animations: Creating basic animations is supported entirely from Rust.
 - [ ] Images
 - [ ] File system
-- [ ] Animations
 - [ ] Tasks
 
 ### Widgets

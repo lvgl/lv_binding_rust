@@ -7,7 +7,7 @@ use embedded_graphics_simulator::{
 use lvgl;
 use lvgl::style::Style;
 use lvgl::widgets::{Bar, Label};
-use lvgl::{Align, Animation, Color, Display, DrawBuffer, Event, LvError, Part, Widget};
+use lvgl::{Align, AnimationState, Color, Display, DrawBuffer, Event, LvError, Part, Widget};
 use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
@@ -84,7 +84,7 @@ fn main() -> Result<(), LvError> {
             i = 0;
             lvgl::event_send(&mut bar, Event::Clicked)?;
         }
-        bar.set_value(i, Animation::ON)?;
+        bar.set_value(i, AnimationState::ON)?;
         i += 1;
 
         lvgl::task_handler();
