@@ -28,8 +28,10 @@ pub struct Obj {
 }
 
 impl Debug for Obj {
-    fn fmt(&self, f:& mut fmt::Formatter) -> fmt::Result {
-        f.debug_struct("NativeObject").field("raw",&"!! LVGL lv_obj_t ptr !!").finish()
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("NativeObject")
+            .field("raw", &"!! LVGL lv_obj_t ptr !!")
+            .finish()
     }
 }
 
