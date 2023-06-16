@@ -9,6 +9,9 @@ use crate::lv_core::style::Style;
 use crate::{Align, LvError, LvResult};
 use core::ptr;
 
+use core::fmt;
+use core::fmt::Debug;
+
 /// Represents a native LVGL object.
 pub trait NativeObject {
     /// Provide common way to access to the underlying native object pointer.
@@ -22,6 +25,14 @@ pub struct Obj {
     // We use a raw pointer here because we do not control this memory address, it is controlled
     // by LVGL's global state.
     raw: *mut lvgl_sys::lv_obj_t,
+}
+
+impl Debug for Obj {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("NativeObject")
+            .field("raw", &"!! LVGL lv_obj_t ptr !!")
+            .finish()
+    }
 }
 
 // We need to manually impl methods on Obj since widget codegen is defined in
@@ -159,6 +170,7 @@ macro_rules! define_object {
         define_object!($item, event = $event_type, part = $part_type);
     };
     ($item:ident, event = $event_type:ty, part = $part_type:ty) => {
+        #[derive(Debug)]
         pub struct $item {
             core: $crate::Obj,
         }

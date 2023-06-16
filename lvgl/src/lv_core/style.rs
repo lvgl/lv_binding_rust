@@ -16,6 +16,8 @@
 //! counterparts.
 
 use crate::{font::Font, Align, Box, Color, TextAlign};
+use core::fmt;
+use core::fmt::Debug;
 use core::mem;
 use cty::c_uint;
 use paste::paste;
@@ -29,6 +31,15 @@ pub enum Themes {
 #[derive(Clone)]
 pub struct Style {
     pub(crate) raw: Box<lvgl_sys::lv_style_t>,
+}
+
+impl Debug for Style {
+    // TODO: Decode and dump style values
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Style")
+            .field("raw", &"!! LVGL lv_style_t ptr !!")
+            .finish()
+    }
 }
 
 impl Default for Style {
