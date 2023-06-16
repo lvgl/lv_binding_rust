@@ -1,6 +1,7 @@
 use crate::{LvError, NativeObject, Obj, Part, Widget};
 
 /// An LVGL screen.
+#[derive(Debug)]
 pub struct Screen {
     raw: Obj,
 }
