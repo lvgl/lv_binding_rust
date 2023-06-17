@@ -18,7 +18,7 @@
 use crate::{font::Font, Align, Box, Color, TextAlign};
 use core::fmt;
 use core::fmt::Debug;
-use core::mem;
+use core::mem::{self, MaybeUninit};
 use cty::c_uint;
 use paste::paste;
 
@@ -397,8 +397,8 @@ macro_rules! gen_lv_style_generic {
 
 impl Style {
     pub fn get_prop(&self, prop: StyleProp) -> StyleValues {
-        let mut ret: StyleValues;
-        let mut raw_ret = match prop {
+        let mut raw_ret = MaybeUninit::<lvgl_sys::lv_style_value_t>::uninit();
+        let mut ret = match prop {
             StyleProp::WIDTH
             | StyleProp::MIN_WIDTH
             | StyleProp::MAX_WIDTH
@@ -430,10 +430,7 @@ impl Style {
             | StyleProp::LINE_DASH_WIDTH
             | StyleProp::LINE_DASH_GAP
             | StyleProp::ARC_WIDTH
-            | StyleProp::RADIUS => {
-                ret = StyleValues::Num(0);
-                lvgl_sys::lv_style_value_t { num: 0 }
-            }
+            | StyleProp::RADIUS => StyleValues::Num(0),
 
             StyleProp::BG_OPA
             | StyleProp::BG_IMG_OPA
@@ -446,10 +443,7 @@ impl Style {
             | StyleProp::LINE_OPA
             | StyleProp::ARC_OPA
             | StyleProp::TEXT_OPA
-            | StyleProp::OPA => {
-                ret = StyleValues::Opacity(Opacity::OPA_0);
-                lvgl_sys::lv_style_value_t { num: 0 }
-            }
+            | StyleProp::OPA => StyleValues::Opacity(Opacity::OPA_0),
 
             StyleProp::BG_COLOR
             | StyleProp::BG_GRAD_COLOR
@@ -458,25 +452,16 @@ impl Style {
             | StyleProp::SHADOW_COLOR
             | StyleProp::LINE_COLOR
             | StyleProp::ARC_COLOR
-            | StyleProp::TEXT_COLOR => {
-                ret = StyleValues::Color(Color::default());
-                lvgl_sys::lv_style_value_t {
-                    color: Color::default().raw,
-                }
-            }
+            | StyleProp::TEXT_COLOR => StyleValues::Color(Color::default()),
 
-            _ => {
-                ret = StyleValues::None;
-                lvgl_sys::lv_style_value_t {
-                    ptr: core::ptr::null(),
-                }
-            }
+            _ => StyleValues::None,
         };
 
-        let ptr = &mut raw_ret as *mut _;
+        let ptr = raw_ret.as_mut_ptr() as *mut _;
         let result = unsafe {
             lvgl_sys::lv_style_get_prop(self.raw.clone().into_raw() as *const _, prop.bits(), ptr)
         };
+        let raw_ret = unsafe { raw_ret.assume_init() };
         if <u8 as Into<u32>>::into(result) == lvgl_sys::LV_RES_OK {
             unsafe {
                 ret = match ret {
