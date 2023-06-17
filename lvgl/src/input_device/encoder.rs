@@ -173,7 +173,7 @@ unsafe extern "C" fn feedback(_indev_drv: *mut lvgl_sys::lv_indev_drv_t, _code: 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{Display, DrawBuffer};
+    use crate::Display;
     use core::marker::PhantomData;
     use embedded_graphics::draw_target::DrawTarget;
     use embedded_graphics::geometry::Size;
@@ -214,11 +214,8 @@ mod test {
 
     #[test]
     fn encoder_input_device() {
-        const HOR_RES: u32 = 240;
-        const VER_RES: u32 = 240;
-
-        let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
-        let display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
+        crate::tests::initialize_test(true);
+        let display = Display::default();
 
         fn read_encoder_device() -> BufferStatus {
             EncoderInputData::Press.pressed().once()

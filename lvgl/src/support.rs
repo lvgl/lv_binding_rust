@@ -350,16 +350,16 @@ impl From<TextAlign> for u8 {
 }
 
 /// Boolean for determining whether animations are enabled.
-pub enum Animation {
+pub enum AnimationState {
     ON,
     OFF,
 }
 
-impl From<Animation> for lvgl_sys::lv_anim_enable_t {
-    fn from(anim: Animation) -> Self {
+impl From<AnimationState> for lvgl_sys::lv_anim_enable_t {
+    fn from(anim: AnimationState) -> Self {
         match anim {
-            Animation::ON => lvgl_sys::lv_anim_enable_t_LV_ANIM_ON,
-            Animation::OFF => lvgl_sys::lv_anim_enable_t_LV_ANIM_OFF,
+            AnimationState::ON => lvgl_sys::lv_anim_enable_t_LV_ANIM_ON,
+            AnimationState::OFF => lvgl_sys::lv_anim_enable_t_LV_ANIM_OFF,
         }
     }
 }

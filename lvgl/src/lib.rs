@@ -52,9 +52,9 @@ use crate::point::Point;
 #[cfg(feature = "embedded_graphics")]
 use embedded_graphics::geometry::Point;
 
+pub use crate::lv_core::*;
 pub use display::*;
 pub use functions::*;
-pub use lv_core::*;
 pub use support::*;
 
 mod display;
@@ -102,40 +102,36 @@ pub fn init() {
 
 #[cfg(not(feature = "unsafe_no_autoinit"))]
 #[ctor::ctor]
-fn init() {
+fn once_init() {
     unsafe {
         lvgl_sys::lv_init();
     }
 }
 
+/// Initializes LVGL. Unless `unsafe_no_autoinit` is enabled, do not call
+/// without first calling `deinit()` and dropping all old values.
+#[cfg(not(feature = "unsafe_no_autoinit"))]
+pub unsafe fn init() {
+    unsafe {
+        lvgl_sys::lv_init();
+    }
+}
+
+/// Uninitializes LVGL. Make sure to reinitialize it before reusing it.
+pub unsafe fn deinit() {
+    unsafe { lvgl_sys::lv_deinit() }
+}
+
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::display::{Display, DrawBuffer};
-    use core::sync::atomic::{AtomicBool, Ordering};
 
-    struct RunOnce(AtomicBool);
-
-    impl RunOnce {
-        const fn new() -> Self {
-            Self(AtomicBool::new(false))
-        }
-
-        fn swap_and_check(&self) -> bool {
-            self.0
-                .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
-                .is_ok()
-        }
-    }
-
-    pub(crate) fn initialize_test() {
-        #[cfg(feature = "unsafe_no_autoinit")]
-        init();
-
-        static ONCE_INIT: RunOnce = RunOnce::new();
-        const REFRESH_BUFFER_SIZE: usize = 64 * 64 / 10;
-        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
-
-        if ONCE_INIT.swap_and_check() {
+    pub(crate) fn initialize_test(buf: bool) {
+        unsafe { crate::deinit() };
+        unsafe { crate::init() };
+        if buf {
+            const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
+            let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
             let _ = Display::register(buffer, 240, 240, |_| {}).unwrap();
         }
     }

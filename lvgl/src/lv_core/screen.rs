@@ -24,7 +24,7 @@ impl Widget for Screen {
     type SpecialEvent = u32;
     type Part = Part;
 
-    fn from_raw(raw: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
+    unsafe fn from_raw(raw: core::ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
         match Self::try_from(Obj::from_raw(raw)?) {
             Ok(s) => Some(s),
             Err(_) => None,
@@ -70,7 +70,7 @@ mod test {
     fn screen_test() {
         const HOR_RES: u32 = 240;
         const VER_RES: u32 = 240;
-
+        crate::tests::initialize_test(false);
         let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
         let mut display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
         let mut screen_old = display.get_scr_act().unwrap();

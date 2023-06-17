@@ -1,4 +1,4 @@
-use crate::support::Animation;
+use crate::support::AnimationState;
 use crate::widgets::Bar;
 use crate::{LvResult, NativeObject};
 
@@ -12,7 +12,7 @@ impl Bar {
     //}
 
     /// Set a new value on the bar
-    pub fn set_value(&mut self, value: i32, anim: Animation) -> LvResult<()> {
+    pub fn set_value(&mut self, value: i32, anim: AnimationState) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_bar_set_value(self.core.raw()?.as_mut(), value, anim.into());
         }
