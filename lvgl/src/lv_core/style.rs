@@ -55,6 +55,7 @@ impl Default for Style {
 
 bitflags! {
     /// Represents possible opacities for use on `Style` objects.
+    #[derive(Debug, Clone, Copy)]
     pub struct Opacity: u32 {
         const OPA_TRANSP = lvgl_sys::LV_OPA_TRANSP;
         const OPA_0 = lvgl_sys::LV_OPA_0;
@@ -205,10 +206,50 @@ impl<const N: usize> From<&CoordDesc<N>> for *const i16 {
     }
 }
 
+#[derive(Clone)]
+pub enum StyleValues {
+    Num(i32),
+    Color(Color),
+    Opacity(Opacity),
+    //Align(Align),
+    None,
+}
+
+impl StyleValues {
+    pub fn is_some(&self) -> bool {
+        match self {
+            StyleValues::None => false,
+            _ => true,
+        }
+    }
+}
+
+/*impl StyleValues {
+    pub fn num(&self) -> i32 {
+        self.num
+    }
+
+    pub fn color(&self) -> Color {
+        self.color
+    }
+}
+
+impl From<lvgl_sys::lv_style_value_t> for StyleValues {
+    fn from(value: lvgl_sys::lv_style_value_t) -> Self {
+        #[cfg(debug_assertions)]
+        assert!(!value.ptr.is_null());
+        Self {
+            num: value.num,
+            color: Color::from_raw(value.color),
+        }
+    }
+}*/
+
 bitflags! {
     /// Various constants relevant for `Style` parameters
+    #[derive(PartialEq, Eq)]
     pub struct StyleProp: u32 {
-        const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV;
+        //const PROP_INV = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_INV;
 
         /*Group 0*/
         const WIDTH = lvgl_sys::lv_style_prop_t_LV_STYLE_WIDTH;
@@ -318,7 +359,7 @@ bitflags! {
         const LAYOUT = lvgl_sys::lv_style_prop_t_LV_STYLE_LAYOUT;
         const BASE_DIR = lvgl_sys::lv_style_prop_t_LV_STYLE_BASE_DIR;
 
-        const PROP_ANY = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_ANY;
+        //const PROP_ANY = lvgl_sys::lv_style_prop_t_LV_STYLE_PROP_ANY;
     }
 }
 
@@ -355,6 +396,111 @@ macro_rules! gen_lv_style_generic {
 }
 
 impl Style {
+    pub fn get_prop(&self, prop: StyleProp) -> StyleValues {
+        let mut ret: StyleValues;
+        let mut raw_ret = match prop {
+            StyleProp::WIDTH
+            | StyleProp::MIN_WIDTH
+            | StyleProp::MAX_WIDTH
+            | StyleProp::HEIGHT
+            | StyleProp::MIN_HEIGHT
+            | StyleProp::MAX_HEIGHT
+            | StyleProp::X
+            | StyleProp::Y
+            | StyleProp::TRANSFORM_WIDTH
+            | StyleProp::TRANSFORM_HEIGHT
+            | StyleProp::TRANSFORM_ZOOM
+            | StyleProp::TRANSFORM_ANGLE
+            | StyleProp::TRANSLATE_X
+            | StyleProp::TRANSLATE_Y
+            | StyleProp::PAD_TOP
+            | StyleProp::PAD_LEFT
+            | StyleProp::PAD_BOTTOM
+            | StyleProp::PAD_RIGHT
+            | StyleProp::PAD_ROW
+            | StyleProp::PAD_COLUMN
+            | StyleProp::BORDER_WIDTH
+            | StyleProp::OUTLINE_WIDTH
+            | StyleProp::OUTLINE_PAD
+            | StyleProp::SHADOW_WIDTH
+            | StyleProp::SHADOW_SPREAD
+            | StyleProp::SHADOW_OFS_X
+            | StyleProp::SHADOW_OFS_Y
+            | StyleProp::LINE_WIDTH
+            | StyleProp::LINE_DASH_WIDTH
+            | StyleProp::LINE_DASH_GAP
+            | StyleProp::ARC_WIDTH
+            | StyleProp::RADIUS => {
+                ret = StyleValues::Num(0);
+                lvgl_sys::lv_style_value_t { num: 0 }
+            }
+
+            StyleProp::BG_OPA
+            | StyleProp::BG_IMG_OPA
+            | StyleProp::BG_IMG_RECOLOR_OPA
+            | StyleProp::BORDER_OPA
+            | StyleProp::OUTLINE_OPA
+            | StyleProp::SHADOW_OPA
+            | StyleProp::IMG_OPA
+            | StyleProp::IMG_RECOLOR_OPA
+            | StyleProp::LINE_OPA
+            | StyleProp::ARC_OPA
+            | StyleProp::TEXT_OPA
+            | StyleProp::OPA => {
+                ret = StyleValues::Opacity(Opacity::OPA_0);
+                lvgl_sys::lv_style_value_t { num: 0 }
+            }
+
+            StyleProp::BG_COLOR
+            | StyleProp::BG_GRAD_COLOR
+            | StyleProp::BORDER_COLOR
+            | StyleProp::OUTLINE_COLOR
+            | StyleProp::SHADOW_COLOR
+            | StyleProp::LINE_COLOR
+            | StyleProp::ARC_COLOR
+            | StyleProp::TEXT_COLOR => {
+                ret = StyleValues::Color(Color::default());
+                lvgl_sys::lv_style_value_t {
+                    color: Color::default().raw,
+                }
+            }
+
+            _ => {
+                ret = StyleValues::None;
+                lvgl_sys::lv_style_value_t {
+                    ptr: core::ptr::null(),
+                }
+            }
+        };
+
+        let ptr = &mut raw_ret as *mut _;
+        let result = unsafe {
+            lvgl_sys::lv_style_get_prop(self.raw.clone().into_raw() as *const _, prop.bits(), ptr)
+        };
+        if <u8 as Into<u32>>::into(result) == lvgl_sys::LV_RES_OK {
+            unsafe {
+                ret = match ret {
+                    StyleValues::Num(_) => StyleValues::Num(raw_ret.num),
+                    StyleValues::Opacity(_) => StyleValues::Opacity(Opacity::from_bits_retain(
+                        raw_ret.num.try_into().unwrap(),
+                    )),
+                    StyleValues::Color(_) => StyleValues::Color(Color::from_raw(raw_ret.color)),
+                    _ => StyleValues::None,
+                }
+            }
+            ret
+        } else {
+            StyleValues::None
+        }
+        /*unsafe {
+            let ret = lvgl_sys::lv_style_value_t {
+                num: 0,
+                ptr: core::ptr::null(),
+                color: Color::from_rgb((0, 0, 0)).raw,
+            };
+        }*/
+    }
+
     gen_lv_style!(set_align, Align);
     //gen_lv_style!(set_anim, );
     //gen_lv_style!(set_anim_speed, );
