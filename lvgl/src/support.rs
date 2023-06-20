@@ -2,7 +2,9 @@ use crate::display::DisplayError;
 use crate::Widget;
 use core::convert::{TryFrom, TryInto};
 use core::ptr::NonNull;
-
+use core::fmt;
+#[cfg(feature = "nightly")]
+use core::error::Error;
 #[cfg(feature = "embedded_graphics")]
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 
@@ -16,6 +18,20 @@ pub enum LvError {
     LvOOMemory,
     AlreadyInUse,
 }
+
+impl fmt::Display for LvError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", match self {
+            LvError::InvalidReference => "Accessed invalid reference or ptr",
+            LvError::Uninitialized => "LVGL uninitialized",
+            LvError::LvOOMemory => "LVGL out of memory",
+            LvError::AlreadyInUse => "Resource already in use",
+        })
+    }
+}
+
+#[cfg(feature = "nightly")]
+impl Error for LvError {}
 
 impl From<DisplayError> for LvError {
     fn from(err: DisplayError) -> Self {

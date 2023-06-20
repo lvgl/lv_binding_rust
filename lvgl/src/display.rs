@@ -7,6 +7,9 @@ use core::mem::{ManuallyDrop, MaybeUninit};
 use core::pin::Pin;
 use core::ptr::NonNull;
 use core::{ptr, result};
+use core::fmt;
+#[cfg(feature = "nightly")]
+use core::error::Error;
 
 /// Error in interacting with a `Display`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -15,6 +18,19 @@ pub enum DisplayError {
     FailedToRegister,
     NotRegistered,
 }
+
+impl fmt::Display for DisplayError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Display {}", match self {
+            DisplayError::NotAvailable => "not available",
+            DisplayError::FailedToRegister => "failed to register",
+            DisplayError::NotRegistered => "not registered",
+        })
+    }
+}
+
+#[cfg(feature = "nightly")]
+impl Error for DisplayError {}
 
 type Result<T> = result::Result<T, DisplayError>;
 
