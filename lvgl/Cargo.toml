@@ -52,9 +52,11 @@ use-vendored-config = ["lvgl-sys/use-vendored-config"]
 # on the timer module for usage notes.
 rust_timer = ["lvgl-sys/rust_timer"]
 
-# Enables some unstable features. Currently, only #[cfg_accessible] is used.
+# Enables some unstable features. Currently, #![feature(cfg_accessible)] and
+# #![feature(error_in_core)] are used.
 # This feature will currently allow:
 # - Using built-in LVGL fonts other than the default
+# - Handling LvErrors/LvResults with error-handling libraries i.e. anyhow
 nightly = []
 
 # Disables auto-initializing LVGL.

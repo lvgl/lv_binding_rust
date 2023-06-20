@@ -14,6 +14,7 @@
 
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(feature = "nightly", feature(cfg_accessible))]
+#![cfg_attr(feature = "nightly", feature(error_in_core))]
 
 #[macro_use]
 extern crate bitflags;
