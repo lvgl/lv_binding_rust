@@ -21,7 +21,7 @@ pub struct Animation {
 
 impl Animation {
     /// Instantiates an `Animation` with the required attributes.
-    pub fn new<'a, T, F>(
+    pub fn new<'a, 'b, T, F>(
         target: &mut T,
         duration: Duration,
         start: i32,
@@ -29,7 +29,7 @@ impl Animation {
         animator: F,
     ) -> LvResult<Self>
     where
-        T: Widget,
+        T: Widget<'b>,
         F: FnMut(&mut Obj, i32) + 'a,
     {
         unsafe {
@@ -49,7 +49,7 @@ impl Animation {
             (*anim.raw).end_value = end;
             (*anim.raw).user_data = Box::<F>::into_raw(Box::new(animator)) as *mut _;
             (*anim.raw).var = target as *mut _ as *mut _;
-            (*anim.raw).exec_cb = Some(animator_trampoline::<T, F>);
+            (*anim.raw).exec_cb = Some(animator_trampoline::<'a, 'b, T, F>);
 
             Ok(anim)
         }
@@ -104,9 +104,9 @@ impl Animation {
     }
 }
 
-unsafe extern "C" fn animator_trampoline<'a, T, F>(obj: *mut c_void, val: i32)
+unsafe extern "C" fn animator_trampoline<'a, 'b, T, F>(obj: *mut c_void, val: i32)
 where
-    T: Widget,
+    T: Widget<'b>,
     F: FnMut(&mut Obj, i32) + 'a,
 {
     unsafe {

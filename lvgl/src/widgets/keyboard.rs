@@ -2,7 +2,7 @@ use crate::widgets::{Keyboard, Textarea};
 use crate::LvResult;
 use crate::NativeObject;
 
-impl Keyboard {
+impl Keyboard<'_> {
     /// Associates a given `Textarea` to the keyboard.
     pub fn set_textarea(&mut self, textarea: &mut Textarea) -> LvResult<()> {
         unsafe {

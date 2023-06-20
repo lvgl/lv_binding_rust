@@ -8,7 +8,7 @@ mod alloc_imp {
     use cstr_core::CString;
     //use core::convert::TryFrom;
 
-    impl<S: AsRef<str>> From<S> for Label {
+    impl<S: AsRef<str>> From<S> for Label<'_> {
         fn from(text: S) -> Self {
             // text.try_into().unwrap()
             let text_cstr = CString::new(text.as_ref()).unwrap();
@@ -31,7 +31,7 @@ mod alloc_imp {
     // }
 }
 
-impl Label {
+impl Label<'_> {
     pub fn set_long_mode(&mut self, long_mode: LabelLongMode) -> LvResult<()> {
         unsafe {
             Ok(lvgl_sys::lv_label_set_long_mode(

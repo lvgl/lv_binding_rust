@@ -38,7 +38,7 @@ pub(crate) fn disp_get_default() -> Result<Display> {
     ))
 }
 
-pub(crate) fn get_str_act(disp: Option<&Display>) -> Result<Obj> {
+pub(crate) fn get_str_act<'a>(disp: Option<&'a Display>) -> Result<Obj<'a>> {
     let scr_ptr = unsafe {
         lvgl_sys::lv_disp_get_scr_act(
             disp.map(|d| d.disp.as_ptr())
@@ -69,7 +69,10 @@ pub fn task_handler() {
 
 /// Directly send an event to a specific widget.
 #[inline]
-pub fn event_send<W: Widget>(obj: &mut W, event: Event<W::SpecialEvent>) -> LvResult<()> {
+pub fn event_send<W: for<'a> Widget<'a>>(
+    obj: &mut W,
+    event: Event<<W as Widget<'_>>::SpecialEvent>,
+) -> LvResult<()> {
     unsafe {
         lvgl_sys::lv_event_send(obj.raw()?.as_mut(), event.into(), ptr::null_mut());
     };

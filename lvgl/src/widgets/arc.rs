@@ -2,7 +2,7 @@ use crate::lv_core::obj::NativeObject;
 use crate::widgets::Arc;
 use crate::LvResult;
 
-impl Arc {
+impl Arc<'_> {
     // /// Set the start angle, for the given arc part.
     // /// 0 degrees for the right, 90 degrees for the bottom, etc.
     // pub fn set_start_angle(&mut self, angle: u16, part: ArcPart) -> LvResult<()> {

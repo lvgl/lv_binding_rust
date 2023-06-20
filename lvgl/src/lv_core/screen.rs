@@ -2,11 +2,11 @@ use crate::{LvError, NativeObject, Obj, Part, Widget};
 
 /// An LVGL screen.
 #[derive(Debug)]
-pub struct Screen {
-    raw: Obj,
+pub struct Screen<'a> {
+    raw: Obj<'a>,
 }
 
-impl Default for Screen {
+impl Default for Screen<'_> {
     fn default() -> Self {
         Self {
             raw: Obj::default(),
@@ -14,13 +14,13 @@ impl Default for Screen {
     }
 }
 
-impl NativeObject for Screen {
+impl NativeObject for Screen<'_> {
     fn raw(&self) -> crate::LvResult<core::ptr::NonNull<lvgl_sys::lv_obj_t>> {
         self.raw.raw()
     }
 }
 
-impl Widget for Screen {
+impl<'a> Widget<'a> for Screen<'a> {
     type SpecialEvent = u32;
     type Part = Part;
 
@@ -32,10 +32,10 @@ impl Widget for Screen {
     }
 }
 
-impl TryFrom<Obj> for Screen {
+impl<'a> TryFrom<Obj<'a>> for Screen<'a> {
     type Error = LvError;
 
-    fn try_from(value: Obj) -> Result<Self, Self::Error> {
+    fn try_from(value: Obj<'a>) -> Result<Self, Self::Error> {
         match unsafe { (*value.raw()?.as_mut()).parent } as usize {
             0 => Ok(Self { raw: value }),
             _ => Err(LvError::InvalidReference),
@@ -43,20 +43,20 @@ impl TryFrom<Obj> for Screen {
     }
 }
 
-impl Into<Obj> for Screen {
-    fn into(self) -> Obj {
+impl<'a> Into<Obj<'a>> for Screen<'a> {
+    fn into(self) -> Obj<'a> {
         self.raw
     }
 }
 
-impl AsRef<Obj> for Screen {
-    fn as_ref(&self) -> &Obj {
+impl<'a> AsRef<Obj<'a>> for Screen<'a> {
+    fn as_ref(&self) -> &Obj<'a> {
         &self.raw
     }
 }
 
-impl AsMut<Obj> for Screen {
-    fn as_mut(&mut self) -> &mut Obj {
+impl<'a> AsMut<Obj<'a>> for Screen<'a> {
+    fn as_mut(&mut self) -> &mut Obj<'a> {
         &mut self.raw
     }
 }
@@ -72,7 +72,7 @@ mod test {
         const VER_RES: u32 = 240;
         crate::tests::initialize_test(false);
         let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
-        let mut display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
+        let display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
         let mut screen_old = display.get_scr_act().unwrap();
         let mut screen_new = Screen::default();
         display.set_scr_act(&mut screen_new).unwrap();
