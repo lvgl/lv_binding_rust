@@ -4,3 +4,5 @@ members = [
     "lvgl-codegen",
     "lvgl-sys",
 ]
+
+resolver = "2"
