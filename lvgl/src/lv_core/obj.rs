@@ -8,6 +8,7 @@
 use crate::lv_core::style::Style;
 use crate::{Align, LvError, LvResult};
 use core::fmt::{self, Debug};
+use core::marker::PhantomData;
 use core::ptr;
 
 /// Represents a native LVGL object.
@@ -19,13 +20,15 @@ pub trait NativeObject {
 /// Generic LVGL object.
 ///
 /// This is the parent object of all widget types. It stores the native LVGL raw pointer.
-pub struct Obj {
+pub struct Obj<'a> {
     // We use a raw pointer here because we do not control this memory address, it is controlled
     // by LVGL's global state.
     raw: *mut lvgl_sys::lv_obj_t,
+    // This is to ensure safety for style memory; it has no runtime impact
+    styles_used: PhantomData<&'a lvgl_sys::lv_style_t>,
 }
 
-impl Debug for Obj {
+impl Debug for Obj<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("NativeObject")
             .field("raw", &"!! LVGL lv_obj_t ptr !!")
@@ -35,13 +38,16 @@ impl Debug for Obj {
 
 // We need to manually impl methods on Obj since widget codegen is defined in
 // terms of Obj
-impl Obj {
+impl Obj<'_> {
     pub fn create(parent: &mut impl NativeObject) -> LvResult<Self> {
         unsafe {
             let ptr = lvgl_sys::lv_obj_create(parent.raw()?.as_mut());
             if ptr::NonNull::new(ptr).is_some() {
                 //(*ptr).user_data = Box::new(UserDataObj::empty()).into_raw() as *mut _;
-                Ok(Self { raw: ptr })
+                Ok(Self {
+                    raw: ptr,
+                    styles_used: PhantomData,
+                })
             } else {
                 Err(LvError::InvalidReference)
             }
@@ -49,12 +55,12 @@ impl Obj {
     }
 
     pub fn new() -> crate::LvResult<Self> {
-        let mut parent = crate::display::DefaultDisplay::get_scr_act()?;
+        let mut parent = crate::display::get_scr_act()?;
         Self::create(&mut parent)
     }
 }
 
-impl NativeObject for Obj {
+impl NativeObject for Obj<'_> {
     fn raw(&self) -> LvResult<ptr::NonNull<lvgl_sys::lv_obj_t>> {
         if let Some(non_null_ptr) = ptr::NonNull::new(self.raw) {
             Ok(non_null_ptr)
@@ -65,7 +71,7 @@ impl NativeObject for Obj {
 }
 
 /// A wrapper for all LVGL common operations on generic objects.
-pub trait Widget: NativeObject + Sized {
+pub trait Widget<'a>: NativeObject + Sized + 'a {
     type SpecialEvent;
     type Part: Into<lvgl_sys::lv_part_t>;
 
@@ -79,7 +85,7 @@ pub trait Widget: NativeObject + Sized {
     unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
 
     /// Adds a `Style` to a given widget.
-    fn add_style(&mut self, part: Self::Part, style: &mut Style) -> LvResult<()> {
+    fn add_style(&mut self, part: Self::Part, style: &'a mut Style) -> LvResult<()> {
         unsafe {
             lvgl_sys::lv_obj_add_style(
                 self.raw()?.as_mut(),
@@ -144,19 +150,23 @@ pub trait Widget: NativeObject + Sized {
     }
 }
 
-impl Widget for Obj {
+impl<'a> Widget<'a> for Obj<'a> {
     type SpecialEvent = u32;
     type Part = Part;
 
     unsafe fn from_raw(raw: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
-        Some(Self { raw: raw.as_ptr() })
+        Some(Self {
+            raw: raw.as_ptr(),
+            styles_used: PhantomData,
+        })
     }
 }
 
-impl Default for Obj {
+impl Default for Obj<'_> {
     fn default() -> Self {
         Self {
             raw: unsafe { lvgl_sys::lv_obj_create(ptr::null_mut()) },
+            styles_used: PhantomData,
         }
     }
 }
@@ -176,14 +186,14 @@ macro_rules! define_object {
     };
     ($item:ident, event = $event_type:ty, part = $part_type:ty) => {
         #[derive(Debug)]
-        pub struct $item {
-            core: $crate::Obj,
+        pub struct $item<'a> {
+            core: $crate::Obj<'a>,
         }
 
-        impl $item {
+        impl<'a> $item<'a> {
             pub fn on_event<F>(&mut self, f: F) -> $crate::LvResult<()>
             where
-                F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget>::SpecialEvent>),
+                F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget<'a>>::SpecialEvent>),
             {
                 use $crate::NativeObject;
                 unsafe {
@@ -191,7 +201,9 @@ macro_rules! define_object {
                     obj.user_data = $crate::Box::into_raw($crate::Box::new(f)) as *mut _;
                     lvgl_sys::lv_obj_add_event_cb(
                         obj,
-                        lvgl_sys::lv_event_cb_t::Some($crate::support::event_callback::<Self, F>),
+                        lvgl_sys::lv_event_cb_t::Some(
+                            $crate::support::event_callback::<'a, Self, F>,
+                        ),
                         lvgl_sys::lv_event_code_t_LV_EVENT_ALL,
                         obj.user_data,
                     );
@@ -200,13 +212,13 @@ macro_rules! define_object {
             }
         }
 
-        impl $crate::NativeObject for $item {
+        impl $crate::NativeObject for $item<'_> {
             fn raw(&self) -> $crate::LvResult<core::ptr::NonNull<lvgl_sys::lv_obj_t>> {
                 self.core.raw()
             }
         }
 
-        impl $crate::Widget for $item {
+        impl<'a> $crate::Widget<'a> for $item<'a> {
             type SpecialEvent = $event_type;
             type Part = $part_type;
 
@@ -248,7 +260,7 @@ macro_rules! define_object {
 //     }
 //
 //     pub fn new() -> crate::LvResult<Self> {
-//         let mut parent = crate::display::DefaultDisplay::get_scr_act()?;
+//         let mut parent = crate::display::get_scr_act()?;
 //         Ok(Self::create_at(&mut parent)?)
 //     }
 // }

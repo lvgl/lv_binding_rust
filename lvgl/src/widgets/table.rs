@@ -3,7 +3,7 @@ use crate::widgets::Table;
 use crate::LvResult;
 use core::mem::MaybeUninit;
 
-impl Table {
+impl Table<'_> {
     /// Sets the column width. Row height cannot be set manually and is
     /// calculated by LVGL based on styling parameters.
     pub fn set_col_width(&mut self, column: u16, width: i16) -> LvResult<()> {

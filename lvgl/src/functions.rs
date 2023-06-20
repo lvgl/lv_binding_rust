@@ -69,7 +69,10 @@ pub fn task_handler() {
 
 /// Directly send an event to a specific widget.
 #[inline]
-pub fn event_send<W: Widget>(obj: &mut W, event: Event<W::SpecialEvent>) -> LvResult<()> {
+pub fn event_send<W: for<'a> Widget<'a>>(
+    obj: &mut W,
+    event: Event<<W as Widget<'_>>::SpecialEvent>,
+) -> LvResult<()> {
     unsafe {
         lvgl_sys::lv_event_send(obj.raw()?.as_mut(), event.into(), ptr::null_mut());
     };

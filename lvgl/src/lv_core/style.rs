@@ -217,10 +217,7 @@ pub enum StyleValues {
 
 impl StyleValues {
     pub fn is_some(&self) -> bool {
-        match self {
-            StyleValues::None => false,
-            _ => true,
-        }
+        !matches!(self, StyleValues::None)
     }
 }
 

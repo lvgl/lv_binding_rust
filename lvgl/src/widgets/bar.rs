@@ -2,7 +2,7 @@ use crate::support::AnimationState;
 use crate::widgets::Bar;
 use crate::{LvResult, NativeObject};
 
-impl Bar {
+impl Bar<'_> {
     /// Set minimum and the maximum values of the bar
     //pub fn set_range(&mut self, min: i16, max: i16) -> LvResult<()> {
     //    unsafe {

@@ -1,10 +1,10 @@
 use crate::display::DisplayError;
 use crate::Widget;
 use core::convert::{TryFrom, TryInto};
-use core::ptr::NonNull;
-use core::fmt;
 #[cfg(feature = "nightly")]
 use core::error::Error;
+use core::fmt;
+use core::ptr::NonNull;
 #[cfg(feature = "embedded_graphics")]
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 
@@ -21,12 +21,16 @@ pub enum LvError {
 
 impl fmt::Display for LvError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            LvError::InvalidReference => "Accessed invalid reference or ptr",
-            LvError::Uninitialized => "LVGL uninitialized",
-            LvError::LvOOMemory => "LVGL out of memory",
-            LvError::AlreadyInUse => "Resource already in use",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                LvError::InvalidReference => "Accessed invalid reference or ptr",
+                LvError::Uninitialized => "LVGL uninitialized",
+                LvError::LvOOMemory => "LVGL out of memory",
+                LvError::AlreadyInUse => "Resource already in use",
+            }
+        )
     }
 }
 
@@ -273,10 +277,10 @@ pub enum PointerEvent {
     DragThrowBegin,
 }
 
-pub(crate) unsafe extern "C" fn event_callback<T, F>(event: *mut lvgl_sys::lv_event_t)
+pub(crate) unsafe extern "C" fn event_callback<'a, T, F>(event: *mut lvgl_sys::lv_event_t)
 where
-    T: Widget + Sized,
-    F: FnMut(T, Event<T::SpecialEvent>),
+    T: Widget<'a> + Sized,
+    F: FnMut(T, Event<<T as Widget<'a>>::SpecialEvent>),
 {
     let code = (*event).code;
     let obj = (*event).target;
@@ -389,9 +393,9 @@ pub enum LabelLongMode {
     Wrap = lvgl_sys::LV_LABEL_LONG_WRAP,
 }
 
-impl Into<u8> for LabelLongMode {
-    fn into(self) -> u8 {
-        unsafe { (self as u32).try_into().unwrap_unchecked() }
+impl From<LabelLongMode> for u8 {
+    fn from(value: LabelLongMode) -> Self {
+        unsafe { (value as u32).try_into().unwrap_unchecked() }
     }
 }
 

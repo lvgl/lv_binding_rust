@@ -3,13 +3,13 @@ use crate::Screen;
 use crate::{disp_drv_register, disp_get_default, get_str_act, LvResult, NativeObject};
 use crate::{Box, Color};
 use core::convert::TryInto;
+#[cfg(feature = "nightly")]
+use core::error::Error;
+use core::fmt;
 use core::mem::{ManuallyDrop, MaybeUninit};
 use core::pin::Pin;
 use core::ptr::NonNull;
 use core::{ptr, result};
-use core::fmt;
-#[cfg(feature = "nightly")]
-use core::error::Error;
 
 /// Error in interacting with a `Display`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -21,11 +21,15 @@ pub enum DisplayError {
 
 impl fmt::Display for DisplayError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Display {}", match self {
-            DisplayError::NotAvailable => "not available",
-            DisplayError::FailedToRegister => "failed to register",
-            DisplayError::NotRegistered => "not registered",
-        })
+        write!(
+            f,
+            "Display {}",
+            match self {
+                DisplayError::NotAvailable => "not available",
+                DisplayError::FailedToRegister => "failed to register",
+                DisplayError::NotRegistered => "not registered",
+            }
+        )
     }
 }
 
@@ -63,18 +67,17 @@ impl<'a> Display {
         let disp_p = &mut display_diver.disp_drv;
         disp_p.hor_res = hor_res.try_into().unwrap_or(240);
         disp_p.ver_res = ver_res.try_into().unwrap_or(240);
-        let ret = Ok(disp_drv_register(&mut display_diver, None)?);
+        Ok(disp_drv_register(&mut display_diver, None)?)
         //display_diver.disp_drv.leak();
-        ret
     }
 
     /// Returns the current active screen.
-    pub fn get_scr_act(&self) -> Result<Screen> {
+    pub fn get_scr_act(&'a self) -> Result<Screen<'a>> {
         Ok(get_str_act(Some(self))?.try_into()?)
     }
 
     /// Sets a `Screen` as currently active.
-    pub fn set_scr_act(&mut self, screen: &mut Screen) -> LvResult<()> {
+    pub fn set_scr_act(&'a self, screen: &'a mut Screen) -> LvResult<()> {
         let scr_ptr = unsafe { screen.raw()?.as_mut() };
         unsafe { lvgl_sys::lv_disp_load_scr(scr_ptr) }
         Ok(())
@@ -152,14 +155,9 @@ impl Drop for Display {
     }
 }
 
-#[derive(Copy, Clone)]
-pub(crate) struct DefaultDisplay {}
-
-impl DefaultDisplay {
-    /// Gets the active screen of the default display.
-    pub(crate) fn get_scr_act() -> Result<Screen> {
-        Ok(get_str_act(None)?.try_into()?)
-    }
+/// Gets the active screen of the default display.
+pub(crate) fn get_scr_act() -> Result<Screen<'static>> {
+    Ok(get_str_act(None)?.try_into()?)
 }
 
 /// A buffer of size `N` representing `N` pixels. `N` can be smaller than the
@@ -401,8 +399,7 @@ mod tests {
         let _screen_direct = display
             .get_scr_act()
             .expect("Return screen directly from the display instance");
-        let _screen_default =
-            DefaultDisplay::get_scr_act().expect("Return screen from the default display");
+        let _screen_default = get_scr_act().expect("Return screen from the default display");
     }
 
     #[test]
