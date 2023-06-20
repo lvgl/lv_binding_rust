@@ -43,13 +43,13 @@ impl Animation {
                 },
             };
 
-            (*anim.raw).time = duration.as_millis().try_into().unwrap_or(0);
-            (*anim.raw).start_value = start;
-            (*anim.raw).current_value = start;
-            (*anim.raw).end_value = end;
-            (*anim.raw).user_data = Box::<F>::into_raw(Box::new(animator)) as *mut _;
-            (*anim.raw).var = target as *mut _ as *mut _;
-            (*anim.raw).exec_cb = Some(animator_trampoline::<'a, 'b, T, F>);
+            anim.raw.time = duration.as_millis().try_into().unwrap_or(0);
+            anim.raw.start_value = start;
+            anim.raw.current_value = start;
+            anim.raw.end_value = end;
+            anim.raw.user_data = Box::<F>::into_raw(Box::new(animator)) as *mut _;
+            anim.raw.var = target as *mut _ as *mut _;
+            anim.raw.exec_cb = Some(animator_trampoline::<'a, 'b, T, F>);
 
             Ok(anim)
         }
@@ -64,32 +64,32 @@ impl Animation {
 
     /// Sets the delay before starting the animation.
     pub fn set_delay(&mut self, delay: Duration) -> Result<(), TryFromIntError> {
-        (*self.raw).act_time = -(delay.as_millis().try_into()?);
+        self.raw.act_time = -(delay.as_millis().try_into()?);
         Ok(())
     }
 
     /// Sets the delay before playback.
     pub fn set_playback_delay(&mut self, delay: Duration) -> Result<(), TryFromIntError> {
-        (*self.raw).playback_delay = delay.as_millis().try_into()?;
+        self.raw.playback_delay = delay.as_millis().try_into()?;
         Ok(())
     }
 
     /// Sets the total playback time.
     pub fn set_playback_time(&mut self, time: Duration) -> Result<(), TryFromIntError> {
-        (*self.raw).playback_time = time.as_millis().try_into()?;
+        self.raw.playback_time = time.as_millis().try_into()?;
         Ok(())
     }
 
     /// Sets the delay before repeating the animation.
     pub fn set_repeat_delay(&mut self, delay: Duration) -> Result<(), TryFromIntError> {
-        (*self.raw).repeat_delay = delay.as_millis().try_into()?;
+        self.raw.repeat_delay = delay.as_millis().try_into()?;
         Ok(())
     }
 
     /// Sets how many times the animation repeats.
     pub fn set_repeat_count(&mut self, count: AnimRepeatCount) {
         unsafe {
-            (*self.raw).repeat_cnt = match count {
+            self.raw.repeat_cnt = match count {
                 AnimRepeatCount::Finite(c) => c,
                 AnimRepeatCount::Infinite => lvgl_sys::LV_ANIM_REPEAT_INFINITE
                     .try_into()

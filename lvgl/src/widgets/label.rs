@@ -34,10 +34,8 @@ mod alloc_imp {
 impl Label<'_> {
     pub fn set_long_mode(&mut self, long_mode: LabelLongMode) -> LvResult<()> {
         unsafe {
-            Ok(lvgl_sys::lv_label_set_long_mode(
-                self.raw()?.as_mut(),
-                long_mode.into(),
-            ))
+            lvgl_sys::lv_label_set_long_mode(self.raw()?.as_mut(), long_mode.into());
+            Ok(())
         }
     }
 

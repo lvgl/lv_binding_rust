@@ -1,17 +1,9 @@
 use crate::{LvError, NativeObject, Obj, Part, Widget};
 
 /// An LVGL screen.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Screen<'a> {
     raw: Obj<'a>,
-}
-
-impl Default for Screen<'_> {
-    fn default() -> Self {
-        Self {
-            raw: Obj::default(),
-        }
-    }
 }
 
 impl NativeObject for Screen<'_> {
@@ -36,7 +28,7 @@ impl<'a> TryFrom<Obj<'a>> for Screen<'a> {
     type Error = LvError;
 
     fn try_from(value: Obj<'a>) -> Result<Self, Self::Error> {
-        match unsafe { (*value.raw()?.as_mut()).parent } as usize {
+        match unsafe { value.raw()?.as_mut().parent } as usize {
             0 => Ok(Self { raw: value }),
             _ => Err(LvError::InvalidReference),
         }

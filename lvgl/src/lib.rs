@@ -109,8 +109,12 @@ fn once_init() {
     }
 }
 
-/// Initializes LVGL. Unless `unsafe_no_autoinit` is enabled, do not call
-/// without first calling `deinit()` and dropping all old values.
+/// Initializes LVGL.
+///
+/// # Safety
+///
+/// Unless `unsafe_no_autoinit` is enabled, do not call this function without
+/// first calling `deinit()` and dropping all old values.
 #[cfg(not(feature = "unsafe_no_autoinit"))]
 pub unsafe fn init() {
     unsafe {
@@ -119,6 +123,10 @@ pub unsafe fn init() {
 }
 
 /// Uninitializes LVGL. Make sure to reinitialize it before reusing it.
+///
+/// # Safety
+///
+/// This function should not be called if LVGL is already uninitialized.
 pub unsafe fn deinit() {
     unsafe { lvgl_sys::lv_deinit() }
 }

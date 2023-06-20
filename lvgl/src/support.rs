@@ -393,9 +393,9 @@ pub enum LabelLongMode {
     Wrap = lvgl_sys::LV_LABEL_LONG_WRAP,
 }
 
-impl Into<u8> for LabelLongMode {
-    fn into(self) -> u8 {
-        unsafe { (self as u32).try_into().unwrap_unchecked() }
+impl From<LabelLongMode> for u8 {
+    fn from(value: LabelLongMode) -> Self {
+        unsafe { (value as u32).try_into().unwrap_unchecked() }
     }
 }
 

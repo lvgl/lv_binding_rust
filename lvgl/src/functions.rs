@@ -38,7 +38,7 @@ pub(crate) fn disp_get_default() -> Result<Display> {
     ))
 }
 
-pub(crate) fn get_str_act<'a>(disp: Option<&'a Display>) -> Result<Obj<'a>> {
+pub(crate) fn get_str_act(disp: Option<&Display>) -> Result<Obj> {
     let scr_ptr = unsafe {
         lvgl_sys::lv_disp_get_scr_act(
             disp.map(|d| d.disp.as_ptr())

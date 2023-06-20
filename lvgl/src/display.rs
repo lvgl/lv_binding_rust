@@ -67,9 +67,8 @@ impl<'a> Display {
         let disp_p = &mut display_diver.disp_drv;
         disp_p.hor_res = hor_res.try_into().unwrap_or(240);
         disp_p.ver_res = ver_res.try_into().unwrap_or(240);
-        let ret = Ok(disp_drv_register(&mut display_diver, None)?);
+        Ok(disp_drv_register(&mut display_diver, None)?)
         //display_diver.disp_drv.leak();
-        ret
     }
 
     /// Returns the current active screen.
