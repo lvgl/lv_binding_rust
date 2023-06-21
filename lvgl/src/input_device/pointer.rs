@@ -222,7 +222,7 @@ mod test {
         crate::tests::initialize_test();
         const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
         let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
-        let display = Display::register(buffer, 240, 240, |_| {}).unwrap();
+        let (display, _) = Display::register(buffer, 240, 240, |_| {}).unwrap();
 
         fn read_touchpad_device() -> BufferStatus {
             PointerInputData::Touch(Point::new(120, 23))

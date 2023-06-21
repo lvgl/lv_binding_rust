@@ -91,7 +91,7 @@ mod tests {
         tests::initialize_test();
         const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
         let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
-        let disp = Display::register(buffer, 240, 240, |_| {}).unwrap();
+        let (disp, _) = Display::register(buffer, 240, 240, |_| {}).unwrap();
         let _input = lv_drv_input_pointer_sdl!(disp);
     }
 }

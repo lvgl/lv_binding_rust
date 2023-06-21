@@ -66,8 +66,7 @@ mod test {
         const VER_RES: u32 = 240;
         crate::tests::initialize_test();
         let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
-        let display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
-        let mut screen = display.get_scr_act().unwrap();
+        let (_display, mut screen) = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
         let mut group = Group::default();
         let mut btn = Btn::create(&mut screen).unwrap();
         group.add_obj(&mut btn).unwrap();

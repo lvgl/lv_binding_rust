@@ -134,8 +134,8 @@ mod test {
         crate::tests::initialize_test();
         const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
         let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
-        let display = Display::register(buffer, 240, 240, |_| {}).unwrap();
-        let mut screen = display.get_scr_act().unwrap();
+        let (_display, mut screen) = Display::register(buffer, 240, 240, |_| {}).unwrap();
+        //let mut screen = display.get_scr_act().unwrap();
         let mut btn = Btn::create(&mut screen).unwrap();
         let mut anim =
             Animation::new(&mut btn, Duration::from_millis(10), 0, 100, |_, _| {}).unwrap();
