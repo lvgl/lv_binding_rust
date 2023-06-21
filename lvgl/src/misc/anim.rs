@@ -113,7 +113,7 @@ where
         let anim =
             NonNull::new(lvgl_sys::lv_anim_get(obj, None) as *mut lvgl_sys::lv_anim_t).unwrap();
         // yes, we have to do it this way. Casting `obj` directly to `&mut Obj` segfaults
-        let obj = (*(obj as *mut T)).raw().unwrap();
+        let obj = (*(obj as *mut T)).raw();
         if !anim.as_ref().user_data.is_null() {
             let callback = &mut *(obj.as_ref().user_data as *mut F);
             let mut obj_nondrop = Obj::from_raw(obj).unwrap();

@@ -1,6 +1,6 @@
 use crate::functions::CoreError;
 use crate::Screen;
-use crate::{disp_drv_register, disp_get_default, get_str_act, LvResult, NativeObject};
+use crate::{disp_drv_register, disp_get_default, get_str_act, NativeObject};
 use crate::{Box, Color};
 use core::convert::TryInto;
 #[cfg(feature = "nightly")]
@@ -77,10 +77,9 @@ impl<'a> Display {
     }
 
     /// Sets a `Screen` as currently active.
-    pub fn set_scr_act(&'a self, screen: &'a mut Screen) -> LvResult<()> {
-        let scr_ptr = unsafe { screen.raw()?.as_mut() };
+    pub fn set_scr_act(&'a self, screen: &'a mut Screen) {
+        let scr_ptr = unsafe { screen.raw().as_mut() };
         unsafe { lvgl_sys::lv_disp_load_scr(scr_ptr) }
-        Ok(())
     }
 
     /// Registers a display from raw functions and values.

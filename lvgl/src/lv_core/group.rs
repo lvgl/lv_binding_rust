@@ -27,7 +27,7 @@ impl Group {
 
     /// Adds an object to the group.
     pub fn add_obj(&mut self, obj: &impl NativeObject) -> LvResult<()> {
-        unsafe { lvgl_sys::lv_group_add_obj(self.raw()?.as_mut(), obj.raw()?.as_mut()) }
+        unsafe { lvgl_sys::lv_group_add_obj(self.raw()?.as_mut(), obj.raw().as_mut()) }
         Ok(())
     }
 
