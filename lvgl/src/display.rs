@@ -1,6 +1,6 @@
 use crate::functions::CoreError;
-use crate::Screen;
-use crate::{disp_drv_register, disp_get_default, get_str_act, NativeObject};
+use crate::{Screen, Widget};
+use crate::{disp_drv_register, disp_get_default, NativeObject};
 use crate::{Box, Color};
 use core::convert::TryInto;
 #[cfg(feature = "nightly")]
@@ -40,7 +40,7 @@ type Result<T> = result::Result<T, DisplayError>;
 
 /// An LVGL-registered display. Equivalent to an `lv_disp_t`.
 pub struct Display {
-    pub(crate) disp: NonNull<lvgl_sys::lv_disp_t>,
+    _disp: NonNull<lvgl_sys::lv_disp_t>,
     drop: Option<unsafe extern "C" fn()>,
 }
 
@@ -49,7 +49,7 @@ impl<'a> Display {
         disp: NonNull<lvgl_sys::lv_disp_t>,
         drop: Option<unsafe extern "C" fn()>,
     ) -> Self {
-        Self { disp, drop }
+        Self { _disp: disp, drop }
     }
 
     /// Registers a given `DrawBuffer` with an associated update function to
@@ -72,8 +72,11 @@ impl<'a> Display {
     }
 
     /// Returns the current active screen.
-    pub fn get_scr_act(&'a self) -> Result<Screen<'a>> {
-        Ok(get_str_act(Some(self))?.try_into()?)
+    pub fn get_scr_act(&'a self) -> Option<Screen<'a>> {
+        unsafe {
+            let ret = lvgl_sys::lv_disp_get_scr_act(&self as *const _ as *mut _);
+            Screen::from_raw(NonNull::new(ret)?)
+        }
     }
 
     /// Sets a `Screen` as currently active.
@@ -153,11 +156,6 @@ impl Drop for Display {
             unsafe { drop() }
         }
     }
-}
-
-/// Gets the active screen of the default display.
-pub(crate) fn get_scr_act() -> Result<Screen<'static>> {
-    Ok(get_str_act(None)?.try_into()?)
 }
 
 /// A buffer of size `N` representing `N` pixels. `N` can be smaller than the
@@ -389,24 +387,30 @@ mod tests {
 
     #[test]
     fn get_scr_act_return_display() {
-        tests::initialize_test(true);
-        let _screen = get_str_act(None).expect("We can get the active screen");
+        tests::initialize_test();
+        const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
+        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
+        let display = Display::register(buffer, 240, 240, |_| {}).unwrap();
+        let _screen = display.get_scr_act();
     }
 
     #[test]
     fn get_default_display() {
-        tests::initialize_test(true);
-        let display = Display::default();
+        tests::initialize_test();
+        const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
+        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
+        let display = Display::register(buffer, 240, 240, |_| {}).unwrap();
         let _screen_direct = display
             .get_scr_act()
             .expect("Return screen directly from the display instance");
-        let _screen_default = get_scr_act().expect("Return screen from the default display");
     }
 
     #[test]
     fn register_display_directly() -> Result<()> {
-        crate::tests::initialize_test(true);
-        let display = Display::default();
+        crate::tests::initialize_test();
+        const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
+        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
+        let display = Display::register(buffer, 240, 240, |_| {}).unwrap();
         let _screen = display
             .get_scr_act()
             .expect("Return screen directly from the display instance");

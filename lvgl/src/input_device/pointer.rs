@@ -178,7 +178,7 @@ unsafe extern "C" fn feedback(_indev_drv: *mut lvgl_sys::lv_indev_drv_t, _code: 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::Display;
+    use crate::{Display, DrawBuffer};
     use core::marker::PhantomData;
     use embedded_graphics::draw_target::DrawTarget;
     use embedded_graphics::geometry::Size;
@@ -219,8 +219,10 @@ mod test {
 
     #[test]
     fn pointer_input_device() {
-        crate::tests::initialize_test(true);
-        let display = Display::default();
+        crate::tests::initialize_test();
+        const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
+        let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
+        let display = Display::register(buffer, 240, 240, |_| {}).unwrap();
 
         fn read_touchpad_device() -> BufferStatus {
             PointerInputData::Touch(Point::new(120, 23))

@@ -29,6 +29,14 @@ pub struct Obj<'a> {
     dependents: PhantomData<&'a isize>,
 }
 
+impl Drop for Obj<'_> {
+    fn drop(&mut self) {
+        unsafe {
+            lvgl_sys::lv_obj_del(self.raw().as_mut())
+        }
+    }
+}
+
 impl Debug for Obj<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("NativeObject")
@@ -43,7 +51,7 @@ impl<'a> Obj<'a> {
     pub fn create(parent: &'a mut impl NativeObject) -> LvResult<Self> {
         unsafe {
             let ptr = lvgl_sys::lv_obj_create(parent.raw().as_mut());
-            if let Some(nn_ptr) = ptr::NonNull::new(ptr) {
+            if let Some(nn_ptr) = NonNull::new(ptr) {
                 //(*ptr).user_data = Box::new(UserDataObj::empty()).into_raw() as *mut _;
                 Ok(Self {
                     raw: nn_ptr,
@@ -55,10 +63,10 @@ impl<'a> Obj<'a> {
         }
     }
 
-    pub fn new() -> crate::LvResult<Self> {
-        let mut parent = crate::display::get_scr_act()?;
-        Self::create(unsafe { &mut *(&mut parent as *mut _) })
-    }
+    //pub fn new() -> crate::LvResult<Self> {
+    //    let mut parent = crate::display::get_scr_act()?;
+    //    Self::create(unsafe { &mut *(&mut parent as *mut _) })
+    //}
 
     pub fn blank() -> LvResult<Self> {
         match NonNull::new(unsafe { lvgl_sys::lv_obj_create(ptr::null_mut()) }) {
@@ -72,7 +80,7 @@ impl<'a> Obj<'a> {
 }
 
 impl NativeObject for Obj<'_> {
-    fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
+    fn raw(&self) -> NonNull<lvgl_sys::lv_obj_t> {
         self.raw
     }
 }
@@ -89,7 +97,7 @@ pub trait Widget<'a>: NativeObject + Sized + 'a {
     /// If the pointer is derived from a Rust-instantiated `obj` such as via
     /// calling `.raw()`, only the `obj` that survives longest may be dropped
     /// and the caller is responsible for ensuring data races do not occur.
-    unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
+    unsafe fn from_raw(raw_pointer: NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
 
     /// Adds a `Style` to a given widget.
     fn add_style(&mut self, part: Self::Part, style: &'a mut Style) {

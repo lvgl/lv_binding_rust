@@ -121,10 +121,10 @@ impl Rusty for LvFunc {
                     }
                 }
 
-                pub fn new() -> crate::LvResult<Self> {
-                    let mut parent = crate::display::get_scr_act()?;
-                    Self::create(&mut parent)
-                }
+                //pub fn new() -> crate::LvResult<Self> {
+                //    let mut parent = crate::display::get_scr_act()?;
+                //    Self::create(&mut parent)
+                //}
 
             });
         }
