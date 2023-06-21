@@ -228,6 +228,6 @@ mod test {
                 .once()
         }
 
-        let _touch_screen = Pointer::register(|| read_touchpad_device(), &display).unwrap();
+        let _touch_screen = Pointer::register(read_touchpad_device, &display).unwrap();
     }
 }

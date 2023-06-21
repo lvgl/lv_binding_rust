@@ -221,6 +221,6 @@ mod test {
             EncoderInputData::Press.pressed().once()
         }
 
-        let _encoder = Encoder::register(|| read_encoder_device(), &display).unwrap();
+        let _encoder = Encoder::register(read_encoder_device, &display).unwrap();
     }
 }
