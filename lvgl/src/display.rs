@@ -1,6 +1,6 @@
 use crate::functions::CoreError;
 use crate::Screen;
-use crate::{disp_drv_register, disp_get_default, get_str_act, LvResult, NativeObject};
+use crate::{disp_drv_register, disp_get_default, get_str_act, NativeObject};
 use crate::{Box, Color};
 use core::convert::TryInto;
 #[cfg(feature = "nightly")]
@@ -77,10 +77,9 @@ impl<'a> Display {
     }
 
     /// Sets a `Screen` as currently active.
-    pub fn set_scr_act(&'a self, screen: &'a mut Screen) -> LvResult<()> {
-        let scr_ptr = unsafe { screen.raw()?.as_mut() };
+    pub fn set_scr_act(&'a self, screen: &'a mut Screen) {
+        let scr_ptr = unsafe { screen.raw().as_mut() };
         unsafe { lvgl_sys::lv_disp_load_scr(scr_ptr) }
-        Ok(())
     }
 
     /// Registers a display from raw functions and values.
@@ -89,6 +88,7 @@ impl<'a> Display {
     ///
     /// `hor_res` and `ver_res` must be nonzero, and the provided functions
     /// must not themselves cause undefined behavior.
+    #[allow(clippy::too_many_arguments)]
     pub unsafe fn register_raw<const N: usize>(
         draw_buffer: DrawBuffer<N>,
         hor_res: u32,
@@ -230,6 +230,7 @@ impl<'a, const N: usize> DisplayDriver<N> {
         }))
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub unsafe fn new_raw(
         mut draw_buffer: DrawBuffer<N>,
         flush_cb: Option<

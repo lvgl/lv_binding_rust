@@ -1,6 +1,6 @@
 use crate::support::AnimationState;
 use crate::widgets::Bar;
-use crate::{LvResult, NativeObject};
+use crate::NativeObject;
 
 impl Bar<'_> {
     /// Set minimum and the maximum values of the bar
@@ -12,16 +12,15 @@ impl Bar<'_> {
     //}
 
     /// Set a new value on the bar
-    pub fn set_value(&mut self, value: i32, anim: AnimationState) -> LvResult<()> {
+    pub fn set_value(&mut self, value: i32, anim: AnimationState) {
         unsafe {
-            lvgl_sys::lv_bar_set_value(self.core.raw()?.as_mut(), value, anim.into());
+            lvgl_sys::lv_bar_set_value(self.core.raw().as_mut(), value, anim.into());
         }
-        Ok(())
     }
 
     /// Gets the current value of the bar
-    pub fn get_value(&self) -> LvResult<i32> {
-        unsafe { Ok(lvgl_sys::lv_bar_get_value(self.core.raw()?.as_ptr())) }
+    pub fn get_value(&self) -> i32 {
+        unsafe { lvgl_sys::lv_bar_get_value(self.core.raw().as_ptr()) }
     }
 }
 /*

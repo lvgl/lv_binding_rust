@@ -110,7 +110,7 @@ impl Rusty for LvFunc {
                 pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::#original_func_name(
-                            parent.raw()?.as_mut(),
+                            parent.raw().as_mut(),
                         );
                         if let Some(raw) = core::ptr::NonNull::new(ptr) {
                             let core = <crate::Obj as crate::Widget>::from_raw(raw).unwrap();
@@ -196,7 +196,7 @@ impl Rusty for LvFunc {
             .fold(quote!(), |args, (i, arg)| {
                 // if first arg is `const`, then it should be immutable
                 let next_arg = if i == 0 {
-                    quote!(self.core.raw()?.as_mut())
+                    quote!(self.core.raw().as_mut())
                 } else {
                     let var = arg.get_value_usage();
                     quote!(#var)
@@ -557,7 +557,7 @@ mod test {
         let expected_code = quote! {
             pub fn set_bg_end_angle(&mut self, end: u16) -> crate::LvResult<()> {
                 unsafe {
-                    lvgl_sys::lv_arc_set_bg_end_angle(self.core.raw()?.as_mut(), end);
+                    lvgl_sys::lv_arc_set_bg_end_angle(self.core.raw().as_mut(), end);
                 }
                 Ok(())
             }
@@ -590,7 +590,7 @@ mod test {
             pub fn set_text(&mut self, text: &cstr_core::CStr) -> crate::LvResult<()> {
                 unsafe {
                     lvgl_sys::lv_label_set_text(
-                        self.core.raw()?.as_mut(),
+                        self.core.raw().as_mut(),
                         text.as_ptr()
                     );
                 }
@@ -649,7 +649,7 @@ mod test {
                 pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::lv_arc_create(
-                            parent.raw()?.as_mut(),
+                            parent.raw().as_mut(),
                         );
                         if let Some(raw) = core::ptr::NonNull::new(ptr) {
                             let core = <crate::Obj as crate::Widget>::from_raw(raw).unwrap();
