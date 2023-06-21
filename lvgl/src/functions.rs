@@ -30,13 +30,13 @@ pub(crate) fn disp_drv_register<const N: usize>(
     ))
 }
 
-pub(crate) fn disp_get_default() -> Result<Display> {
-    let disp_ptr = unsafe { lvgl_sys::lv_disp_get_default() };
-    Ok(Display::from_raw(
-        NonNull::new(disp_ptr).ok_or(CoreError::OperationFailed)?,
-        None,
-    ))
-}
+//pub(crate) fn disp_get_default() -> Result<Display> {
+//    let disp_ptr = unsafe { lvgl_sys::lv_disp_get_default() };
+//    Ok(Display::from_raw(
+//        NonNull::new(disp_ptr).ok_or(CoreError::OperationFailed)?,
+//        None,
+//    ))
+//}
 
 /// Runs an LVGL tick lasting a given `core::time::Duration`. This function
 /// should be called periodically.

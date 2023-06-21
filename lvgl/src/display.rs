@@ -1,11 +1,12 @@
 use crate::functions::CoreError;
-use crate::{disp_drv_register, disp_get_default, NativeObject};
+use crate::{disp_drv_register, NativeObject};
 use crate::{Box, Color};
 use crate::{Screen, Widget};
 use core::convert::TryInto;
 #[cfg(feature = "nightly")]
 use core::error::Error;
 use core::fmt;
+use core::marker::PhantomData;
 use core::mem::{ManuallyDrop, MaybeUninit};
 use core::pin::Pin;
 use core::ptr::NonNull;
@@ -39,17 +40,22 @@ impl Error for DisplayError {}
 type Result<T> = result::Result<T, DisplayError>;
 
 /// An LVGL-registered display. Equivalent to an `lv_disp_t`.
-pub struct Display {
+pub struct Display<'a> {
     _disp: NonNull<lvgl_sys::lv_disp_t>,
     drop: Option<unsafe extern "C" fn()>,
+    _screens: PhantomData<&'a Screen<'a>>,
 }
 
-impl<'a> Display {
+impl<'a> Display<'a> {
     pub(crate) fn from_raw(
         disp: NonNull<lvgl_sys::lv_disp_t>,
         drop: Option<unsafe extern "C" fn()>,
     ) -> Self {
-        Self { _disp: disp, drop }
+        Self {
+            _disp: disp,
+            drop,
+            _screens: PhantomData,
+        }
     }
 
     /// Registers a given `DrawBuffer` with an associated update function to
@@ -63,11 +69,14 @@ impl<'a> Display {
     where
         F: FnMut(&DisplayRefresh<N>) + 'a,
     {
-        let mut display_diver = DisplayDriver::new(draw_buffer, display_update)?;
-        let disp_p = &mut display_diver.disp_drv;
+        let mut display_driver = DisplayDriver::new(draw_buffer, display_update)?;
+        let disp_p = &mut display_driver.disp_drv;
         disp_p.hor_res = hor_res.try_into().unwrap_or(240);
         disp_p.ver_res = ver_res.try_into().unwrap_or(240);
-        Ok(disp_drv_register(&mut display_diver, None)?)
+        Ok(disp_drv_register::<N>(
+            unsafe { &mut *(&mut display_driver as *mut _ as *mut _) },
+            None,
+        )?)
         //display_diver.disp_drv.leak();
     }
 
@@ -140,17 +149,20 @@ impl<'a> Display {
         let disp_p = &mut display_driver.disp_drv;
         disp_p.hor_res = hor_res.try_into().unwrap_or(240);
         disp_p.ver_res = ver_res.try_into().unwrap_or(240);
-        Ok(disp_drv_register(&mut display_driver, drop)?)
+        Ok(disp_drv_register::<N>(
+            unsafe { &mut *(&mut display_driver as *mut _ as *mut _) },
+            drop,
+        )?)
     }
 }
 
-impl Default for Display {
-    fn default() -> Self {
-        disp_get_default().expect("LVGL must be INITIALIZED")
-    }
-}
+//impl Default for Display<'_> {
+//    fn default() -> Self {
+//        disp_get_default().expect("LVGL must be INITIALIZED")
+//    }
+//}
 
-impl Drop for Display {
+impl Drop for Display<'_> {
     fn drop(&mut self) {
         if let Some(drop) = self.drop {
             unsafe { drop() }
