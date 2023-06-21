@@ -88,6 +88,7 @@ impl<'a> Display {
     ///
     /// `hor_res` and `ver_res` must be nonzero, and the provided functions
     /// must not themselves cause undefined behavior.
+    #[allow(clippy::too_many_arguments)]
     pub unsafe fn register_raw<const N: usize>(
         draw_buffer: DrawBuffer<N>,
         hor_res: u32,
@@ -229,6 +230,7 @@ impl<'a, const N: usize> DisplayDriver<N> {
         }))
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub unsafe fn new_raw(
         mut draw_buffer: DrawBuffer<N>,
         flush_cb: Option<

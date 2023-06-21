@@ -41,6 +41,7 @@ impl<'a> TryFrom<Obj<'a>> for Screen<'a> {
     }
 }
 
+#[allow(clippy::from_over_into)]
 impl<'a> Into<Obj<'a>> for Screen<'a> {
     fn into(self) -> Obj<'a> {
         self.raw
