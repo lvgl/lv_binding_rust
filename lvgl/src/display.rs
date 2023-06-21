@@ -1,7 +1,7 @@
 use crate::functions::CoreError;
-use crate::{Screen, Widget};
 use crate::{disp_drv_register, disp_get_default, NativeObject};
 use crate::{Box, Color};
+use crate::{Screen, Widget};
 use core::convert::TryInto;
 #[cfg(feature = "nightly")]
 use core::error::Error;

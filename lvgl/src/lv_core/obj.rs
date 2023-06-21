@@ -31,9 +31,7 @@ pub struct Obj<'a> {
 
 impl Drop for Obj<'_> {
     fn drop(&mut self) {
-        unsafe {
-            lvgl_sys::lv_obj_del(self.raw().as_mut())
-        }
+        unsafe { lvgl_sys::lv_obj_del(self.raw().as_mut()) }
     }
 }
 
