@@ -1,3 +1,4 @@
+#[cfg(feature = "library")]
 use cc::Build;
 #[cfg(feature = "drivers")]
 use std::collections::HashSet;
@@ -41,7 +42,9 @@ fn main() {
         font_extra_src: font_extra_src.as_ref().map(PathBuf::as_path),
     };
 
+    #[cfg(feature = "library")]
     compile_library(&conf);
+
     generate_bindings(&conf);
 }
 
@@ -67,6 +70,7 @@ struct BuildConf<'a> {
     font_extra_src: Option<&'a Path>,
 }
 
+#[cfg(feature = "library")]
 fn compile_library(conf: &BuildConf) {
     let vendor = conf.vendor;
 
@@ -134,7 +138,10 @@ fn generate_bindings(conf: &BuildConf) {
     ];
 
     // Set correct target triple for bindgen when cross-compiling
-    let target = env::var("TARGET").expect("Cargo build scripts always have TARGET");
+    let target = env::var("CROSS_COMPILE").map_or_else(
+        |_| env::var("TARGET").expect("Cargo build scripts always have TARGET"),
+        |c| c.trim_end_matches('-').to_owned(),
+    );
     let host = env::var("HOST").expect("Cargo build scripts always have HOST");
     if target != host {
         cc_args.push("-target");
@@ -285,6 +292,7 @@ fn add_font_headers(bindings: bindgen::Builder, dir: Option<&Path>) -> bindgen::
     }
 }
 
+#[cfg(feature = "library")]
 fn add_c_files(build: &mut cc::Build, path: impl AsRef<Path>) {
     for e in path.as_ref().read_dir().unwrap() {
         let e = e.unwrap();
