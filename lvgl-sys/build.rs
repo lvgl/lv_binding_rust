@@ -57,7 +57,7 @@ fn main() {
 
     #[cfg(feature = "drivers")]
     let drivers = vendor.join("lv_drivers");
-
+    println!("cargo:rerun-if-env-changed={}", CONFIG_NAME);
     let lv_config_dir = {
         let conf_path = env::var(CONFIG_NAME)
             .map(PathBuf::from)
@@ -134,7 +134,6 @@ fn main() {
         add_c_files(&mut cfg, p)
     }
     add_c_files(&mut cfg, &lvgl_src);
-    add_c_files(&mut cfg, &lv_config_dir);
     add_c_files(&mut cfg, &shims_dir);
     #[cfg(feature = "drivers")]
     add_c_files(&mut cfg, &drivers);
