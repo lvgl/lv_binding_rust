@@ -12,7 +12,7 @@ keywords = ["littlevgl", "lvgl", "graphical_interfaces"]
 build = "build.rs"
 
 [dependencies]
-lvgl-sys = { version = "0.6.2", path = "../lvgl-sys" }
+lvgl-sys = { version = "0.6.2", path = "../lvgl-sys", features = ["library"]}
 cty = "0.2.2"
 embedded-graphics = { version = "0.8.0", optional = true }
 cstr_core = { version = "0.2.6", default-features = false, features = ["alloc"] }
@@ -77,7 +77,7 @@ unsafe_no_autoinit = []
 quote = "1.0.23"
 proc-macro2 = "1.0.51"
 lvgl-codegen = { version = "0.6.2", path = "../lvgl-codegen" }
-lvgl-sys = { version = "0.6.2", path = "../lvgl-sys" }
+lvgl-sys = { version = "0.6.2", path = "../lvgl-sys", features = ["raw-bindings"]}
 
 [dev-dependencies]
 embedded-graphics-simulator = "0.5.0"
