@@ -145,7 +145,7 @@ fn main() {
         .warnings(false)
         .include(&lv_config_dir);
     if let Some(p) = &font_extra_src {
-        cfg.includes(p);
+        cfg.include(p);
     }
     #[cfg(feature = "rust_timer")]
     cfg.include(&timer_shim);
