@@ -109,7 +109,7 @@ impl<'a> Display<'a> {
         unsafe { lvgl_sys::lv_disp_load_scr(scr_ptr) }
     }
 
-    pub fn is_scr_act(&self, screen: &Screen) -> bool {
+    pub fn is_scr_act(&'a self, screen: &Screen) -> bool {
         unsafe {
             let act = self.get_scr_act().map(|s| {
                 s.raw().as_ptr() as usize

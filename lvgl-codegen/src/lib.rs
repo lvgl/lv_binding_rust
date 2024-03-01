@@ -107,7 +107,7 @@ impl Rusty for LvFunc {
         if new_name.as_str().eq("create") {
             return Ok(quote! {
 
-                pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
+                pub fn create(parent: &'a mut impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::#original_func_name(
                             parent.raw().as_mut(),

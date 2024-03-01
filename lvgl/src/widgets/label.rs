@@ -1,7 +1,7 @@
 use crate::widgets::Label;
 use crate::{LabelLongMode, NativeObject};
 
-impl Label<'_> {
+impl<'a> Label<'a> {
     pub fn set_long_mode(&mut self, long_mode: LabelLongMode) {
         unsafe {
             lvgl_sys::lv_label_set_long_mode(self.raw().as_mut(), long_mode.into());
@@ -13,7 +13,7 @@ impl Label<'_> {
     }
 
     #[cfg(feature = "alloc")]
-    pub fn from_str<S: AsRef<str>>(text: S, parent: &mut impl NativeObject) -> Self {
+    pub fn from_str<S: AsRef<str>>(text: S, parent: &'a mut impl NativeObject) -> Self {
         use cstr_core::CString;
         // text.try_into().unwrap()
         let text_cstr = CString::new(text.as_ref()).unwrap();
