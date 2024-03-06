@@ -19,25 +19,23 @@ fn main() -> LvResult<()> {
     const HOR_RES: u32 = 240;
     const VER_RES: u32 = 240;
 
-    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
-    let display = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES)?;
-    let _input = lv_drv_input_pointer_sdl!(display)?;
-
-    // Create screen and widgets
-    let mut screen = display.get_scr_act()?;
-
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((0, 0, 0)));
+
+    let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
+    let (display, mut screen) = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES)?;
+    let _input = lv_drv_input_pointer_sdl!(display)?;
+
     screen.add_style(Part::Main, &mut screen_style);
     // Create the button
     let mut button = Btn::create(&mut screen)?;
     button.set_align(Align::LeftMid, 30, 0);
     button.set_size(180, 80);
-    let mut btn_lbl = Label::create(&mut button)?;
+    let mut btn_lbl = Label::create(&button)?;
     btn_lbl.set_text(CString::new("Click me!").unwrap().as_c_str())?;
 
     let mut btn_state = false;
-    button.on_event(|_btn, event| {
+    button.on_event(|btn, event| {
         println!("Button received event: {:?}", event);
         if let lvgl::Event::Clicked = event {
             if btn_state {
@@ -49,6 +47,7 @@ fn main() -> LvResult<()> {
             }
             btn_state = !btn_state;
         }
+        btn
     })?;
 
     loop {

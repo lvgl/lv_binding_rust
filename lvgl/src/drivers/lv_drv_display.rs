@@ -3,7 +3,7 @@ macro_rules! lv_drv_disp_fbdev {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::fbdev_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -27,7 +27,7 @@ macro_rules! lv_drv_disp_drm {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::drm_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -51,7 +51,7 @@ macro_rules! lv_drv_disp_gtk {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::gtkdrv_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -75,7 +75,7 @@ macro_rules! lv_drv_disp_sdl {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::sdl_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -102,7 +102,7 @@ macro_rules! lv_drv_disp_gc9a01 {
                 0 => (),
                 c = panic!("GC9A01_init() returned error code {c}")
             };
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -126,7 +126,7 @@ macro_rules! lv_drv_disp_ili9341 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::ili9341_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -150,7 +150,7 @@ macro_rules! lv_drv_disp_r61581 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::r61581_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -174,7 +174,7 @@ macro_rules! lv_drv_disp_sharp_mip {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::sharp_mip_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -198,7 +198,7 @@ macro_rules! lv_drv_disp_ssd1963 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::ssd1963_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -222,7 +222,7 @@ macro_rules! lv_drv_disp_st7565 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::st7565_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -246,7 +246,7 @@ macro_rules! lv_drv_disp_uc1610 {
     ($draw_buffer:ident, $hor_res:ident, $ver_res:ident) => {
         unsafe {
             lvgl_sys::uc1610_init();
-            $crate::Display::register_raw(
+            $crate::Display::register_raw_macro(
                 $draw_buffer,
                 $hor_res,
                 $ver_res,
@@ -274,7 +274,7 @@ mod tests {
     fn gtk_test() {
         const HOR_RES: u32 = 240;
         const VER_RES: u32 = 240;
-        tests::initialize_test(false);
+        tests::initialize_test();
         let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
         let _disp = lv_drv_disp_sdl!(buffer, HOR_RES, VER_RES).unwrap();
     }

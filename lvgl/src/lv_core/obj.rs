@@ -7,8 +7,10 @@
 
 use crate::lv_core::style::Style;
 use crate::{Align, LvError, LvResult};
+use core::cell::UnsafeCell;
 use core::fmt::{self, Debug};
 use core::marker::PhantomData;
+use core::mem::transmute;
 use core::ptr::{self, NonNull};
 
 /// Represents a native LVGL object.
@@ -22,11 +24,17 @@ pub trait NativeObject {
 /// This is the parent object of all widget types. It stores the native LVGL
 /// raw pointer.
 pub struct Obj<'a> {
-    // We use a raw pointer here because we do not control this memory address,
-    // it is controlled by LVGL's global state.
-    raw: NonNull<lvgl_sys::lv_obj_t>,
-    // This is to ensure safety for children memory; it has no runtime impact
-    dependents: PhantomData<&'a isize>,
+    // We do not control this memory address, it is controlled by LVGL's
+    // global state.
+    raw: NonNull<UnsafeCell<lvgl_sys::lv_obj_t>>,
+    // This is to ensure parent doesn't get dropped; it has no runtime impact
+    parent: PhantomData<&'a Obj<'a>>,
+}
+
+impl Drop for Obj<'_> {
+    fn drop(&mut self) {
+        unsafe { lvgl_sys::lv_obj_del_async(self.raw().as_mut()) }
+    }
 }
 
 impl Debug for Obj<'_> {
@@ -40,14 +48,15 @@ impl Debug for Obj<'_> {
 // We need to manually impl methods on Obj since widget codegen is defined in
 // terms of Obj
 impl<'a> Obj<'a> {
-    pub fn create(parent: &'a mut impl NativeObject) -> LvResult<Self> {
+    pub fn create(parent: &'a impl NativeObject) -> LvResult<Self> {
         unsafe {
             let ptr = lvgl_sys::lv_obj_create(parent.raw().as_mut());
-            if let Some(nn_ptr) = ptr::NonNull::new(ptr) {
+            if let Some(nn_ptr) = NonNull::new(ptr) {
                 //(*ptr).user_data = Box::new(UserDataObj::empty()).into_raw() as *mut _;
                 Ok(Self {
-                    raw: nn_ptr,
-                    dependents: PhantomData::<&'a _>,
+                    // Gross, but fast. UnsafeCell<T> has the same layout as T
+                    raw: transmute(nn_ptr),
+                    parent: PhantomData::<&'a _>,
                 })
             } else {
                 Err(LvError::InvalidReference)
@@ -55,16 +64,16 @@ impl<'a> Obj<'a> {
         }
     }
 
-    pub fn new() -> crate::LvResult<Self> {
-        let mut parent = crate::display::get_scr_act()?;
-        Self::create(unsafe { &mut *(&mut parent as *mut _) })
-    }
+    //pub fn new() -> crate::LvResult<Self> {
+    //    let mut parent = crate::display::get_scr_act()?;
+    //    Self::create(unsafe { &mut *(&mut parent as *mut _) })
+    //}
 
     pub fn blank() -> LvResult<Self> {
         match NonNull::new(unsafe { lvgl_sys::lv_obj_create(ptr::null_mut()) }) {
             Some(raw) => Ok(Self {
-                raw,
-                dependents: PhantomData,
+                raw: unsafe { transmute(raw) },
+                parent: PhantomData::<&'a _>,
             }),
             None => Err(LvError::LvOOMemory),
         }
@@ -72,8 +81,8 @@ impl<'a> Obj<'a> {
 }
 
 impl NativeObject for Obj<'_> {
-    fn raw(&self) -> ptr::NonNull<lvgl_sys::lv_obj_t> {
-        self.raw
+    fn raw(&self) -> NonNull<lvgl_sys::lv_obj_t> {
+        unsafe { NonNull::new_unchecked((*(self.raw.as_ptr())).get()) }
     }
 }
 
@@ -89,10 +98,10 @@ pub trait Widget<'a>: NativeObject + Sized + 'a {
     /// If the pointer is derived from a Rust-instantiated `obj` such as via
     /// calling `.raw()`, only the `obj` that survives longest may be dropped
     /// and the caller is responsible for ensuring data races do not occur.
-    unsafe fn from_raw(raw_pointer: ptr::NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
+    unsafe fn from_raw(raw_pointer: NonNull<lvgl_sys::lv_obj_t>) -> Option<Self>;
 
     /// Adds a `Style` to a given widget.
-    fn add_style(&mut self, part: Self::Part, style: &'a mut Style) {
+    fn add_style(&self, part: Self::Part, style: &'a mut Style) {
         unsafe {
             lvgl_sys::lv_obj_add_style(
                 self.raw().as_mut(),
@@ -157,8 +166,8 @@ impl<'a> Widget<'a> for Obj<'a> {
 
     unsafe fn from_raw(raw: NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
         Some(Self {
-            raw,
-            dependents: PhantomData,
+            raw: transmute(raw),
+            parent: PhantomData::<&'a _>,
         })
     }
 }
@@ -183,9 +192,9 @@ macro_rules! define_object {
         }
 
         impl<'a> $item<'a> {
-            pub fn on_event<F>(&mut self, f: F) -> $crate::LvResult<()>
+            pub fn on_event<F>(&self, f: F) -> $crate::LvResult<()>
             where
-                F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget<'a>>::SpecialEvent>),
+                F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget<'a>>::SpecialEvent>) -> Self,
             {
                 use $crate::NativeObject;
                 unsafe {

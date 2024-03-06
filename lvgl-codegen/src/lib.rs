@@ -107,7 +107,7 @@ impl Rusty for LvFunc {
         if new_name.as_str().eq("create") {
             return Ok(quote! {
 
-                pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
+                pub fn create(parent: &'a impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::#original_func_name(
                             parent.raw().as_mut(),
@@ -121,10 +121,10 @@ impl Rusty for LvFunc {
                     }
                 }
 
-                pub fn new() -> crate::LvResult<Self> {
-                    let mut parent = crate::display::get_scr_act()?;
-                    Self::create(&mut parent)
-                }
+                //pub fn new() -> crate::LvResult<Self> {
+                //    let mut parent = crate::display::get_scr_act()?;
+                //    Self::create(&mut parent)
+                //}
 
             });
         }
@@ -646,7 +646,7 @@ mod test {
             define_object!(Arc);
 
             impl<'a> Arc<'a> {
-                pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
+                pub fn create(parent: &'a impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::lv_arc_create(
                             parent.raw().as_mut(),
@@ -660,10 +660,10 @@ mod test {
                     }
                 }
 
-                pub fn new() -> crate::LvResult<Self> {
-                    let mut parent = crate::display::get_scr_act()?;
-                    Self::create(&mut parent)
-                }
+                //pub fn new() -> crate::LvResult<Self> {
+                //    let mut parent = crate::display::get_scr_act()?;
+                //    Self::create(&mut parent)
+                //}
             }
         };
 

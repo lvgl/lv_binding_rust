@@ -154,6 +154,7 @@ fn main() {
     #[cfg(feature = "drivers")]
     cfg.includes(incl_extra.split(','));
 
+    //#[cfg(not(feature = "no_compile"))]
     cfg.compile("lvgl");
 
     let mut cc_args = vec![

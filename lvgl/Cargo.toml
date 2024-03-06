@@ -21,7 +21,7 @@ paste = "1.0.12"
 ctor = "0.2.2"
 
 [features]
-default = ["embedded_graphics", "drivers"]
+default = ["embedded_graphics", "drivers", "lvgl-sys/no_compile"]
 
 # Enable the embedded_graphics crate as a backend for graphics and input
 # devices. This is the 'legacy' method (supported in LVGL 0.5.2 and below) and
