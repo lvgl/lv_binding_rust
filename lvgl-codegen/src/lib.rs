@@ -646,7 +646,7 @@ mod test {
             define_object!(Arc);
 
             impl<'a> Arc<'a> {
-                pub fn create(parent: &mut impl crate::NativeObject) -> crate::LvResult<Self> {
+                pub fn create(parent: &'a impl crate::NativeObject) -> crate::LvResult<Self> {
                     unsafe {
                         let ptr = lvgl_sys::lv_arc_create(
                             parent.raw().as_mut(),
