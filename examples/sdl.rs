@@ -31,11 +31,11 @@ fn main() -> LvResult<()> {
     let mut button = Btn::create(&mut screen)?;
     button.set_align(Align::LeftMid, 30, 0);
     button.set_size(180, 80);
-    let mut btn_lbl = Label::create(&mut button)?;
+    let mut btn_lbl = Label::create(&button)?;
     btn_lbl.set_text(CString::new("Click me!").unwrap().as_c_str())?;
 
     let mut btn_state = false;
-    button.on_event(|_btn, event| {
+    button.on_event(|btn, event| {
         println!("Button received event: {:?}", event);
         if let lvgl::Event::Clicked = event {
             if btn_state {
@@ -47,6 +47,7 @@ fn main() -> LvResult<()> {
             }
             btn_state = !btn_state;
         }
+        btn
     })?;
 
     loop {

@@ -28,7 +28,7 @@ pub struct Obj<'a> {
     // global state.
     raw: NonNull<UnsafeCell<lvgl_sys::lv_obj_t>>,
     // This is to ensure parent doesn't get dropped; it has no runtime impact
-    dependents: PhantomData<&'a Obj<'a>>,
+    parent: PhantomData<&'a Obj<'a>>,
 }
 
 impl Drop for Obj<'_> {
@@ -56,7 +56,7 @@ impl<'a> Obj<'a> {
                 Ok(Self {
                     // Gross, but fast. UnsafeCell<T> has the same layout as T
                     raw: transmute(nn_ptr),
-                    dependents: PhantomData::<&'a _>,
+                    parent: PhantomData::<&'a _>,
                 })
             } else {
                 Err(LvError::InvalidReference)
@@ -73,7 +73,7 @@ impl<'a> Obj<'a> {
         match NonNull::new(unsafe { lvgl_sys::lv_obj_create(ptr::null_mut()) }) {
             Some(raw) => Ok(Self {
                 raw: unsafe { transmute(raw) },
-                dependents: PhantomData::<&'a _>,
+                parent: PhantomData::<&'a _>,
             }),
             None => Err(LvError::LvOOMemory),
         }
@@ -167,7 +167,7 @@ impl<'a> Widget<'a> for Obj<'a> {
     unsafe fn from_raw(raw: NonNull<lvgl_sys::lv_obj_t>) -> Option<Self> {
         Some(Self {
             raw: transmute(raw),
-            dependents: PhantomData::<&'a _>,
+            parent: PhantomData::<&'a _>,
         })
     }
 }
@@ -194,7 +194,7 @@ macro_rules! define_object {
         impl<'a> $item<'a> {
             pub fn on_event<F>(&self, f: F) -> $crate::LvResult<()>
             where
-                F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget<'a>>::SpecialEvent>),
+                F: FnMut(Self, $crate::support::Event<<Self as $crate::Widget<'a>>::SpecialEvent>) -> Self,
             {
                 use $crate::NativeObject;
                 unsafe {
