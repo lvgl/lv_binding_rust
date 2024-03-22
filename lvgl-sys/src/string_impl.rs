@@ -115,16 +115,15 @@ pub unsafe extern "C" fn strncat(s1: *mut c_char, s2: *const c_char, n: size_t) 
 
 #[no_mangle]
 pub unsafe extern "C" fn strncmp(s1: *const c_char, s2: *const c_char, n: size_t) -> c_int {
-    let s1 = core::slice::from_raw_parts(s1 as *const c_uchar, n);
-    let s2 = core::slice::from_raw_parts(s2 as *const c_uchar, n);
-
-    for (&a, &b) in s1.iter().zip(s2.iter()) {
-        let val = (a as c_int) - (b as c_int);
-        if a != b || a == 0 {
-            return val;
+    let mut i = 0;
+    while i < n {
+        let c1 = *s1.add(i);
+        let c2 = *s2.add(i);
+        if c1 != c2 || c1 == 0 {
+            return (c1 as c_int) - (c2 as c_int);
         }
+        i += 1;
     }
-
     0
 }
 
@@ -156,4 +155,26 @@ pub unsafe extern "C" fn strrchr(s: *const c_char, c: c_int) -> *mut c_char {
         i -= 1;
     }
     ptr::null_mut()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::string_impl::{strcmp, strncmp};
+
+    #[test]
+    fn strcmp_test() {
+        unsafe {
+            let s1 = [1, 2, 0].as_ptr();
+            let s2 = [1, 2, 3, 0].as_ptr();
+            assert!(strncmp(s1, s2, 0) == 0);
+            assert!(strncmp(s1, s2, 1) == 0);
+            assert!(strncmp(s1, s2, 2) == 0);
+            assert!(strncmp(s1, s2, 3) < 0);
+            assert!(strncmp(s2, s1, 3) > 0);
+            assert!(strncmp(s1, s2, 4) < 0);
+            assert!(strncmp(s2, s1, 4) > 0);
+            assert!(strcmp(s1, s2) < 0);
+            assert!(strcmp(s2, s1) > 0);
+        }
+    }
 }
