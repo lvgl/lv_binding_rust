@@ -31,17 +31,18 @@ fn main() -> Result<(), LvError> {
     // whenever LVGL has updates to be painted to the display.
     let display = Display::register(buffer, HOR_RES, VER_RES, |refresh| {
         sim_display.draw_iter(refresh.as_pixels()).unwrap();
-    })?;
+    });
 
     // Create screen and widgets
-    let mut screen = display.get_scr_act()?;
+    let binding = display?;
+    let mut screen = binding.get_scr_act();
 
     println!("Before all widgets: {:?}", mem_info());
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((0, 0, 0)));
     screen_style.set_radius(0);
-    screen.add_style(Part::Main, &mut screen_style)?;
+    screen?.add_style(Part::Main, &mut screen_style);
 
     let mut time = Label::from("20:46");
     let mut style_time = Style::default();
@@ -51,22 +52,22 @@ fn main() -> Result<(), LvError> {
     // See font module documentation for an explanation of the unsafe block
     style_time.set_text_font(unsafe { Font::new_raw(lvgl_sys::noto_sans_numeric_80) });
 
-    time.add_style(Part::Main, &mut style_time)?;
-    time.set_align(Align::Center, 0, 90)?;
-    time.set_width(240)?;
-    time.set_height(240)?;
+    time.add_style(Part::Main, &mut style_time);
+    time.set_align(Align::Center, 0, 90);
+    time.set_width(240);
+    time.set_height(240);
 
     let mut bt = Label::from("#5794f2 \u{F293}#");
-    bt.set_width(50)?;
-    bt.set_height(80)?;
-    bt.set_recolor(true)?;
-    bt.set_align(Align::TopLeft, 0, 0)?;
+    bt.set_width(50);
+    bt.set_height(80);
+    bt.set_recolor(true);
+    bt.set_align(Align::TopLeft, 0, 0);
 
     let mut power: Label = "#fade2a 20%#".into();
-    power.set_recolor(true)?;
-    power.set_width(80)?;
-    power.set_height(20)?;
-    power.set_align(Align::TopRight, 40, 0)?;
+    power.set_recolor(true);
+    power.set_width(80);
+    power.set_height(20);
+    power.set_align(Align::TopRight, 40, 0);
 
     let mut i = 0;
     'running: loop {
@@ -75,7 +76,7 @@ fn main() -> Result<(), LvError> {
             i = 0;
         }
         let val = CString::new(format!("21:{:02}", i)).unwrap();
-        time.set_text(&val)?;
+        time.set_text(&val);
         i = 1 + i;
 
         lvgl::task_handler();
