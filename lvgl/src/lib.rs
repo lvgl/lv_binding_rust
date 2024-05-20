@@ -16,6 +16,8 @@
 #![cfg_attr(feature = "nightly", feature(cfg_accessible))]
 #![cfg_attr(feature = "nightly", feature(error_in_core))]
 
+pub use lvgl_sys as sys;
+
 #[macro_use]
 extern crate bitflags;
 
