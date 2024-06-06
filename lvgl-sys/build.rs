@@ -153,11 +153,13 @@ fn main() {
     cfg.include(&drivers);
     #[cfg(feature = "drivers")]
     cfg.includes(incl_extra.split(','));
-
+    cfg.includes(["/usr/include", "/usr/local/include"]);
     cfg.compile("lvgl");
 
-    let mut cc_args = vec![
+    let cc_args = vec![
         "-DLV_CONF_INCLUDE_SIMPLE=1",
+        "-I/usr/include",
+        "-I/usr/local/include",
         "-I",
         lv_config_dir.to_str().unwrap(),
         "-I",
@@ -167,11 +169,6 @@ fn main() {
 
     // Set correct target triple for bindgen when cross-compiling
     let target = env::var("TARGET").expect("Cargo build scripts always have TARGET");
-    let host = env::var("HOST").expect("Cargo build scripts always have HOST");
-    if target != host {
-        cc_args.push("-target");
-        cc_args.push(target.as_str());
-    }
 
     let mut additional_args = Vec::new();
     if target.ends_with("emscripten") {
