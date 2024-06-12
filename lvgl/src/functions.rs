@@ -1,6 +1,6 @@
 use crate::display::{Display, DisplayDriver};
 use crate::input_device::InputDriver;
-use crate::{Event, LvError, LvResult, Obj, Widget};
+use crate::{Event, LvError, LvResult, Widget};
 use core::ptr::NonNull;
 #[cfg(not(feature = "rust_timer"))]
 use core::time::Duration;
@@ -30,26 +30,13 @@ pub(crate) fn disp_drv_register<const N: usize>(
     ))
 }
 
-pub(crate) fn disp_get_default() -> Result<Display> {
-    let disp_ptr = unsafe { lvgl_sys::lv_disp_get_default() };
-    Ok(Display::from_raw(
-        NonNull::new(disp_ptr).ok_or(CoreError::OperationFailed)?,
-        None,
-    ))
-}
-
-pub(crate) fn get_str_act(disp: Option<&Display>) -> Result<Obj> {
-    let scr_ptr = unsafe {
-        lvgl_sys::lv_disp_get_scr_act(
-            disp.map(|d| d.disp.as_ptr())
-                .unwrap_or(ptr::null_mut() as *mut lvgl_sys::lv_disp_t),
-        )
-    };
-    match unsafe { Obj::from_raw(NonNull::new(scr_ptr).ok_or(CoreError::ResourceNotAvailable)?) } {
-        Some(o) => Ok(o),
-        None => Err(CoreError::OperationFailed),
-    }
-}
+//pub(crate) fn disp_get_default() -> Result<Display> {
+//    let disp_ptr = unsafe { lvgl_sys::lv_disp_get_default() };
+//    Ok(Display::from_raw(
+//        NonNull::new(disp_ptr).ok_or(CoreError::OperationFailed)?,
+//        None,
+//    ))
+//}
 
 /// Runs an LVGL tick lasting a given `core::time::Duration`. This function
 /// should be called periodically.

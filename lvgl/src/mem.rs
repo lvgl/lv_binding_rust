@@ -127,7 +127,7 @@ mod test {
 
     #[test]
     fn place_value_in_lv_mem() {
-        tests::initialize_test(false);
+        tests::initialize_test();
 
         let v = Box::new(5);
         drop(v);
@@ -137,7 +137,7 @@ mod test {
 
     #[test]
     fn place_complex_value_in_lv_mem() {
-        tests::initialize_test(false);
+        tests::initialize_test();
 
         #[repr(C)]
         #[derive(Debug)]
@@ -189,7 +189,7 @@ mod test {
 
     #[test]
     fn clone_object_in_lv_mem() {
-        crate::tests::initialize_test(false);
+        crate::tests::initialize_test();
 
         let v1 = Box::new(5);
         let v2 = v1.clone();

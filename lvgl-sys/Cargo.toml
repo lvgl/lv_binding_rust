@@ -35,3 +35,4 @@ bindgen = "0.65.1"
 use-vendored-config = []
 drivers = []
 rust_timer = []
+no_compile = []

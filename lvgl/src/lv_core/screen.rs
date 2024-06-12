@@ -69,10 +69,9 @@ mod test {
     fn screen_test() {
         const HOR_RES: u32 = 240;
         const VER_RES: u32 = 240;
-        crate::tests::initialize_test(false);
+        crate::tests::initialize_test();
         let buffer = DrawBuffer::<{ (HOR_RES * VER_RES) as usize }>::default();
-        let display = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
-        let mut screen_old = display.get_scr_act().unwrap();
+        let (display, mut screen_old) = Display::register(buffer, HOR_RES, VER_RES, |_| {}).unwrap();
         let mut screen_new = Screen::blank().unwrap();
         display.set_scr_act(&mut screen_new);
         display.set_scr_act(&mut screen_old);

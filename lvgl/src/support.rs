@@ -5,6 +5,7 @@ use core::convert::{TryFrom, TryInto};
 use core::error::Error;
 use core::fmt;
 use core::ptr::NonNull;
+use core::mem::ManuallyDrop;
 #[cfg(feature = "embedded_graphics")]
 use embedded_graphics::pixelcolor::{Rgb565, Rgb888};
 
@@ -280,7 +281,7 @@ pub enum PointerEvent {
 pub(crate) unsafe extern "C" fn event_callback<'a, T, F>(event: *mut lvgl_sys::lv_event_t)
 where
     T: Widget<'a> + Sized,
-    F: FnMut(T, Event<<T as Widget<'a>>::SpecialEvent>),
+    F: FnMut(T, Event<<T as Widget<'a>>::SpecialEvent>) -> T,
 {
     let code = (*event).code;
     let obj = (*event).target;
@@ -290,8 +291,8 @@ where
             let object = T::from_raw(obj_ptr).unwrap();
             // get the pointer from the Rust callback closure FnMut provided by users
             let user_closure = &mut *((*obj).user_data as *mut F);
-            // call user callback closure
-            user_closure(object, code);
+            // call user callback closure and do *not* drop the widget
+            let _never_drop = ManuallyDrop::new(user_closure(object, code));
         }
     }
 }

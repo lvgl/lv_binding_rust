@@ -116,15 +116,8 @@ fn once_init() {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::display::{Display, DrawBuffer};
-
-    pub(crate) fn initialize_test(buf: bool) {
+    pub(crate) fn initialize_test() {
         unsafe { crate::deinit() };
         crate::init();
-        if buf {
-            const REFRESH_BUFFER_SIZE: usize = 240 * 240 / 10;
-            let buffer = DrawBuffer::<REFRESH_BUFFER_SIZE>::default();
-            let _ = Display::register(buffer, 240, 240, |_| {}).unwrap();
-        }
     }
 }
