@@ -54,7 +54,7 @@ pub(crate) fn get_str_act(disp: Option<&Display>) -> Result<Obj> {
 /// Runs an LVGL tick lasting a given `core::time::Duration`. This function
 /// should be called periodically.
 #[inline]
-#[cfg(not(feature = "rust_timer"))]
+#[cfg(not(any(feature = "rust_timer", feature = "custom_timer")))]
 pub fn tick_inc(tick_period: Duration) {
     unsafe {
         lvgl_sys::lv_tick_inc(tick_period.as_millis() as u32);
