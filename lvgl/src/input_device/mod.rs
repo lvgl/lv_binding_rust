@@ -20,11 +20,10 @@
 //! fn main() {
 //!     // IMPORTANT: Initialize a display driver first!
 //!     // ...
-//!     // Define the initial state of your input
+//!     // Define the initial state of your input//! 
 //!     let mut latest_touch_status = PointerInputData::Touch(Point::new(0, 0)).released().once();
 //!     // Register a new input device that's capable of reading the current state of the input
-//!     let mut touch_screen = Pointer::new(|| latest_touch_status, &display);
-//!     lvgl::indev_drv_register(&mut touch_screen).unwrap();
+//!     let pointer = Pointer::register(|| latest_touch_status, &display).unwrap();
 //!     // ...
 //! }
 //! ```
