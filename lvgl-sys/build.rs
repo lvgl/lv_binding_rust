@@ -54,7 +54,7 @@ fn main() {
         env::var("LVGL_INCLUDE").unwrap_or("/usr/include,/usr/local/include".to_string());
 
     let cflags_extra = env::var("LVGL_CFLAGS").unwrap_or_default();
-    let cflags_extra = cflags_extra.split(',');
+    let cflags_extra = cflags_extra.split(',').filter(|s| !s.is_empty());
 
     #[cfg(feature = "drivers")]
     let link_extra = env::var("LVGL_LINK").unwrap_or("SDL2".to_string());
