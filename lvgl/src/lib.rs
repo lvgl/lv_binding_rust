@@ -97,6 +97,7 @@ pub fn init() {
 ///
 /// After calling, ensure existing LVGL-related values are not accessed even if
 /// LVGL is reinitialized.
+#[cfg(not(feature = "custom_allocator"))]
 pub unsafe fn deinit() {
     unsafe {
         if IS_INIT {
