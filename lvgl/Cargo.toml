@@ -73,6 +73,9 @@ nightly = []
 # function before constructing or using anything LVGL-related.
 unsafe_no_autoinit = []
 
+# This feature is required to use the custom allocator in lvgl (`LV_MEM_CUSTOM=1` in `lv_conf.h`).
+custom_allocator = []
+
 [build-dependencies]
 quote = "1.0.23"
 proc-macro2 = "1.0.51"
