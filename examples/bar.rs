@@ -79,7 +79,7 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
-        sleep(Duration::from_millis(1500));
+        sleep(Duration::from_millis(15));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }
 
