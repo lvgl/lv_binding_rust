@@ -33,12 +33,12 @@ fn main() -> Result<(), LvError> {
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((255, 255, 255)));
     screen_style.set_radius(0);
-    screen.add_style(Part::Main, &mut screen_style)?;
+    screen.add_style(Part::Main, &mut screen_style);
 
     // Create the bar object
     let mut bar = Bar::create(&mut screen)?;
-    bar.set_size(175, 20)?;
-    bar.set_align(Align::Center, 0, 10)?;
+    bar.set_size(175, 20);
+    bar.set_align(Align::Center, 0, 10);
     bar.set_range(0, 100)?;
     bar.on_event(|_b, _e| {
         println!("Completed!");
@@ -47,24 +47,27 @@ fn main() -> Result<(), LvError> {
     // Set the indicator style for the bar object
     let mut ind_style = Style::default();
     ind_style.set_bg_color(Color::from_rgb((100, 245, 100)));
-    bar.add_style(Part::Any, &mut ind_style)?;
+    bar.add_style(Part::Any, &mut ind_style);
 
     let mut loading_lbl = Label::create(&mut screen)?;
     loading_lbl.set_text(CString::new("Loading...").unwrap().as_c_str())?;
-    loading_lbl.set_align(Align::OutTopMid, 0, 0)?;
+    loading_lbl.set_align(Align::OutTopMid, 0, 0);
 
     let mut loading_style = Style::default();
     loading_style.set_text_color(Color::from_rgb((0, 0, 0)));
-    loading_lbl.add_style(Part::Main, &mut loading_style)?;
+    loading_lbl.add_style(Part::Main, &mut loading_style);
 
     let mut i = 0;
     'running: loop {
         let start = Instant::now();
         if i > 100 {
             i = 0;
-            lvgl::event_send(&mut bar, Event::Clicked)?;
+            // Enabling this line gives the followong errors:
+            // - error[E0597]: `ind_style` does not live long enough when adding an style to the bar
+            // - implementation of `Widget` is not general enough
+            // lvgl::event_send(&mut bar, Event::Clicked);
         }
-        bar.set_value(i, AnimationState::ON)?;
+        bar.set_value(i, AnimationState::ON);
         i += 1;
 
         lvgl::task_handler();

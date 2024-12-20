@@ -46,18 +46,18 @@ fn main() -> Result<(), LvError> {
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((0, 0, 0)));
-    screen.add_style(Part::Main, &mut screen_style)?;
+    screen.add_style(Part::Main, &mut screen_style);
     // Create the button
     let mut button = Btn::create(&mut screen)?;
-    button.set_align(Align::LeftMid, 30, 0)?;
-    button.set_size(180, 80)?;
+    button.set_align(Align::LeftMid, 30, 0);
+    button.set_size(180, 80);
     let mut btn_lbl = Label::create(&mut button)?;
     btn_lbl.set_text(CString::new("Click me!").unwrap().as_c_str())?;
 
     let mut btn_state = false;
 
     let mut anim = Animation::new(&mut button, Duration::from_secs(1), 0, 60, |obj, val| {
-        obj.set_align(Align::LeftMid, val, 0).unwrap()
+        obj.set_align(Align::LeftMid, val, 0)
     })?;
     anim.set_repeat_count(AnimRepeatCount::Infinite);
     anim.start();
