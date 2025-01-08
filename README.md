@@ -99,6 +99,10 @@ $ DEP_LV_CONFIG_PATH=`pwd`/examples/include cargo run --example demo --features=
 The bindings are still in development. There are many features of LVGL that needs to be exposed by `lvgl-rs`. In
 this section you can check what is implemented at the moment.
 
+Unsafe bindings are located in `lvgl-sys` folder are generated via `bindgen`.
+
+Safe bindings are generated using the `lvgl-codegen` lib, which takes the raw unsafe bindings and generate safe/rust idiomatic bindings (check the `build.rs` script in the `lvgl` folder).
+
 ### Features
 
 List of LVGL features that impacts the library usage in general.
