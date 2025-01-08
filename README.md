@@ -60,7 +60,7 @@ for `no_std`, so we need to use a workaround to build "lvgl-rs". The mainstrem i
 [rust-lang/cargo#7915](https://github.com/rust-lang/cargo/issues/7915).
 
 ```shell
-$ DEP_LV_CONFIG_PATH=`pwd` cargo build -Zfeatures=build_dep
+DEP_LV_CONFIG_PATH=`pwd` cargo build -Z features=build_dep
 ```
 
 The `unsafe_no_autoinit` feature must also be enabled when building for baremetal targets. See its documentation in `Cargo.toml` for notes on usage.
