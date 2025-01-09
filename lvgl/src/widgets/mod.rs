@@ -12,6 +12,7 @@ mod label;
 mod meter;
 mod slider;
 mod table;
+mod textarea;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -23,3 +24,4 @@ pub use label::*;
 pub use meter::*;
 pub use slider::*;
 pub use table::*;
+pub use textarea::*;
