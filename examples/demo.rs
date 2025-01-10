@@ -35,7 +35,7 @@ fn main() -> Result<(), LvError> {
 
     // Create screen and widgets
     let binding = display?;
-    let mut screen = binding.get_scr_act();
+    let screen = binding.get_scr_act();
 
     println!("Before all widgets: {:?}", mem_info());
 
@@ -60,11 +60,11 @@ fn main() -> Result<(), LvError> {
     let mut bt = Label::from("#5794f2 \u{F293}#");
     bt.set_width(50);
     bt.set_height(80);
-    bt.set_recolor(true);
+    let _ = bt.set_recolor(true);
     bt.set_align(Align::TopLeft, 0, 0);
 
     let mut power: Label = "#fade2a 20%#".into();
-    power.set_recolor(true);
+    let _ = power.set_recolor(true);
     power.set_width(80);
     power.set_height(20);
     power.set_align(Align::TopRight, 40, 0);
@@ -76,7 +76,7 @@ fn main() -> Result<(), LvError> {
             i = 0;
         }
         let val = CString::new(format!("21:{:02}", i)).unwrap();
-        time.set_text(&val);
+        let _ = time.set_text(&val);
         i = 1 + i;
 
         lvgl::task_handler();
@@ -88,6 +88,7 @@ fn main() -> Result<(), LvError> {
                 _ => {}
             }
         }
+
         sleep(Duration::from_secs(1));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }
