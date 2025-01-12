@@ -249,14 +249,29 @@ impl Rusty for LvFunc {
                 }
             });
 
-        // TODO: Handle methods that return types
+        // NOTE: When the function returns something we can 'avoid' placing an Ok()
+        // at the end.
+        let return_ok_at_the_end = if return_type.is_empty() {
+            quote!(Ok(()))
+        } else {
+            quote!()
+        };
+
+        // And we can also return from the unsafe block by removing the ; at the end
+        let implicit_return = if has_return_value {
+            quote!()
+        } else {
+            quote!(;)
+        };
+
         Ok(quote! {
-            pub fn #func_name(#args_decl) -> crate::LvResult<()> {
+            pub fn #func_name(#args_decl) -> #return_type {
                 #args_processing
                 unsafe {
-                    lvgl_sys::#original_func_name(#args_call);
+                    lvgl_sys::#original_func_name(#args_call)#implicit_return
                 }
-                Ok(())
+
+                #return_ok_at_the_end
             }
         })
     }
