@@ -129,10 +129,47 @@ impl Rusty for LvFunc {
             });
         }
 
-        // We don't deal with methods that return types yet
-        if self.ret.is_some() {
-            return Err(WrapperError::Skip);
-        }
+        // Handle return values
+        let mut has_return_value = false;
+        let return_type = match self.ret {
+            // function returns void
+            None => quote!(()),
+            // function returns something
+            _ => {
+                let literal_name = self.ret.as_ref().unwrap().literal_name.clone();
+                match literal_name {
+                    _ if literal_name == "bool" => {
+                        has_return_value = true;
+                        quote!(bool)
+                    }
+                    _ if literal_name == "u32" => {
+                        has_return_value = true;
+                        quote!(u32)
+                    }
+                    _ if literal_name == "i32" => {
+                        has_return_value = true;
+                        quote!(i32)
+                    }
+                    _ if literal_name == "u16" => {
+                        has_return_value = true;
+                        quote!(u16)
+                    }
+                    _ if literal_name == "i16" => {
+                        has_return_value = true;
+                        quote!(i16)
+                    }
+                    _ if literal_name == "u8" => {
+                        has_return_value = true;
+                        quote!(u8)
+                    }
+                    _ if literal_name == "i8" => {
+                        has_return_value = true;
+                        quote!(i8)
+                    }
+                    _ => return Err(WrapperError::Skip)
+                }
+            }
+        };
 
         // Make sure all arguments can be generated, skip the first arg (self)!
         for arg in self.args.iter().skip(1) {
