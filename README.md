@@ -127,4 +127,11 @@ List of LVGL features that impacts the library usage in general.
 Widgets currently implemented might have some missing features. If the widget you want to use is not exposed or
 is missing a feature you want to make use, please send a Pull Request or open an issue.
 
+### Troubleshooting
+
+Here's a list of known issues that can be faced when using this repo:
+
+- [Enum alignment issues](https://github.com/lvgl/lv_binding_rust/issues/163)
+
+
 [![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
