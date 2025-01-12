@@ -609,11 +609,10 @@ mod test {
 
         let code = arc_set_bg_end_angle.code(&arc_widget).unwrap();
         let expected_code = quote! {
-            pub fn set_bg_end_angle(&mut self, end: u16) -> crate::LvResult<()> {
+            pub fn set_bg_end_angle(&mut self, end: u16) -> () {
                 unsafe {
                     lvgl_sys::lv_arc_set_bg_end_angle(self.core.raw().as_mut(), end);
                 }
-                Ok(())
             }
         };
 
@@ -641,16 +640,106 @@ mod test {
         let code = label_set_text.code(&parent_widget).unwrap();
         let expected_code = quote! {
 
-            pub fn set_text(&mut self, text: &cstr_core::CStr) -> crate::LvResult<()> {
+            pub fn set_text(&mut self, text: &cstr_core::CStr) -> () {
                 unsafe {
                     lvgl_sys::lv_label_set_text(
                         self.core.raw().as_mut(),
                         text.as_ptr()
                     );
                 }
-                Ok(())
             }
 
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_method_wrapper_for_void_return() {
+        let bindgen_code = quote! {
+            extern "C" {
+                #[doc = " Set a new text for a label. Memory will be allocated to store the text by the label."]
+                #[doc = " @param label pointer to a label object"]
+                #[doc = " @param text '\\0' terminated character string. NULL to refresh with the current text."]
+                pub fn lv_label_set_text(label: *mut lv_obj_t, text: *const cty::c_char);
+            }
+        };
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let label_set_text = cg.get(0).unwrap().clone();
+        let parent_widget = LvWidget {
+            name: "label".to_string(),
+            methods: vec![],
+        };
+
+        let code = label_set_text.code(&parent_widget).unwrap();
+        let expected_code = quote! {
+            pub fn set_text(&mut self, text: &cstr_core::CStr) -> () {
+                unsafe {
+                    lvgl_sys::lv_label_set_text(
+                        self.core.raw().as_mut(),
+                        text.as_ptr()
+                    );
+                }
+            }
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_method_wrapper_for_boolean_return() {
+        let bindgen_code = quote! {
+            extern "C" {
+                pub fn lv_label_get_recolor(label: *mut lv_obj_t) -> bool;
+            }
+        };
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let label_get_recolor = cg.get(0).unwrap().clone();
+        let parent_widget = LvWidget {
+            name: "label".to_string(),
+            methods: vec![],
+        };
+
+        let code = label_get_recolor.code(&parent_widget).unwrap();
+        let expected_code = quote! {
+            pub fn get_recolor(&mut self) -> bool {
+                unsafe {
+                    lvgl_sys::lv_label_get_recolor(
+                        self.core.raw().as_mut()
+                    )
+                }
+            }
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_method_wrapper_for_uint32_return() {
+        let bindgen_code = quote! {
+            extern "C" {
+                pub fn lv_label_get_text_selection_start(label: *mut lv_obj_t) -> u32;
+            }
+        };
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let label_get_text_selection_start = cg.get(0).unwrap().clone();
+        let parent_widget = LvWidget {
+            name: "label".to_string(),
+            methods: vec![],
+        };
+
+        let code = label_get_text_selection_start.code(&parent_widget).unwrap();
+        let expected_code = quote! {
+            pub fn get_text_selection_start(&mut self) -> u32 {
+                unsafe {
+                    lvgl_sys::lv_label_get_text_selection_start(
+                        self.core.raw().as_mut()
+                    )
+                }
+            }
         };
 
         assert_eq!(code.to_string(), expected_code.to_string());
