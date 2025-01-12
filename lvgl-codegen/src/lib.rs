@@ -226,6 +226,8 @@ impl Rusty for LvFunc {
                 }
             });
 
+        // TODO Unsafe function for getters should be lvgl_sys::lv_bar_get_value(self.core.raw().as_ptr()) ?
+        // Currently they are lvgl_sys :: lv_bar_get_value (self . core . raw () . as_mut ()) }
         let args_call = self
             .args
             .iter()
