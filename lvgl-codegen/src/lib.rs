@@ -176,13 +176,16 @@ impl Rusty for LvFunc {
             arg.code(self)?;
         }
 
+        // Generate the arguments being passed into the Rust 'wrapper'
+        //
+        // - Iif the first argument (of the C function) is const then we require a &self immutable reference, otherwise an &mut self reference
+        // - The arguments will be appended to the accumulator (args_accumulator) as they are generated in the closure
         let args_decl = self
             .args
             .iter()
             .enumerate()
-            .fold(quote!(), |args, (i, arg)| {
-                // if first arg is `const`, then it should be immutable
-                let next_arg = if i == 0 {
+            .fold(quote!(), |args_accumulator, (arg_idx, arg)| {
+                let next_arg = if arg_idx == 0 {
                     if arg.get_type().is_const() {
                         quote!(&self)
                     } else {
@@ -191,14 +194,14 @@ impl Rusty for LvFunc {
                 } else {
                     arg.code(self).unwrap()
                 };
-                if args.is_empty() {
-                    quote! {
-                        #next_arg
-                    }
-                } else {
-                    quote! {
-                        #args, #next_arg
-                    }
+
+                // If the accummulator is empty then we call quote! only with the next_arg content
+                if args_accumulator.is_empty() {
+                    quote! {#next_arg}
+                }
+                // Otherwise we append next_arg at the end of the accumulator
+                else {
+                    quote! {#args_accumulator, #next_arg}
                 }
             });
 
@@ -226,41 +229,42 @@ impl Rusty for LvFunc {
                 }
             });
 
-        // TODO Unsafe function for getters should be lvgl_sys::lv_bar_get_value(self.core.raw().as_ptr()) ?
-        // Currently they are lvgl_sys :: lv_bar_get_value (self . core . raw () . as_mut ()) }
-        let args_call = self
+        // Generate the arguments being passed into the FFI interface
+        //
+        // - The first argument will be always self.core.raw().as_mut() (see quote! when arg_idx == 0), it's most likely a pointer to lv_obj_t
+        //   TODO: When handling getters this should be self.raw().as_ptr() instead, this also requires updating args_decl
+        // - The arguments will be appended to the accumulator (args_accumulator) as they are generated in the closure
+        let ffi_args = self
             .args
             .iter()
             .enumerate()
-            .fold(quote!(), |args, (i, arg)| {
-                // if first arg is `const`, then it should be immutable
-                let next_arg = if i == 0 {
+            .fold(quote!(), |args_accumulator, (arg_idx, arg)| {
+                let next_arg = if arg_idx == 0 {
                     quote!(self.core.raw().as_mut())
                 } else {
                     let var = arg.get_value_usage();
                     quote!(#var)
                 };
-                if args.is_empty() {
-                    quote! {
-                        #next_arg
-                    }
-                } else {
-                    quote! {
-                        #args, #next_arg
-                    }
+
+                // If the accummulator is empty then we call quote! only with the next_arg content
+                if args_accumulator.is_empty() {
+                    quote! {#next_arg}
+                }
+                // Otherwise we append next_arg at the end of the accumulator
+                else {
+                    quote! {#args_accumulator, #next_arg}
                 }
             });
 
-        // NOTE: When the function returns something we can 'avoid' placing an Ok()
-        // at the end.
-        let return_ok_at_the_end = if return_type.is_empty() {
+        // NOTE: When the function returns something we can 'avoid' placing an Ok() at the end.
+        let explicit_ok = if return_type.is_empty() {
             quote!(Ok(()))
         } else {
             quote!()
         };
 
         // And we can also return from the unsafe block by removing the ; at the end
-        let implicit_return = if has_return_value {
+        let optional_semicolon = if has_return_value {
             quote!()
         } else {
             quote!(;)
@@ -270,10 +274,10 @@ impl Rusty for LvFunc {
             pub fn #func_name(#args_decl) -> #return_type {
                 #args_processing
                 unsafe {
-                    lvgl_sys::#original_func_name(#args_call)#implicit_return
+                    lvgl_sys::#original_func_name(#ffi_args)#optional_semicolon
                 }
 
-                #return_ok_at_the_end
+                #explicit_ok
             }
         })
     }
