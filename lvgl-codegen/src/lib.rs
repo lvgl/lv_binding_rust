@@ -137,32 +137,32 @@ impl Rusty for LvFunc {
             // function returns something
             _ => {
                 let literal_name = self.ret.as_ref().unwrap().literal_name.clone();
-                match literal_name {
-                    _ if literal_name == "bool" => {
+                match literal_name.as_str() {
+                    "bool" => {
                         has_return_value = true;
                         quote!(bool)
                     }
-                    _ if literal_name == "u32" => {
+                    "u32" => {
                         has_return_value = true;
                         quote!(u32)
                     }
-                    _ if literal_name == "i32" => {
+                    "i32" => {
                         has_return_value = true;
                         quote!(i32)
                     }
-                    _ if literal_name == "u16" => {
+                    "u16" => {
                         has_return_value = true;
                         quote!(u16)
                     }
-                    _ if literal_name == "i16" => {
+                    "i16" => {
                         has_return_value = true;
                         quote!(i16)
                     }
-                    _ if literal_name == "u8" => {
+                    "u8" => {
                         has_return_value = true;
                         quote!(u8)
                     }
-                    _ if literal_name == "i8" => {
+                    "i8" => {
                         has_return_value = true;
                         quote!(i8)
                     }
