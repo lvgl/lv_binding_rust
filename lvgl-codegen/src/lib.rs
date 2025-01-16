@@ -130,7 +130,6 @@ impl Rusty for LvFunc {
         }
 
         // Handle return values
-        let mut has_return_value = false;
         let return_type = match self.ret {
             // function returns void
             None => quote!(()),
@@ -138,34 +137,13 @@ impl Rusty for LvFunc {
             _ => {
                 let return_value: &LvType = self.ret.as_ref().unwrap();
                 match return_value.literal_name.as_str() {
-                    "bool" => {
-                        has_return_value = true;
-                        quote!(bool)
-                    }
-                    "u32" => {
-                        has_return_value = true;
-                        quote!(u32)
-                    }
-                    "i32" => {
-                        has_return_value = true;
-                        quote!(i32)
-                    }
-                    "u16" => {
-                        has_return_value = true;
-                        quote!(u16)
-                    }
-                    "i16" => {
-                        has_return_value = true;
-                        quote!(i16)
-                    }
-                    "u8" => {
-                        has_return_value = true;
-                        quote!(u8)
-                    }
-                    "i8" => {
-                        has_return_value = true;
-                        quote!(i8)
-                    }
+                    "bool" => quote!(bool),
+                    "u32" => quote!(u32),
+                    "i32" => quote!(i32),
+                    "u16" => quote!(u16),
+                    "i16" => quote!(i16),
+                    "u8" => quote!(u8),
+                    "i8" => quote!(i8),
                     _ => return Err(WrapperError::Skip)
                 }
             }
@@ -263,11 +241,11 @@ impl Rusty for LvFunc {
             quote!()
         };
 
-        // And we can also return from the unsafe block by removing the ; at the end
-        let optional_semicolon = if has_return_value {
-            quote!()
-        } else {
-            quote!(;)
+        // Append a semicolon at the end of the unsafe code only if there's no return value.
+        // Otherwise we should remove it
+        let optional_semicolon= match self.ret {
+            None => quote!(;),
+            _ => quote!()
         };
 
         Ok(quote! {
