@@ -136,8 +136,8 @@ impl Rusty for LvFunc {
             None => quote!(()),
             // function returns something
             _ => {
-                let literal_name = self.ret.as_ref().unwrap().literal_name.clone();
-                match literal_name.as_str() {
+                let return_value: &LvType = self.ret.as_ref().unwrap();
+                match return_value.literal_name.as_str() {
                     "bool" => {
                         has_return_value = true;
                         quote!(bool)
