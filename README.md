@@ -60,7 +60,7 @@ for `no_std`, so we need to use a workaround to build "lvgl-rs". The mainstrem i
 [rust-lang/cargo#7915](https://github.com/rust-lang/cargo/issues/7915).
 
 ```shell
-$ DEP_LV_CONFIG_PATH=`pwd` cargo build -Zfeatures=build_dep
+DEP_LV_CONFIG_PATH=`pwd` cargo build -Z features=build_dep
 ```
 
 The `unsafe_no_autoinit` feature must also be enabled when building for baremetal targets. See its documentation in `Cargo.toml` for notes on usage.
@@ -99,6 +99,10 @@ $ DEP_LV_CONFIG_PATH=`pwd`/examples/include cargo run --example demo --features=
 The bindings are still in development. There are many features of LVGL that needs to be exposed by `lvgl-rs`. In
 this section you can check what is implemented at the moment.
 
+Unsafe bindings are located in `lvgl-sys` folder are generated via `bindgen`.
+
+Safe bindings are generated using the `lvgl-codegen` lib, which takes the raw unsafe bindings and generate safe/rust idiomatic bindings (check the `build.rs` script in the `lvgl` folder).
+
 ### Features
 
 List of LVGL features that impacts the library usage in general.
@@ -122,5 +126,12 @@ List of LVGL features that impacts the library usage in general.
 
 Widgets currently implemented might have some missing features. If the widget you want to use is not exposed or
 is missing a feature you want to make use, please send a Pull Request or open an issue.
+
+### Troubleshooting
+
+Here's a list of known issues that can be faced when using this repo:
+
+- [Enum alignment issues](https://github.com/lvgl/lv_binding_rust/issues/163)
+
 
 [![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
