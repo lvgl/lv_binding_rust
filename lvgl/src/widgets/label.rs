@@ -41,8 +41,4 @@ impl Label<'_> {
     pub fn get_long_mode(&self) -> u8 {
         unsafe { lvgl_sys::lv_label_get_long_mode(self.raw().as_ref()) }
     }
-
-    // pub fn get_recolor(&self) -> bool {
-    //     unsafe { lvgl_sys::lv_label_get_recolor(self.raw().as_ref()) }
-    // }
 }

@@ -37,11 +37,6 @@ impl Arc<'_> {
     //     }
     //     Ok(())
     // }
-
-    // Gets the current value of the arc
-    // pub fn get_value(&self) -> i32 {
-    //     unsafe { lvgl_sys::lv_bar_get_value(self.core.raw().as_ptr()) }
-    // }
 }
 /*
 /// The different parts, of an arc object.

@@ -17,11 +17,6 @@ impl Bar<'_> {
             lvgl_sys::lv_bar_set_value(self.core.raw().as_mut(), value, anim.into());
         }
     }
-
-    // Gets the current value of the bar
-    // pub fn get_value(&self) -> i32 {
-    //     unsafe { lvgl_sys::lv_bar_get_value(self.core.raw().as_ptr()) }
-    // }
 }
 /*
 /// The different parts, of a bar object.
