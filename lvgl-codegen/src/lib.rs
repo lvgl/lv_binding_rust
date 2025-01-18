@@ -129,23 +129,41 @@ impl Rusty for LvFunc {
             });
         }
 
-        // We don't deal with methods that return types yet
-        if self.ret.is_some() {
-            return Err(WrapperError::Skip);
-        }
+        // Handle return values
+        let return_type = match self.ret {
+            // function returns void
+            None => quote!(()),
+            // function returns something
+            _ => {
+                let return_value: &LvType = self.ret.as_ref().unwrap();
+                match return_value.literal_name.as_str() {
+                    "bool" => quote!(bool),
+                    "u32" => quote!(u32),
+                    "i32" => quote!(i32),
+                    "u16" => quote!(u16),
+                    "i16" => quote!(i16),
+                    "u8" => quote!(u8),
+                    "i8" => quote!(i8),
+                    _ => return Err(WrapperError::Skip)
+                }
+            }
+        };
 
         // Make sure all arguments can be generated, skip the first arg (self)!
         for arg in self.args.iter().skip(1) {
             arg.code(self)?;
         }
 
+        // Generate the arguments being passed into the Rust 'wrapper'
+        //
+        // - Iif the first argument (of the C function) is const then we require a &self immutable reference, otherwise an &mut self reference
+        // - The arguments will be appended to the accumulator (args_accumulator) as they are generated in the closure
         let args_decl = self
             .args
             .iter()
             .enumerate()
-            .fold(quote!(), |args, (i, arg)| {
-                // if first arg is `const`, then it should be immutable
-                let next_arg = if i == 0 {
+            .fold(quote!(), |args_accumulator, (arg_idx, arg)| {
+                let next_arg = if arg_idx == 0 {
                     if arg.get_type().is_const() {
                         quote!(&self)
                     } else {
@@ -154,14 +172,14 @@ impl Rusty for LvFunc {
                 } else {
                     arg.code(self).unwrap()
                 };
-                if args.is_empty() {
-                    quote! {
-                        #next_arg
-                    }
-                } else {
-                    quote! {
-                        #args, #next_arg
-                    }
+
+                // If the accummulator is empty then we call quote! only with the next_arg content
+                if args_accumulator.is_empty() {
+                    quote! {#next_arg}
+                }
+                // Otherwise we append next_arg at the end of the accumulator
+                else {
+                    quote! {#args_accumulator, #next_arg}
                 }
             });
 
@@ -189,37 +207,55 @@ impl Rusty for LvFunc {
                 }
             });
 
-        let args_call = self
+        // Generate the arguments being passed into the FFI interface
+        //
+        // - The first argument will be always self.core.raw().as_mut() (see quote! when arg_idx == 0), it's most likely a pointer to lv_obj_t
+        //   TODO: When handling getters this should be self.raw().as_ptr() instead, this also requires updating args_decl
+        // - The arguments will be appended to the accumulator (args_accumulator) as they are generated in the closure
+        let ffi_args = self
             .args
             .iter()
             .enumerate()
-            .fold(quote!(), |args, (i, arg)| {
-                // if first arg is `const`, then it should be immutable
-                let next_arg = if i == 0 {
+            .fold(quote!(), |args_accumulator, (arg_idx, arg)| {
+                let next_arg = if arg_idx == 0 {
                     quote!(self.core.raw().as_mut())
                 } else {
                     let var = arg.get_value_usage();
                     quote!(#var)
                 };
-                if args.is_empty() {
-                    quote! {
-                        #next_arg
-                    }
-                } else {
-                    quote! {
-                        #args, #next_arg
-                    }
+
+                // If the accummulator is empty then we call quote! only with the next_arg content
+                if args_accumulator.is_empty() {
+                    quote! {#next_arg}
+                }
+                // Otherwise we append next_arg at the end of the accumulator
+                else {
+                    quote! {#args_accumulator, #next_arg}
                 }
             });
 
-        // TODO: Handle methods that return types
+        // NOTE: When the function returns something we can 'avoid' placing an Ok() at the end.
+        let explicit_ok = if return_type.is_empty() {
+            quote!(Ok(()))
+        } else {
+            quote!()
+        };
+
+        // Append a semicolon at the end of the unsafe code only if there's no return value.
+        // Otherwise we should remove it
+        let optional_semicolon= match self.ret {
+            None => quote!(;),
+            _ => quote!()
+        };
+
         Ok(quote! {
-            pub fn #func_name(#args_decl) -> crate::LvResult<()> {
+            pub fn #func_name(#args_decl) -> #return_type {
                 #args_processing
                 unsafe {
-                    lvgl_sys::#original_func_name(#args_call);
+                    lvgl_sys::#original_func_name(#ffi_args)#optional_semicolon
                 }
-                Ok(())
+
+                #explicit_ok
             }
         })
     }
@@ -555,11 +591,10 @@ mod test {
 
         let code = arc_set_bg_end_angle.code(&arc_widget).unwrap();
         let expected_code = quote! {
-            pub fn set_bg_end_angle(&mut self, end: u16) -> crate::LvResult<()> {
+            pub fn set_bg_end_angle(&mut self, end: u16) -> () {
                 unsafe {
                     lvgl_sys::lv_arc_set_bg_end_angle(self.core.raw().as_mut(), end);
                 }
-                Ok(())
             }
         };
 
@@ -587,16 +622,106 @@ mod test {
         let code = label_set_text.code(&parent_widget).unwrap();
         let expected_code = quote! {
 
-            pub fn set_text(&mut self, text: &cstr_core::CStr) -> crate::LvResult<()> {
+            pub fn set_text(&mut self, text: &cstr_core::CStr) -> () {
                 unsafe {
                     lvgl_sys::lv_label_set_text(
                         self.core.raw().as_mut(),
                         text.as_ptr()
                     );
                 }
-                Ok(())
             }
 
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_method_wrapper_for_void_return() {
+        let bindgen_code = quote! {
+            extern "C" {
+                #[doc = " Set a new text for a label. Memory will be allocated to store the text by the label."]
+                #[doc = " @param label pointer to a label object"]
+                #[doc = " @param text '\\0' terminated character string. NULL to refresh with the current text."]
+                pub fn lv_label_set_text(label: *mut lv_obj_t, text: *const cty::c_char);
+            }
+        };
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let label_set_text = cg.get(0).unwrap().clone();
+        let parent_widget = LvWidget {
+            name: "label".to_string(),
+            methods: vec![],
+        };
+
+        let code = label_set_text.code(&parent_widget).unwrap();
+        let expected_code = quote! {
+            pub fn set_text(&mut self, text: &cstr_core::CStr) -> () {
+                unsafe {
+                    lvgl_sys::lv_label_set_text(
+                        self.core.raw().as_mut(),
+                        text.as_ptr()
+                    );
+                }
+            }
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_method_wrapper_for_boolean_return() {
+        let bindgen_code = quote! {
+            extern "C" {
+                pub fn lv_label_get_recolor(label: *mut lv_obj_t) -> bool;
+            }
+        };
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let label_get_recolor = cg.get(0).unwrap().clone();
+        let parent_widget = LvWidget {
+            name: "label".to_string(),
+            methods: vec![],
+        };
+
+        let code = label_get_recolor.code(&parent_widget).unwrap();
+        let expected_code = quote! {
+            pub fn get_recolor(&mut self) -> bool {
+                unsafe {
+                    lvgl_sys::lv_label_get_recolor(
+                        self.core.raw().as_mut()
+                    )
+                }
+            }
+        };
+
+        assert_eq!(code.to_string(), expected_code.to_string());
+    }
+
+    #[test]
+    fn generate_method_wrapper_for_uint32_return() {
+        let bindgen_code = quote! {
+            extern "C" {
+                pub fn lv_label_get_text_selection_start(label: *mut lv_obj_t) -> u32;
+            }
+        };
+        let cg = CodeGen::load_func_defs(bindgen_code.to_string().as_str()).unwrap();
+
+        let label_get_text_selection_start = cg.get(0).unwrap().clone();
+        let parent_widget = LvWidget {
+            name: "label".to_string(),
+            methods: vec![],
+        };
+
+        let code = label_get_text_selection_start.code(&parent_widget).unwrap();
+        let expected_code = quote! {
+            pub fn get_text_selection_start(&mut self) -> u32 {
+                unsafe {
+                    lvgl_sys::lv_label_get_text_selection_start(
+                        self.core.raw().as_mut()
+                    )
+                }
+            }
         };
 
         assert_eq!(code.to_string(), expected_code.to_string());

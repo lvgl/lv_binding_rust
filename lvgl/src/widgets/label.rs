@@ -13,7 +13,7 @@ mod alloc_imp {
             // text.try_into().unwrap()
             let text_cstr = CString::new(text.as_ref()).unwrap();
             let mut label = Label::new().unwrap();
-            label.set_text(text_cstr.as_c_str()).unwrap();
+            label.set_text(text_cstr.as_c_str());
             label
         }
     }
