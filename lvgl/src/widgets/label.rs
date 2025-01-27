@@ -1,5 +1,6 @@
 use crate::widgets::Label;
 use crate::{LabelLongMode, NativeObject};
+use cstr_core::CStr;
 
 #[cfg(feature = "alloc")]
 mod alloc_imp {
@@ -40,5 +41,11 @@ impl Label<'_> {
 
     pub fn get_long_mode(&self) -> u8 {
         unsafe { lvgl_sys::lv_label_get_long_mode(self.raw().as_ref()) }
+    }
+
+    pub fn get_text(&self) -> &'static str {
+        let char_ptr = unsafe { lvgl_sys::lv_label_get_text(self.raw().as_ref()) };
+        let c_str = unsafe { CStr::from_ptr(char_ptr) };
+        c_str.to_str().unwrap_or_default()
     }
 }
