@@ -49,7 +49,6 @@ fn main() {
 
     // Some basic defaults; SDL2 is the only driver enabled in the provided
     // driver config by default
-    #[cfg(feature = "drivers")]
     let incl_extra =
         env::var("LVGL_INCLUDE").unwrap_or("/usr/include,/usr/local/include".to_string());
 
@@ -155,7 +154,6 @@ fn main() {
     cfg.include(&timer_shim);
     #[cfg(feature = "drivers")]
     cfg.include(&drivers);
-    #[cfg(feature = "drivers")]
     cfg.includes(incl_extra.split(','));
 
     cflags_extra.clone().for_each(|e| {
